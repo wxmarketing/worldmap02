@@ -387,6 +387,7 @@ let countryData = {
     callingCode: "+61"
   }
 };
+window.countryData = countryData;
 
 // Mock data for Google Play Store top charts by country
 const appStoreData = {
