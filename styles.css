@@ -447,3 +447,26 @@ footer p {
     padding: 1rem;
   }
 }
+
+.fullscreen header,
+.fullscreen footer {
+  display: none !important;
+}
+.fullscreen main {
+  padding: 0 !important;
+}
+.fullscreen .dashboard-container {
+  height: 100vh !important;
+  margin: 0;
+}
+.fullscreen .map-container {
+  height: 100vh !important;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+}
+.fullscreen .country-detail {
+  max-height: 100vh;
+  border-radius: 0;
+  box-shadow: none;
+}

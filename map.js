@@ -416,3 +416,16 @@ function getCountryCode(countryName) {
 
 // Initialize the map when DOM is ready
 document.addEventListener("DOMContentLoaded", initMap);
+
+// 全屏按钮事件
+const fullscreenBtn = document.getElementById('fullscreen-btn');
+if (fullscreenBtn) {
+  fullscreenBtn.addEventListener('click', function() {
+    document.body.classList.toggle('fullscreen');
+    if (document.body.classList.contains('fullscreen')) {
+      fullscreenBtn.textContent = '退出全屏';
+    } else {
+      fullscreenBtn.textContent = '全屏';
+    }
+  });
+}
