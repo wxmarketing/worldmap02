@@ -2293,3 +2293,10 @@ async function saveCountryDataToSupabase(country_code) {
 
 // 挂载到 window，确保 map.js 能访问
 window.updateCountryDetail = updateCountryDetail;
+
+// 页面加载时自动从 supabase 拉取云端数据
+// 保证云端数据覆盖本地 countryData
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadCountryDataFromSupabase();
+});
