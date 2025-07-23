@@ -2347,3 +2347,8 @@ function createTemplateCards() {
     });
   });
 }
+
+// 强制全局挂载，确保其他脚本可用
+window.updateCountryDetail = updateCountryDetail;
+window.createCardElement = createCardElement;
+window.addDetailAnalysisButton = addDetailAnalysisButton;
