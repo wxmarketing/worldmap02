@@ -37,7 +37,8 @@ header {
 header h1 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--accent-color);
+  color: #000;
+  font-family: 'Tencent Sans W7', 'TencentSansW7', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
 }
 
 .header-right {
