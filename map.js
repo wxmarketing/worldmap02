@@ -440,6 +440,8 @@ if (nightBtn) {
 }
 
 // ===== 国家搜索功能 =====
+// 只保留如下内容，彻底移除文件中其他位置的searchToggleBtn、searchBox、searchInput、searchSuggest、searchActiveIndex、searchResults等相关定义和事件绑定
+
 document.addEventListener('DOMContentLoaded', function() {
   const searchToggleBtn = document.getElementById('search-toggle-btn');
   const searchBox = document.getElementById('country-search-box');
