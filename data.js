@@ -1891,7 +1891,7 @@ function createCardElement(cardId, cardData) {
   // Create card content
   cardElement.innerHTML = `
     <h3>${cardData.title}</h3>
-    <p>${cardData.content}</p>
+    <div>${cardData.content || ''}</div>
     ${cardData.note ? `<div class="card-note">${cardData.note}</div>` : ''}
   `;
   
@@ -2127,8 +2127,12 @@ function addCardEditorItem(container, cardId, cardData = null) {
       <input type="text" id="${cardId}_title" name="title" value="${cardData.title}" placeholder="例如：经济环境">
     </div>
     <div class="card-field">
-      <label for="${cardId}_content">卡片内容：</label>
-      <textarea id="${cardId}_content" name="content" placeholder="卡片主要内容">${cardData.content}</textarea>
+      <label>卡片内容：</label>
+      <div class="card-content-toolbar">
+        <button type="button" class="bold-btn">加粗</button>
+        <input type="color" class="color-btn" title="更改文字颜色">
+      </div>
+      <div id="${cardId}_content" name="content" class="card-content-editor" contenteditable="true" style="min-height:60px;border:1px solid #ccc;padding:6px;border-radius:3px;">${cardData.content || ""}</div>
     </div>
     <div class="card-field">
       <label for="${cardId}_note">注释信息：</label>
@@ -2143,6 +2147,17 @@ function addCardEditorItem(container, cardId, cardData = null) {
   
   // Add to container
   container.appendChild(cardEditForm);
+  
+  // 富文本按钮事件
+  const contentDiv = cardEditForm.querySelector('.card-content-editor');
+  cardEditForm.querySelector('.bold-btn').addEventListener('click', function() {
+    document.execCommand('bold');
+    contentDiv.focus();
+  });
+  cardEditForm.querySelector('.color-btn').addEventListener('input', function(e) {
+    document.execCommand('foreColor', false, e.target.value);
+    contentDiv.focus();
+  });
   
   // Add event listeners for card actions
   cardEditForm.querySelector(".delete-btn").addEventListener("click", function() {
@@ -2216,7 +2231,8 @@ async function saveCardData() {
   cardForms.forEach((form) => {
     const cardId = form.dataset.cardId;
     const title = form.querySelector("[name='title']").value.trim();
-    const content = form.querySelector("[name='content']").value.trim();
+    // 读取富文本内容
+    const content = form.querySelector(".card-content-editor").innerHTML.trim();
     const note = form.querySelector("[name='note']").value.trim();
     if (title || content) {
       countryData[countryCode].cards.push({
