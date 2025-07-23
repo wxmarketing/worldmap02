@@ -2257,7 +2257,7 @@ function saveCardData() {
 document.addEventListener("DOMContentLoaded", initAdminPanel);
 
 // 拉取所有国家卡片数据（supabase）
-export async function loadCountryDataFromSupabase() {
+async function loadCountryDataFromSupabase() {
   const { data, error } = await supabase
     .from('country_cards')
     .select('*');
@@ -2273,7 +2273,7 @@ export async function loadCountryDataFromSupabase() {
 }
 
 // 保存单个国家卡片数据到supabase
-export async function saveCountryDataToSupabase(country_code) {
+async function saveCountryDataToSupabase(country_code) {
   const cards = countryData[country_code].cards;
   const detailAnalysisUrl = countryData[country_code].detailAnalysisUrl || '';
   const payload = {
