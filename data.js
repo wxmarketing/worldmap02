@@ -1496,6 +1496,7 @@ const allWorldCountries = [
   { code: "FM", name: "Micronesia", name_zh: "密克罗尼西亚" },
   { code: "MH", name: "Marshall Islands", name_zh: "马绍尔群岛" }
 ];
+window.allWorldCountries = allWorldCountries;
 
 // List of all countries available in the data (保持向后兼容性)
 const availableCountries = Object.keys(appStoreData).map(code => {
