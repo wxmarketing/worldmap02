@@ -2160,6 +2160,17 @@ function addCardEditorItem(container, cardId, cardData = null) {
     document.execCommand('foreColor', false, e.target.value);
     contentDiv.focus();
   });
+  // 粘贴时只保留纯文本
+  contentDiv.addEventListener('paste', function(e) {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text');
+    if (document.queryCommandSupported('insertText')) {
+      document.execCommand('insertText', false, text);
+    } else {
+      // 兼容性兜底
+      contentDiv.innerText += text;
+    }
+  });
   
   // Add event listeners for card actions
   cardEditForm.querySelector(".delete-btn").addEventListener("click", function() {
