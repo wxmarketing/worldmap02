@@ -18,5 +18,8 @@ function onCountryClick(countryName, countryCode) {
   updateCountryDetail(countryName, countryCode);
 }
 
+// 挂载到 window，确保 map.js 能访问
+window.onCountryClick = onCountryClick;
+
 // Initialize when DOM is ready
 document.addEventListener("DOMContentLoaded", initApp);
