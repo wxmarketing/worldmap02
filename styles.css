@@ -567,3 +567,46 @@ body.night-mode .country.has-data {
 .country-card p {
   text-indent: 0 !important;
 }
+
+.modal {
+  position: fixed;
+  z-index: 2000;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.3);
+  display: flex; align-items: center; justify-content: center;
+}
+.modal.hidden { display: none; }
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  min-width: 300px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  position: relative;
+}
+.modal-close {
+  position: absolute;
+  right: 1.5rem;
+  top: 1.2rem;
+  font-size: 2rem;
+  color: #888;
+  cursor: pointer;
+}
+#updated-countries-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0 0;
+}
+#updated-countries-list li {
+  margin-bottom: 0.7rem;
+  cursor: pointer;
+  color: #2196f3;
+  font-weight: bold;
+}
+#updated-countries-list li:hover {
+  text-decoration: underline;
+  color: #1565c0;
+}

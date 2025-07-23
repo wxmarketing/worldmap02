@@ -455,3 +455,45 @@ if (nightBtn) {
     nightBtn.textContent = document.body.classList.contains('night-mode') ? '日间模式' : '夜间模式';
   });
 }
+
+// 已更新国家按钮逻辑
+const updatedBtn = document.getElementById('updated-countries-btn');
+const updatedModal = document.getElementById('updated-countries-modal');
+const updatedList = document.getElementById('updated-countries-list');
+const closeUpdated = document.getElementById('close-updated-countries');
+if (updatedBtn && updatedModal && updatedList && closeUpdated) {
+  updatedBtn.addEventListener('click', function() {
+    // 获取所有有卡片的国家
+    if (typeof window.countryData !== 'object') {
+      alert('国家数据未加载');
+      return;
+    }
+    updatedList.innerHTML = '';
+    const updated = Object.entries(window.countryData)
+      .filter(([code, data]) => Array.isArray(data.cards) && data.cards.length > 0)
+      .map(([code, data]) => ({ code, name: data.name_zh || data.name || code }));
+    if (updated.length === 0) {
+      updatedList.innerHTML = '<li style="color:#888;font-weight:normal;">暂无已更新国家</li>';
+    } else {
+      updated.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item.name;
+        li.addEventListener('click', function() {
+          // 自动弹出该国家详情
+          if (typeof window.updateCountryDetail === 'function') {
+            window.updateCountryDetail(item.name, item.code);
+            updatedModal.classList.add('hidden');
+          }
+        });
+        updatedList.appendChild(li);
+      });
+    }
+    updatedModal.classList.remove('hidden');
+  });
+  closeUpdated.addEventListener('click', function() {
+    updatedModal.classList.add('hidden');
+  });
+  updatedModal.addEventListener('click', function(e) {
+    if (e.target === updatedModal) updatedModal.classList.add('hidden');
+  });
+}
