@@ -1930,12 +1930,14 @@ function addDetailAnalysisButton(container, countryData, countryCode) {
   
   // Add click event
   analysisButton.addEventListener("click", function() {
-    const url = countryData.detailAnalysisUrl;
+    let url = countryData.detailAnalysisUrl;
     if (url && url.trim() !== "") {
-      // Open the URL in a new tab
+      // 自动补全 http/https
+      if (!/^https?:\/\//i.test(url)) {
+        url = "https://" + url;
+      }
       window.open(url, "_blank");
     } else {
-      // Show message if no URL is set
       alert("该国家暂未设置详细分析链接，请在管理面板中进行配置。");
     }
   });
