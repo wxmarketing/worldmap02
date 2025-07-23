@@ -149,7 +149,11 @@ function handleCountryClick(event, d) {
   const countryCode = getCountryCode(countryName);
   
   // Update country detail panel
-  updateCountryDetail(countryName, countryCode);
+  if (typeof window.updateCountryDetail === 'function') {
+    window.updateCountryDetail(countryName, countryCode);
+  } else {
+    alert('国家详情弹窗函数未加载，请刷新页面或检查脚本顺序');
+  }
 }
 
 // Get country code from country name
