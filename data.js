@@ -2055,6 +2055,9 @@ function initAdminPanel() {
   
   // Add event listener for save data button
   document.getElementById("save-data").addEventListener("click", saveCardData);
+  document.getElementById("create-template").addEventListener("click", function() {
+    createTemplateCards();
+  });
 }
 
 // Populate card editor with data for a specific country
@@ -2279,3 +2282,30 @@ window.updateCountryDetail = updateCountryDetail;
 document.addEventListener("DOMContentLoaded", async () => {
   await loadCountryDataFromSupabase();
 });
+
+// 模板卡片顺序和标题
+const CARD_TEMPLATE_ORDER = [
+  { key: 'economic_environment', title: '经济环境' },
+  { key: 'payment_habits', title: '付费习惯' },
+  { key: 'infrastructure', title: '基础设施' },
+  { key: 'demographics', title: '人口特征' },
+  { key: 'game_market', title: '游戏市场' },
+  { key: 'game_preferences', title: '游戏偏好' },
+  { key: 'app_usage', title: '应用使用' },
+  { key: 'mobile_payment', title: '移动支付' },
+  { key: 'cultural_customs', title: '文化习俗' }
+];
+
+// 一键创建模板卡片
+function createTemplateCards() {
+  const cardEditorList = document.getElementById('card-editor-list');
+  // 清空现有卡片
+  cardEditorList.innerHTML = '';
+  CARD_TEMPLATE_ORDER.forEach(item => {
+    addCardEditorItem(cardEditorList, item.key + '_' + Date.now(), {
+      title: item.title,
+      content: '',
+      note: ''
+    });
+  });
+}
