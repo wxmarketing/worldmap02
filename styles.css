@@ -31,6 +31,47 @@ body {
   line-height: 1.6;
 }
 
+body.night-mode {
+  --background-color: #181818;
+  --text-color: #f2f2f2;
+  --secondary-color: #bbbbbb;
+  --border-color: #333;
+  --accent-color: #4caf50;
+}
+body.night-mode,
+body.night-mode header,
+body.night-mode main,
+body.night-mode .country-detail,
+body.night-mode .map-container,
+body.night-mode .admin-panel,
+body.night-mode .card-editor-item {
+  background-color: var(--background-color) !important;
+  color: var(--text-color) !important;
+}
+body.night-mode .country-card {
+  background-color: #232323 !important;
+  color: var(--text-color) !important;
+}
+body.night-mode .country-card h3,
+body.night-mode .country-title #country-name {
+  color: var(--accent-color) !important;
+}
+body.night-mode .card-note {
+  color: var(--secondary-color) !important;
+  border-top: 1px solid var(--border-color) !important;
+}
+body.night-mode button,
+body.night-mode #admin-toggle,
+body.night-mode .map-reset-btn {
+  background-color: #222 !important;
+  color: #fff !important;
+}
+body.night-mode button:hover,
+body.night-mode #admin-toggle:hover,
+body.night-mode .map-reset-btn:hover {
+  background-color: #444 !important;
+}
+
 /* Header Styles */
 header {
   background-color: var(--background-color);

@@ -429,3 +429,12 @@ if (fullscreenBtn) {
     }
   });
 }
+
+// 夜间模式按钮事件
+const nightBtn = document.getElementById('night-mode-btn');
+if (nightBtn) {
+  nightBtn.addEventListener('click', function() {
+    document.body.classList.toggle('night-mode');
+    nightBtn.textContent = document.body.classList.contains('night-mode') ? '日间模式' : '夜间模式';
+  });
+}
