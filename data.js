@@ -1856,16 +1856,19 @@ function updateCountryDetail(countryName, countryCode) {
   const cardsContainer = document.getElementById("country-cards");
   cardsContainer.innerHTML = "";
   
-  // Check if the country has cards data
-  if (data.cards && Object.keys(data.cards).length > 0) {
-    // Create a card for each data point
-    Object.keys(data.cards).forEach(cardId => {
-      const cardData = data.cards[cardId];
-      const cardElement = createCardElement(cardId, cardData);
+  // 兼容数组和对象
+  let cardsArr = [];
+  if (Array.isArray(data.cards)) {
+    cardsArr = data.cards;
+  } else if (data.cards && typeof data.cards === 'object') {
+    cardsArr = Object.values(data.cards);
+  }
+  if (cardsArr.length > 0) {
+    cardsArr.forEach(cardData => {
+      const cardElement = createCardElement(cardData.id || '', cardData);
       cardsContainer.appendChild(cardElement);
     });
   } else {
-    // If no cards data available, display a message
     const noDataCard = document.createElement("div");
     noDataCard.className = "country-card";
     noDataCard.innerHTML = `<h3>数据待更新</h3><p>该国家的详细卡片信息正在整理中，敬请期待。</p>`;
@@ -2186,12 +2189,10 @@ function addNewCard(countryCode) {
 async function saveCardData() {
   // Get selected country
   const countryCode = document.getElementById("admin-country-select").value;
-  
   if (!countryCode) {
     alert("请先选择一个国家");
     return;
   }
-  
   // 确保countryData中有这个国家的记录
   if (!countryData[countryCode]) {
     const countryInfo = allWorldCountries.find(country => country.code === countryCode);
@@ -2202,56 +2203,41 @@ async function saveCardData() {
         region: getRegionForCountry(countryCode),
         region_zh: getChineseRegionName(getRegionForCountry(countryCode)),
         flagUrl: `https://flagcdn.com/${countryCode.toLowerCase()}.svg`,
-        cards: {},
+        cards: [],
         detailAnalysisUrl: ""
       };
     }
   }
-  
   // Save detail analysis URL
   const urlInput = document.getElementById(`detail-url-${countryCode}`);
   if (urlInput) {
     countryData[countryCode].detailAnalysisUrl = urlInput.value.trim();
   }
-  
   // Get card editor forms
   const cardForms = document.querySelectorAll(".card-editor-item");
-  
-  // Initialize cards object if it doesn't exist
-  if (!countryData[countryCode].cards) {
-    countryData[countryCode].cards = {};
-  }
-  
-  // Reset cards to empty object (we'll rebuild it)
-  countryData[countryCode].cards = {};
-  
-  // Collect data from forms
+  // 保存为数组，顺序与DOM一致
+  countryData[countryCode].cards = [];
   cardForms.forEach((form) => {
     const cardId = form.dataset.cardId;
     const title = form.querySelector("[name='title']").value.trim();
     const content = form.querySelector("[name='content']").value.trim();
     const note = form.querySelector("[name='note']").value.trim();
-    
-    // 只保存非空的卡片
     if (title || content) {
-      countryData[countryCode].cards[cardId] = {
-        title: title,
-        content: content,
-        note: note,
-      };
+      countryData[countryCode].cards.push({
+        id: cardId,
+        title,
+        content,
+        note
+      });
     }
   });
-  
   // Update UI if the country detail panel is showing this country
   const countryDetailName = document.getElementById("country-name").textContent;
   const chineseCountryName = getChineseCountryName(countryData[countryCode].name);
   if (countryDetailName === chineseCountryName) {
     updateCountryDetail(countryData[countryCode].name, countryCode);
   }
-  
-  // Show success message
   alert("卡片数据保存成功");
-  // 上传到supabase
   await saveCountryDataToSupabase(countryCode);
 }
 
@@ -2269,7 +2255,7 @@ async function loadCountryDataFromSupabase() {
   }
   data.forEach(row => {
     if (!countryData[row.country_code]) countryData[row.country_code] = {};
-    countryData[row.country_code].cards = row.cards;
+    countryData[row.country_code].cards = row.cards || [];
     countryData[row.country_code].detailAnalysisUrl = row.detailAnalysisUrl;
   });
 }
