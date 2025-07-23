@@ -560,3 +560,10 @@ body.night-mode .country.selected {
 body.night-mode .country.has-data {
   fill: #666 !important;
 }
+.card-content-editor {
+  text-indent: 0 !important;
+}
+.country-card div,
+.country-card p {
+  text-indent: 0 !important;
+}
