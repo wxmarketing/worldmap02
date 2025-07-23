@@ -2071,32 +2071,30 @@ function populateCardEditor(countryCode) {
         region: getRegionForCountry(countryCode),
         region_zh: getChineseRegionName(getRegionForCountry(countryCode)),
         flagUrl: `https://flagcdn.com/${countryCode.toLowerCase()}.svg`,
-        cards: {} // 空的卡片数据，等待用户编辑
+        cards: [], // 空的卡片数据，等待用户编辑
+        detailAnalysisUrl: ""
       };
     }
   }
-  
   // Get country data
   const data = getCountryInfo(countryCode);
-  
   // Get card editor list element
   const cardEditorList = document.getElementById("card-editor-list");
-  
   // Clear previous content
   cardEditorList.innerHTML = "";
-  
   // Add detail analysis URL editor
   addDetailAnalysisEditor(cardEditorList, countryCode, data);
-  
-  // Check if country has cards data
-  if (data.cards && Object.keys(data.cards).length > 0) {
-    // Add card editor forms for each card
+  // 渲染卡片，优先数组顺序
+  if (Array.isArray(data.cards) && data.cards.length > 0) {
+    data.cards.forEach(card => {
+      addCardEditorItem(cardEditorList, card.id, card);
+    });
+  } else if (data.cards && typeof data.cards === 'object' && Object.keys(data.cards).length > 0) {
     Object.keys(data.cards).forEach(cardId => {
       const card = data.cards[cardId];
       addCardEditorItem(cardEditorList, cardId, card);
     });
   } else {
-    // Display message if no cards data
     const noCardsMessage = document.createElement("p");
     noCardsMessage.textContent = "该国家暂无卡片数据，请点击\"添加卡片\"按钮创建";
     noCardsMessage.style.marginTop = "20px";
