@@ -23,13 +23,6 @@
   <main>
     <div class="dashboard-container">
       <div class="map-container">
-        <div class="map-search-bar">
-          <button id="search-toggle-btn" class="search-icon-btn" title="搜索国家"><span class="search-icon">🔍</span></button>
-          <div id="country-search-box" class="country-search-box hidden">
-            <input id="country-search-input" type="text" placeholder="搜索国家/地区..." autocomplete="off" />
-            <ul id="country-search-suggest" class="country-search-suggest"></ul>
-          </div>
-        </div>
         <svg id="world-map"></svg>
         <div class="map-btn-group">
           <button id="reset-zoom" class="map-reset-btn">重置</button>
@@ -86,10 +79,10 @@
   </footer>
 
   <!-- Custom JS -->
-  <script src="data.js"></script>
-  <script src="map.js"></script>
-  <script src="app.js"></script>
+  <script type="module" src="data.js"></script>
+  <script type="module" src="map.js"></script>
+  <script type="module" src="app.js"></script>
   <!-- 测试脚本 - 自动点击美国以显示国家详情面板 -->
-  <script src="test-click.js"></script>
+  <script type="module" src="test-click.js"></script>
 </body>
 </html>

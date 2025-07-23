@@ -1497,11 +1497,6 @@ const allWorldCountries = [
   { code: "MH", name: "Marshall Islands", name_zh: "马绍尔群岛" }
 ];
 
-// 兼容ES模块和普通script，确保全局可访问
-if (typeof window !== 'undefined') {
-  window.allWorldCountries = allWorldCountries;
-}
-
 // List of all countries available in the data (保持向后兼容性)
 const availableCountries = Object.keys(appStoreData).map(code => {
   return {
@@ -2347,8 +2342,3 @@ function createTemplateCards() {
     });
   });
 }
-
-// 强制全局挂载，确保其他脚本可用
-window.updateCountryDetail = updateCountryDetail;
-window.createCardElement = createCardElement;
-window.addDetailAnalysisButton = addDetailAnalysisButton;
