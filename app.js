@@ -15,7 +15,11 @@ function onCountryClick(countryName, countryCode) {
   selectedCountryData = getCountryData(countryCode);
   
   // Update country detail panel
-  updateCountryDetail(countryName, countryCode);
+  if (typeof window.updateCountryDetail === 'function') {
+    window.updateCountryDetail(countryName, countryCode);
+  } else {
+    alert('国家详情弹窗函数未加载，请刷新页面或检查脚本顺序');
+  }
 }
 
 // 挂载到 window，确保 map.js 能访问
