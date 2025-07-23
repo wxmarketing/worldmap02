@@ -76,17 +76,18 @@ function loadWorldMap() {
       // 新加坡大致经纬度 [经度, 纬度]
       const singaporeCoords = [103.8198, 1.3521];
       const [x, y] = path.projection()(singaporeCoords);
-      g.append("circle")
+      const sgHotspot = g.append("circle")
         .attr("cx", x)
         .attr("cy", y)
-        .attr("r", 14) // 热区半径，可调整
-        .attr("fill", "rgba(76, 175, 80, 0.15)") // 绿色半透明
+        .attr("r", 18) // 更大热区
+        .attr("fill", "rgba(76, 175, 80, 0.01)") // 几乎透明
         .attr("stroke", "#4caf50")
         .attr("stroke-width", 1)
         .attr("cursor", "pointer")
         .on("click", function(event) {
           handleCountryClick(event, { properties: { name: "Singapore" } });
         });
+      sgHotspot.raise(); // 保证热区在最上层
     })
     .catch(error => {
       console.error("Error loading map data:", error);
