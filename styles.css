@@ -520,3 +520,40 @@ footer p {
   border-radius: 0;
   box-shadow: none;
 }
+
+/* ===== 夜间模式优化细节 ===== */
+body.night-mode header {
+  background-color: #222 !important;
+  color: #f2f2f2 !important;
+}
+body.night-mode .header-subtitle {
+  color: #bbbbbb !important;
+}
+body.night-mode button,
+body.night-mode #admin-toggle,
+body.night-mode .map-reset-btn {
+  background-color: #222 !important;
+  color: #fff !important;
+  border: 1.5px solid #444 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+body.night-mode button:hover,
+body.night-mode #admin-toggle:hover,
+body.night-mode .map-reset-btn:hover {
+  background-color: #333 !important;
+  border-color: #666 !important;
+}
+body.night-mode .country-header {
+  background-color: #232323 !important;
+  color: #f2f2f2 !important;
+}
+body.night-mode .country {
+  fill: #222 !important;
+  stroke: #444 !important;
+}
+body.night-mode .country.selected {
+  fill: #4caf50 !important;
+}
+body.night-mode .country.has-data {
+  fill: #666 !important;
+}
