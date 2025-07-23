@@ -2160,15 +2160,14 @@ function addCardEditorItem(container, cardId, cardData = null) {
     document.execCommand('foreColor', false, e.target.value);
     contentDiv.focus();
   });
-  // 粘贴时只保留纯文本（彻底清除格式）
+  // 粘贴时只保留纯文本（终极方案）
   contentDiv.addEventListener('paste', function(e) {
     e.preventDefault();
     const text = (e.clipboardData || window.clipboardData).getData('text');
-    // 插入纯文本
-    document.execCommand('insertText', false, text);
-    // 粘贴后立即清除所有HTML标签，保证彻底无格式
+    // 直接用innerText覆盖，彻底无格式
+    document.execCommand('insertText', false, text); // 尝试插入
     setTimeout(() => {
-      contentDiv.innerHTML = contentDiv.innerText;
+      contentDiv.innerText = contentDiv.innerText + '';
     }, 0);
   });
   
