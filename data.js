@@ -387,7 +387,6 @@ let countryData = {
     callingCode: "+61"
   }
 };
-window.countryData = countryData;
 
 // Mock data for Google Play Store top charts by country
 const appStoreData = {
@@ -2037,9 +2036,9 @@ function initAdminPanel() {
     document.getElementById("country-detail").classList.add("hidden");
     
     // Reset selected country
-    if (window.selectedCountry) {
-      d3.select(window.selectedCountry).classed("selected", false);
-      window.selectedCountry = null;
+    if (selectedCountry) {
+      d3.select(selectedCountry).classed("selected", false);
+      selectedCountry = null;
     }
     
     // 清空卡片容器，防止数据残留

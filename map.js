@@ -12,7 +12,7 @@ const mapConfig = {
 // Map variables
 let svg, g, path, zoom, countries;
 let currentZoom = { k: 1, x: 0, y: 0 };
-window.selectedCountry = null;
+let selectedCountry = null;
 
 // Initialize the map
 function initMap() {
@@ -76,18 +76,17 @@ function loadWorldMap() {
       // 新加坡大致经纬度 [经度, 纬度]
       const singaporeCoords = [103.8198, 1.3521];
       const [x, y] = path.projection()(singaporeCoords);
-      const sgHotspot = g.append("circle")
+      g.append("circle")
         .attr("cx", x)
         .attr("cy", y)
-        .attr("r", 18) // 更大热区
-        .attr("fill", "rgba(76, 175, 80, 0.01)") // 几乎透明
+        .attr("r", 14) // 热区半径，可调整
+        .attr("fill", "rgba(76, 175, 80, 0.15)") // 绿色半透明
         .attr("stroke", "#4caf50")
         .attr("stroke-width", 1)
         .attr("cursor", "pointer")
         .on("click", function(event) {
           handleCountryClick(event, { properties: { name: "Singapore" } });
         });
-      sgHotspot.raise(); // 保证热区在最上层
     })
     .catch(error => {
       console.error("Error loading map data:", error);
@@ -110,9 +109,9 @@ function resetZoom() {
     .call(zoom.transform, d3.zoomIdentity);
     
   // Reset the selected country
-  if (window.selectedCountry) {
-    d3.select(window.selectedCountry).classed("selected", false);
-    window.selectedCountry = null;
+  if (selectedCountry) {
+    d3.select(selectedCountry).classed("selected", false);
+    selectedCountry = null;
   }
   
   // Hide country detail panel
@@ -151,12 +150,12 @@ function handleCountryClick(event, d) {
   event.stopPropagation();
   
   // Reset previous selection
-  if (window.selectedCountry) {
-    d3.select(window.selectedCountry).classed("selected", false);
+  if (selectedCountry) {
+    d3.select(selectedCountry).classed("selected", false);
   }
   
   // Set new selection
-  window.selectedCountry = this;
+  selectedCountry = this;
   d3.select(this).classed("selected", true);
   
   // Zoom to the selected country
@@ -453,47 +452,5 @@ if (nightBtn) {
   nightBtn.addEventListener('click', function() {
     document.body.classList.toggle('night-mode');
     nightBtn.textContent = document.body.classList.contains('night-mode') ? '日间模式' : '夜间模式';
-  });
-}
-
-// 已更新国家按钮逻辑
-const updatedBtn = document.getElementById('updated-countries-btn');
-const updatedModal = document.getElementById('updated-countries-modal');
-const updatedList = document.getElementById('updated-countries-list');
-const closeUpdated = document.getElementById('close-updated-countries');
-if (updatedBtn && updatedModal && updatedList && closeUpdated) {
-  updatedBtn.addEventListener('click', function() {
-    // 获取所有有卡片的国家
-    if (typeof window.countryData !== 'object') {
-      alert('国家数据未加载');
-      return;
-    }
-    updatedList.innerHTML = '';
-    const updated = Object.entries(window.countryData)
-      .filter(([code, data]) => Array.isArray(data.cards) && data.cards.length > 0)
-      .map(([code, data]) => ({ code, name: data.name_zh || data.name || code }));
-    if (updated.length === 0) {
-      updatedList.innerHTML = '<li style="color:#888;font-weight:normal;">暂无已更新国家</li>';
-    } else {
-      updated.forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = item.name;
-        li.addEventListener('click', function() {
-          // 自动弹出该国家详情
-          if (typeof window.updateCountryDetail === 'function') {
-            window.updateCountryDetail(item.name, item.code);
-            updatedModal.classList.add('hidden');
-          }
-        });
-        updatedList.appendChild(li);
-      });
-    }
-    updatedModal.classList.remove('hidden');
-  });
-  closeUpdated.addEventListener('click', function() {
-    updatedModal.classList.add('hidden');
-  });
-  updatedModal.addEventListener('click', function(e) {
-    if (e.target === updatedModal) updatedModal.classList.add('hidden');
   });
 }
