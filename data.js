@@ -2181,7 +2181,7 @@ function addNewCard(countryCode) {
 }
 
 // Save card data
-function saveCardData() {
+async function saveCardData() {
   // Get selected country
   const countryCode = document.getElementById("admin-country-select").value;
   
@@ -2250,7 +2250,7 @@ function saveCardData() {
   // Show success message
   alert("卡片数据保存成功");
   // 上传到supabase
-  saveCountryDataToSupabase(countryCode);
+  await saveCountryDataToSupabase(countryCode);
 }
 
 // Initialize when DOM is ready
