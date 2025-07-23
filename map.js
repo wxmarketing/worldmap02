@@ -43,7 +43,8 @@ function initMap() {
   svg.call(zoom);
 
   // Initial positioning
-  g.attr("transform", `translate(${mapConfig.initialTranslate[0]},${mapConfig.initialTranslate[1]}) scale(${mapConfig.initialScale/100})`);
+  // 初始状态直接重置，与resetZoom一致
+  svg.call(zoom.transform, d3.zoomIdentity);
 
   // Load and display the world map
   loadWorldMap();
