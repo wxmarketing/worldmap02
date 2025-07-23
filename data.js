@@ -2289,10 +2289,5 @@ async function saveCountryDataToSupabase(country_code) {
   }
 }
 
-// 初始化时拉取supabase数据
-async function initializeCountryData() {
-  await loadCountryDataFromSupabase();
-}
-
 // 挂载到 window，确保 map.js 能访问
 window.updateCountryDetail = updateCountryDetail;
