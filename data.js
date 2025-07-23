@@ -1,3 +1,5 @@
+import { supabase } from './supabase.js';
+
 // 区域中文翻译映射
 const regionTranslations = {
   "North America": "北美洲",
