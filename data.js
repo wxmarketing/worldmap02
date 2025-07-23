@@ -2298,6 +2298,11 @@ const CARD_TEMPLATE_ORDER = [
 
 // 一键创建模板卡片
 function createTemplateCards() {
+  const countryCode = document.getElementById('admin-country-select').value;
+  if (!countryCode) {
+    alert('请先选择一个国家');
+    return;
+  }
   const cardEditorList = document.getElementById('card-editor-list');
   // 清空现有卡片
   cardEditorList.innerHTML = '';
