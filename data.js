@@ -2160,12 +2160,17 @@ function addCardEditorItem(container, cardId, cardData = null) {
     document.execCommand('foreColor', false, e.target.value);
     contentDiv.focus();
   });
-  // 粘贴时只保留纯文本
+  // 粘贴时只保留纯文本（增强版）
   contentDiv.addEventListener('paste', function(e) {
     e.preventDefault();
     const text = (e.clipboardData || window.clipboardData).getData('text');
-    if (document.queryCommandSupported('insertText')) {
-      document.execCommand('insertText', false, text);
+    // 先移除选区内容再插入纯文本
+    if (window.getSelection) {
+      const sel = window.getSelection();
+      if (!sel.rangeCount) return;
+      sel.deleteFromDocument();
+      sel.getRangeAt(0).insertNode(document.createTextNode(text));
+      sel.collapseToEnd();
     } else {
       // 兼容性兜底
       contentDiv.innerText += text;
