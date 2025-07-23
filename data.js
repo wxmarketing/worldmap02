@@ -2084,15 +2084,10 @@ function populateCardEditor(countryCode) {
   cardEditorList.innerHTML = "";
   // Add detail analysis URL editor
   addDetailAnalysisEditor(cardEditorList, countryCode, data);
-  // 渲染卡片，优先数组顺序
+  // 只用数组顺序渲染卡片
   if (Array.isArray(data.cards) && data.cards.length > 0) {
     data.cards.forEach(card => {
       addCardEditorItem(cardEditorList, card.id, card);
-    });
-  } else if (data.cards && typeof data.cards === 'object' && Object.keys(data.cards).length > 0) {
-    Object.keys(data.cards).forEach(cardId => {
-      const card = data.cards[cardId];
-      addCardEditorItem(cardEditorList, cardId, card);
     });
   } else {
     const noCardsMessage = document.createElement("p");
