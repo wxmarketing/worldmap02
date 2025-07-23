@@ -1,0 +1,431 @@
+/* Global Variables */
+:root {
+  --primary-color: #000000;
+  --secondary-color: #333333;
+  --accent-color: #42A529;
+  --background-color: #ffffff;
+  --text-color: #000000;
+  --border-color: #e0e0e0;
+  --hover-color: #f5f5f5;
+}
+
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+/* Header Styles */
+header {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+.header-right {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.header-subtitle {
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+  font-weight: normal;
+}
+
+button {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #348b21;
+}
+
+select {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: white;
+  color: var(--text-color);
+}
+
+/* Main Layout */
+main {
+  padding: 2rem;
+}
+
+.dashboard-container {
+  display: flex;
+  gap: 2rem;
+  height: 80vh;
+}
+
+.map-container {
+  flex: 2;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 1rem;
+  position: relative;
+}
+
+#world-map {
+  width: 100%;
+  height: 100%;
+}
+
+.map-reset-btn {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--accent-color);
+  color: white;
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.map-reset-btn:hover {
+  background-color: #348b21;
+}
+
+/* Country Detail Panel */
+.country-detail {
+  flex: 1;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.country-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1rem;
+  background-color: white;
+  color: black;
+  text-align: center;
+  position: relative;
+}
+
+.country-title {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.country-title #country-region {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.country-title #country-name {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: var(--accent-color);
+}
+
+.country-header button {
+  background: none;
+  color: #666;
+  font-size: 1.5rem;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.country-info {
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.country-flag {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.country-flag img {
+  max-width: 100%;
+  height: auto;
+  max-height: 150px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border-radius: 4px;
+}
+
+.country-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.country-card {
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.country-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.country-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  color: var(--accent-color);
+}
+
+.country-card p {
+  line-height: 1.5;
+  color: var(--text-color);
+  margin-bottom: 1rem;
+}
+
+.country-card .card-note {
+  font-size: 0.85rem;
+  color: var(--secondary-color);
+  border-top: 1px solid var(--border-color);
+  padding-top: 0.75rem;
+  font-style: italic;
+}
+
+/* 管理面板的卡片编辑样式 */
+.cards-editor {
+  margin-top: 1.5rem;
+}
+
+.card-editor-item {
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.card-controls {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.card-field {
+  margin-bottom: 1rem;
+}
+
+.card-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.card-field input,
+.card-field textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.card-field textarea {
+  min-height: 100px;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.save-button {
+  background-color: var(--accent-color);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+/* Admin Panel Styles */
+.admin-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 800px;
+  height: 80%;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--accent-color);
+  color: white;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.admin-content {
+  flex: 1;
+  padding: 1rem;
+  overflow: auto;
+}
+
+.data-management {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+#admin-country-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.app-editor {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+/* Utility Classes */
+.hidden {
+  display: none !important;
+}
+
+/* Footer */
+footer {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  text-align: center;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border-color);
+}
+
+footer p {
+  margin: 0;
+}
+
+/* Map Styles */
+.country {
+  fill: #e0e0e0;
+  stroke: #fff;
+  stroke-width: 0.5px;
+  cursor: pointer;
+  transition: fill 0.3s ease;
+}
+
+.country:hover {
+  fill: var(--hover-color);
+}
+
+.country.selected {
+  fill: var(--accent-color);
+}
+
+.country.has-data {
+  fill: var(--secondary-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .map-container {
+    height: 50vh;
+  }
+  
+  .country-detail {
+    max-height: 50vh;
+  }
+  
+  .country-header {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .country-title #country-region {
+    font-size: 0.8rem;
+    margin-bottom: 0.15rem;
+  }
+  
+  .country-title #country-name {
+    font-size: 1.4rem;
+  }
+  
+  .country-info {
+    padding: 0.75rem;
+  }
+  
+  header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  main {
+    padding: 1rem;
+  }
+}

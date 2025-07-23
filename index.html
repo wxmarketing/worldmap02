@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Map Dashboard - Google Play Top Charts</title>
+  <!-- D3.js Library -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <!-- TopoJSON library for map data -->
+  <script src="https://unpkg.com/topojson@3"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>世界地图看板</h1>
+    <div class="header-right">
+      <span class="header-subtitle">点击地图查看国家详细信息</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="dashboard-container">
+      <div class="map-container">
+        <svg id="world-map"></svg>
+        <button id="reset-zoom" class="map-reset-btn">重置</button>
+      </div>
+      <div class="country-detail hidden" id="country-detail">
+        <div class="country-header">
+          <div class="country-title">
+            <span id="country-region">东南亚</span>
+            <span id="country-name">印度尼西亚</span>
+          </div>
+          <button id="close-detail">×</button>
+        </div>
+        <div class="country-info">
+          <div id="country-cards" class="country-cards">
+            <!-- 国家信息卡片将由JavaScript动态生成 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="admin-panel hidden" id="admin-panel">
+    <div class="admin-header">
+      <h2>管理面板</h2>
+      <button id="close-admin">×</button>
+    </div>
+    <div class="admin-content">
+      <div class="data-management">
+        <h3>Data Management</h3>
+        <select id="admin-country-select">
+          <option value="">Select Country</option>
+          <!-- Countries will be added dynamically -->
+        </select>
+        
+        <div id="cards-editor" class="cards-editor">
+          <h4>Edit Country Information Cards</h4>
+          <div class="card-controls">
+            <button id="add-card">添加卡片</button>
+          </div>
+          <div id="card-editor-list">
+            <!-- 卡片编辑表单将由JavaScript动态生成 -->
+          </div>
+          <button id="save-data" class="save-button">保存更改</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <button id="admin-toggle">管理面板</button>
+  </footer>
+
+  <!-- Custom JS -->
+  <script src="data.js"></script>
+  <script src="map.js"></script>
+  <script src="app.js"></script>
+  <!-- 测试脚本 - 自动点击美国以显示国家详情面板 -->
+  <script src="test-click.js"></script>
+</body>
+</html>
