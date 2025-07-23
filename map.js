@@ -438,3 +438,107 @@ if (nightBtn) {
     nightBtn.textContent = document.body.classList.contains('night-mode') ? '日间模式' : '夜间模式';
   });
 }
+
+// ===== 国家搜索功能 =====
+const searchToggleBtn = document.getElementById('search-toggle-btn');
+const searchBox = document.getElementById('country-search-box');
+const searchInput = document.getElementById('country-search-input');
+const searchSuggest = document.getElementById('country-search-suggest');
+let searchActiveIndex = -1;
+let searchResults = [];
+
+if (searchToggleBtn && searchBox && searchInput && searchSuggest) {
+  searchToggleBtn.addEventListener('click', () => {
+    searchBox.classList.toggle('hidden');
+    searchInput.value = '';
+    searchSuggest.innerHTML = '';
+    searchActiveIndex = -1;
+    if (!searchBox.classList.contains('hidden')) {
+      setTimeout(() => searchInput.focus(), 100);
+    }
+  });
+
+  // 搜索联想逻辑
+  searchInput.addEventListener('input', function() {
+    const val = this.value.trim().toLowerCase();
+    if (!val) {
+      searchSuggest.innerHTML = '';
+      searchResults = [];
+      return;
+    }
+    // 支持拼音、中文、英文模糊匹配
+    searchResults = (window.allWorldCountries || []).filter(c => {
+      return (
+        c.name_zh && c.name_zh.includes(val)
+        || c.name && c.name.toLowerCase().includes(val)
+        || (c.pinyin && c.pinyin.includes(val))
+      );
+    });
+    // 兼容无拼音字段时只用中英文
+    if (!searchResults.length) {
+      searchResults = (window.allWorldCountries || []).filter(c => {
+        return (
+          (c.name_zh && c.name_zh.toLowerCase().includes(val))
+          || (c.name && c.name.toLowerCase().includes(val))
+        );
+      });
+    }
+    searchSuggest.innerHTML = searchResults.slice(0, 10).map((c, i) =>
+      `<li data-index="${i}">${c.name_zh || ''} ${c.name ? '(' + c.name + ')' : ''}</li>`
+    ).join('');
+    searchActiveIndex = -1;
+  });
+
+  // 下拉选中与键盘事件
+  searchInput.addEventListener('keydown', function(e) {
+    const items = searchSuggest.querySelectorAll('li');
+    if (!items.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      searchActiveIndex = (searchActiveIndex + 1) % items.length;
+      items.forEach((li, idx) => li.classList.toggle('active', idx === searchActiveIndex));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      searchActiveIndex = (searchActiveIndex - 1 + items.length) % items.length;
+      items.forEach((li, idx) => li.classList.toggle('active', idx === searchActiveIndex));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (searchActiveIndex >= 0 && searchResults[searchActiveIndex]) {
+        selectCountry(searchResults[searchActiveIndex]);
+      } else if (searchResults.length) {
+        selectCountry(searchResults[0]);
+      }
+    }
+  });
+  searchSuggest.addEventListener('mousedown', function(e) {
+    if (e.target.tagName === 'LI') {
+      const idx = +e.target.dataset.index;
+      if (searchResults[idx]) {
+        selectCountry(searchResults[idx]);
+      }
+    }
+  });
+}
+
+function selectCountry(country) {
+  if (!country) return;
+  // 1. 地图高亮并缩放到该国家
+  if (window.zoomToCountry && typeof window.zoomToCountry === 'function') {
+    // 需要找到地图数据中的d对象
+    const svg = document.getElementById('world-map');
+    if (svg) {
+      const paths = svg.querySelectorAll('.country');
+      for (const p of paths) {
+        if (p.getAttribute('data-name') === country.name) {
+          // 触发地图点击事件
+          p.dispatchEvent(new MouseEvent('click', {bubbles:true}));
+          break;
+        }
+      }
+    }
+  }
+  // 2. 关闭搜索框
+  if (searchBox) searchBox.classList.add('hidden');
+  if (searchInput) searchInput.value = '';
+  if (searchSuggest) searchSuggest.innerHTML = '';
+}
