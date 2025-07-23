@@ -61,19 +61,24 @@ header h1 {
   font-weight: normal;
 }
 
-button {
-  background-color: var(--accent-color);
-  color: white;
+button,
+#admin-toggle,
+.map-reset-btn {
+  background-color: #000;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.4rem;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  border-radius: 2rem;
+  padding: 0.8rem 2.2rem;
   cursor: pointer;
-  font-size: 0.9rem;
   transition: background-color 0.3s ease;
+  box-shadow: none;
 }
-
-button:hover {
-  background-color: #348b21;
+button:hover,
+#admin-toggle:hover,
+.map-reset-btn:hover {
+  background-color: #333;
 }
 
 select {
