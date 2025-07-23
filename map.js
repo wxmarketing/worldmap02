@@ -12,7 +12,7 @@ const mapConfig = {
 // Map variables
 let svg, g, path, zoom, countries;
 let currentZoom = { k: 1, x: 0, y: 0 };
-let selectedCountry = null;
+window.selectedCountry = null;
 
 // Initialize the map
 function initMap() {
@@ -110,9 +110,9 @@ function resetZoom() {
     .call(zoom.transform, d3.zoomIdentity);
     
   // Reset the selected country
-  if (selectedCountry) {
-    d3.select(selectedCountry).classed("selected", false);
-    selectedCountry = null;
+  if (window.selectedCountry) {
+    d3.select(window.selectedCountry).classed("selected", false);
+    window.selectedCountry = null;
   }
   
   // Hide country detail panel
@@ -151,12 +151,12 @@ function handleCountryClick(event, d) {
   event.stopPropagation();
   
   // Reset previous selection
-  if (selectedCountry) {
-    d3.select(selectedCountry).classed("selected", false);
+  if (window.selectedCountry) {
+    d3.select(window.selectedCountry).classed("selected", false);
   }
   
   // Set new selection
-  selectedCountry = this;
+  window.selectedCountry = this;
   d3.select(this).classed("selected", true);
   
   // Zoom to the selected country
