@@ -11,6 +11,7 @@ const mapConfig = {
 
 // Map variables
 let svg, g, path, zoom, countries;
+let projection; // projection声明为全局变量
 let currentZoom = { k: 1, x: 0, y: 0 };
 let selectedCountry = null;
 
@@ -27,7 +28,7 @@ function initMap() {
   g = svg.append("g");
 
   // Define the projection (Mercator)
-  const projection = d3.geoMercator()
+  projection = d3.geoMercator()
     .scale(mapConfig.scale)
     .translate([mapConfig.width / 2, mapConfig.height / 2]);
 
@@ -75,7 +76,7 @@ function loadWorldMap() {
       // 新加坡热区
       // 新加坡大致经纬度 [经度, 纬度]
       const singaporeCoords = [103.8198, 1.3521];
-      const [x, y] = path.projection()(singaporeCoords);
+      const [x, y] = projection(singaporeCoords);
       g.append("circle")
         .attr("cx", x)
         .attr("cy", y)
@@ -134,7 +135,7 @@ function zoomToCountry(d) {
   // 针对Point类型（如新加坡热区）特殊处理
   if (d && d.geometry && d.geometry.type === 'Point' && Array.isArray(d.geometry.coordinates)) {
     const [lng, lat] = d.geometry.coordinates;
-    const [x, y] = path.projection()([lng, lat]);
+    const [x, y] = projection([lng, lat]);
     const scale = 4; // 适中放大倍数，避免超出视野
     const translate = [mapConfig.width / 2 - scale * x, mapConfig.height / 2 - scale * y];
     svg.transition()
