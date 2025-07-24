@@ -86,12 +86,13 @@ function loadWorldMap() {
         .attr("stroke-width", 0.5)
         .attr("cursor", "pointer")
         .on("click", function(event) {
-          // 传递一个简单的GeoJSON Point对象，避免NaN
-          handleCountryClick(event, {
+          const sgObj = {
             type: "Feature",
             properties: { name: "Singapore" },
             geometry: { type: "Point", coordinates: [103.8198, 1.3521] }
-          });
+          };
+          console.log('新加坡热区点击', sgObj);
+          handleCountryClick(event, sgObj);
         });
     })
     .catch(error => {
@@ -134,12 +135,15 @@ function resetZoom() {
 function zoomToCountry(d) {
   // 针对Point类型（如新加坡热区）特殊处理
   if (d && d.geometry && d.geometry.type === 'Point' && Array.isArray(d.geometry.coordinates)) {
+    console.log('zoomToCountry Point分支', d);
     if (typeof projection !== 'function') {
       console.warn('zoomToCountry: projection未初始化', projection);
       return;
     }
     const [lng, lat] = d.geometry.coordinates;
     const xy = projection([lng, lat]);
+    console.log('projection', projection);
+    console.log('lng, lat', lng, lat, 'xy', xy);
     if (!Array.isArray(xy) || xy.length !== 2 || xy.some(v => typeof v !== 'number' || isNaN(v))) {
       console.warn('zoomToCountry: 投影坐标无效', { lng, lat, xy, projection });
       return;
