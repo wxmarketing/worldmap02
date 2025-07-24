@@ -469,9 +469,24 @@ footer p {
   }
   header {
     flex-direction: column;
-    gap: 0.5rem;
-    padding: 0.5rem 0.5rem 0 0.5rem;
+    align-items: center;
+    padding: 1.2rem 0.5rem;
+  }
+  .header-center {
+    width: 100%;
+    align-items: center;
+  }
+  .header-subtitle {
+    text-align: center;
+    font-size: 1rem;
     margin-bottom: 0.5rem;
+  }
+  #night-mode-btn {
+    display: block;
+    margin: 0 auto;
+    width: 60vw;
+    max-width: 300px;
+    font-size: 1.1rem;
   }
   header h1 {
     font-size: 1.5rem;
