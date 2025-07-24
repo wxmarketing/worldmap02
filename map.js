@@ -134,8 +134,17 @@ function resetZoom() {
 function zoomToCountry(d) {
   // 针对Point类型（如新加坡热区）特殊处理
   if (d && d.geometry && d.geometry.type === 'Point' && Array.isArray(d.geometry.coordinates)) {
+    if (typeof projection !== 'function') {
+      console.warn('zoomToCountry: projection未初始化', projection);
+      return;
+    }
     const [lng, lat] = d.geometry.coordinates;
-    const [x, y] = projection([lng, lat]);
+    const xy = projection([lng, lat]);
+    if (!Array.isArray(xy) || xy.length !== 2 || xy.some(v => typeof v !== 'number' || isNaN(v))) {
+      console.warn('zoomToCountry: 投影坐标无效', { lng, lat, xy, projection });
+      return;
+    }
+    const [x, y] = xy;
     const scale = 4; // 适中放大倍数，避免超出视野
     const translate = [mapConfig.width / 2 - scale * x, mapConfig.height / 2 - scale * y];
     svg.transition()
