@@ -79,7 +79,7 @@ function loadWorldMap() {
       g.append("circle")
         .attr("cx", x)
         .attr("cy", y)
-        .attr("r", 14) // 热区半径，可调整
+        .attr("r", 3.5) // 热区半径，缩小为原来的1/4
         .attr("fill", "rgba(76, 175, 80, 0.15)") // 绿色半透明
         .attr("stroke", "#4caf50")
         .attr("stroke-width", 1)
