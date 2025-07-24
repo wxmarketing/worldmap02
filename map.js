@@ -102,7 +102,12 @@ function loadWorldMap() {
 function handleZoom(event) {
   // Store current zoom state
   currentZoom = event.transform;
-  
+  // 校验transform有效性，防止NaN
+  const t = event.transform;
+  if ([t.x, t.y, t.k].some(v => typeof v !== 'number' || isNaN(v))) {
+    console.warn('handleZoom: transform含NaN，跳过', t);
+    return;
+  }
   // Apply transformation to the map group
   g.attr("transform", event.transform);
 }
