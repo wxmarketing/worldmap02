@@ -105,7 +105,8 @@ function handleZoom(event) {
   // 校验transform有效性，防止NaN
   const t = event.transform;
   if ([t.x, t.y, t.k].some(v => typeof v !== 'number' || isNaN(v))) {
-    console.warn('handleZoom: transform含NaN，跳过', t);
+    console.warn('handleZoom: transform含NaN，强制重置', t);
+    g.attr('transform', 'translate(0,0) scale(1)');
     return;
   }
   // Apply transformation to the map group
