@@ -85,7 +85,12 @@ function loadWorldMap() {
         .attr("stroke-width", 0.5)
         .attr("cursor", "pointer")
         .on("click", function(event) {
-          handleCountryClick(event, { properties: { name: "Singapore" } });
+          // 传递一个简单的GeoJSON Point对象，避免NaN
+          handleCountryClick(event, {
+            type: "Feature",
+            properties: { name: "Singapore" },
+            geometry: { type: "Point", coordinates: [103.8198, 1.3521] }
+          });
         });
     })
     .catch(error => {
@@ -122,6 +127,12 @@ function resetZoom() {
 function zoomToCountry(d) {
   // Get the country's bounds
   const bounds = path.bounds(d);
+  // 校验bounds有效性，防止NaN
+  if (!Array.isArray(bounds) || bounds.length !== 2 ||
+      bounds[0].some(isNaN) || bounds[1].some(isNaN)) {
+    console.warn('zoomToCountry: bounds无效，跳过缩放', bounds, d);
+    return;
+  }
   const dx = bounds[1][0] - bounds[0][0];
   const dy = bounds[1][1] - bounds[0][1];
   const x = (bounds[0][0] + bounds[1][0]) / 2;
