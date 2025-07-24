@@ -131,6 +131,22 @@ function resetZoom() {
 
 // Zoom to a specific country
 function zoomToCountry(d) {
+  // 针对Point类型（如新加坡热区）特殊处理
+  if (d && d.geometry && d.geometry.type === 'Point' && Array.isArray(d.geometry.coordinates)) {
+    const [lng, lat] = d.geometry.coordinates;
+    const [x, y] = path.projection()([lng, lat]);
+    const scale = mapConfig.maxZoom; // 最大放大倍数
+    const translate = [mapConfig.width / 2 - scale * x, mapConfig.height / 2 - scale * y];
+    svg.transition()
+      .duration(750)
+      .call(
+        zoom.transform,
+        d3.zoomIdentity
+          .translate(translate[0], translate[1])
+          .scale(scale)
+      );
+    return;
+  }
   // Get the country's bounds
   const bounds = path.bounds(d);
   // 校验bounds有效性，防止NaN
