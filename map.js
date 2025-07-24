@@ -82,7 +82,7 @@ function loadWorldMap() {
         .attr("r", 3.5) // 热区半径，缩小为原来的1/4
         .attr("fill", "rgba(76, 175, 80, 0.15)") // 绿色半透明
         .attr("stroke", "#4caf50")
-        .attr("stroke-width", 1)
+        .attr("stroke-width", 0.5)
         .attr("cursor", "pointer")
         .on("click", function(event) {
           handleCountryClick(event, { properties: { name: "Singapore" } });
