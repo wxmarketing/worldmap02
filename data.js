@@ -1871,7 +1871,7 @@ function updateCountryDetail(countryName, countryCode) {
   } else {
     const noDataCard = document.createElement("div");
     noDataCard.className = "country-card";
-    noDataCard.innerHTML = `<h3>数据待更新</h3><p>该国家的详细卡片信息正在整理中，敬请期待。</p>`;
+    noDataCard.innerHTML = `<h3>数据待更新</h3><p>该国家/地区的详细卡片信息正在整理中，敬请期待。</p>`;
     cardsContainer.appendChild(noDataCard);
   }
   
