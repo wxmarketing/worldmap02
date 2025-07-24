@@ -135,7 +135,7 @@ function zoomToCountry(d) {
   if (d && d.geometry && d.geometry.type === 'Point' && Array.isArray(d.geometry.coordinates)) {
     const [lng, lat] = d.geometry.coordinates;
     const [x, y] = path.projection()([lng, lat]);
-    const scale = mapConfig.maxZoom; // 最大放大倍数
+    const scale = 4; // 适中放大倍数，避免超出视野
     const translate = [mapConfig.width / 2 - scale * x, mapConfig.height / 2 - scale * y];
     svg.transition()
       .duration(750)
