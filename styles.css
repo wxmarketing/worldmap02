@@ -585,3 +585,50 @@ body.night-mode .country.has-data {
 .country-card p {
   text-indent: 0 !important;
 }
+
+/* Autocomplete Styles */
+.header-center {
+  position: relative;
+}
+
+.autocomplete-results {
+  position: absolute;
+  top: 100%; /* Position below the search input */
+  left: 0;
+  width: 100%;
+  max-height: 250px; /* Limit height for scrollability */
+  overflow-y: auto;
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+  list-style: none;
+  padding: 0;
+  margin-top: 5px;
+}
+
+.autocomplete-results.hidden {
+  display: none;
+}
+
+.autocomplete-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  user-select: none; /* Prevent text selection on click */
+  transition: background-color 0.2s ease;
+}
+
+.autocomplete-item:hover {
+  background-color: var(--hover-color);
+}
+
+body.night-mode .autocomplete-results {
+  background-color: #2a2a2a !important;
+  border-color: #444 !important;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+}
+
+body.night-mode .autocomplete-item:hover {
+  background-color: #3e3e3e !important;
+}
