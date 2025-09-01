@@ -1621,9 +1621,11 @@ function initializeCountryData() {
   });
   
   console.log("国家数据初始化完成，共有", Object.keys(countryData).length, "个国家");
+  console.log("初始化后斐济数据：", countryData["FJ"]);
 }
 
 // 执行国家数据初始化
+// 确保在任何需要访问 countryData 的代码之前执行
 initializeCountryData();
 
 // Function to get country information for a specific country
@@ -2308,7 +2310,9 @@ window.updateCountryDetail = updateCountryDetail;
 // 保证云端数据覆盖本地 countryData
 
 document.addEventListener("DOMContentLoaded", async () => {
+  console.log("DOMContentLoaded 事件触发，开始加载 Supabase 数据...");
   await loadCountryDataFromSupabase();
+  console.log("Supabase 数据加载完成，斐济数据：", countryData["FJ"]);
 });
 
 // 模板卡片顺序和标题

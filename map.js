@@ -224,7 +224,6 @@ function handleCountryClick(event, d) {
 
 // Get country code from country name
 function getCountryCode(countryName) {
-  console.log(`getCountryCode: Input countryName = "${countryName}"`);
   const name = countryName.toLowerCase(); // 将输入转换为小写
   // Expanded mapping for demo purposes
   const countryMapping = {
@@ -588,7 +587,6 @@ function getCountryCode(countryName) {
   };
   
   const mappedCode = countryMapping[name];
-  console.log(`getCountryCode: Mapped name = "${name}", Result code = "${mappedCode}"`);
   return mappedCode || countryName; // Return the actual country name if not found in mapping
 }
 
@@ -625,7 +623,6 @@ function filterMapCountries(searchTerm) {
     // 确保 countryData 存在且包含该 countryCode
     const nameZh = (countryData[countryCode] && countryData[countryCode].name_zh) ? countryData[countryCode].name_zh.toLowerCase() : '';
     const isMatch = searchTerm && (countryName.includes(searchTerm) || countryCode.includes(searchTerm) || nameZh.includes(searchTerm));
-    console.log(`filterMapCountries: Country: ${countryName} (Code: ${countryCode}), name_zh: ${nameZh}, countryData[${countryCode}]:`, countryData[countryCode], `Match: ${isMatch}`);
     return isMatch;
   });
 
