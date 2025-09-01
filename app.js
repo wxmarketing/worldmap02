@@ -47,7 +47,8 @@ function displayAutocompleteResults(results) {
       item.textContent = country.name_zh || country.name;
       item.dataset.countryCode = country.code;
       item.dataset.countryName = country.name;
-      item.addEventListener('click', () => selectAutocompleteItem(country.name, country.code));
+      item.dataset.countryNameZh = country.name_zh; // 存储中文名
+      item.addEventListener('click', () => selectAutocompleteItem(country.name, country.code, country.name_zh));
       autocompleteResultsContainer.appendChild(item);
     });
     autocompleteResultsContainer.classList.remove('hidden');
@@ -57,9 +58,9 @@ function displayAutocompleteResults(results) {
 }
 
 // Select an item from autocomplete
-function selectAutocompleteItem(countryName, countryCode) {
+function selectAutocompleteItem(countryName, countryCode, countryNameZh) {
   const searchInput = document.getElementById("country-search");
-  searchInput.value = countryName; // Fill search box with selected country's English name
+  searchInput.value = countryNameZh || countryName; // 优先显示中文名
   autocompleteResultsContainer.classList.add('hidden');
   
   // Trigger map functionality
