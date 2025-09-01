@@ -1,45 +1,18 @@
-import { countryData, regionTranslations, updateCountryDetail } from './data.js';
-
 // Main app functionality
 
 // Global variables
 let selectedCountryData = null;
 
-// Utility function for debouncing
-function debounce(func, delay) {
-  let timeout;
-  return function(...args) {
-    const context = this;
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(context, args), delay);
-  };
-}
-
-// Handle search input
-function handleSearchInput(event) {
-  const searchTerm = event.target.value.toLowerCase();
-  // Call map.js function to filter/highlight countries
-  if (typeof window.filterMapCountries === 'function') {
-    window.filterMapCountries(searchTerm);
-  }
-}
-
 // Initialize the application
 function initApp() {
   // No category filter needed anymore - app is simplified
   console.log("App initialized");
-
-  // Initialize search input
-  const searchInput = document.getElementById("country-search");
-  if (searchInput) {
-    searchInput.addEventListener("input", debounce(handleSearchInput, 300));
-  }
 }
 
 // Handle country click event (to be called from map.js)
 function onCountryClick(countryName, countryCode) {
   // Store selected country data
-  selectedCountryData = countryData[countryCode];
+  selectedCountryData = getCountryData(countryCode);
   
   // Update country detail panel
   if (typeof window.updateCountryDetail === 'function') {
