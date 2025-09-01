@@ -19,7 +19,6 @@ let selectedCountry = null;
 
 // Initialize the map
 async function initMap() {
-  console.log("initMap 函数被调用"); // 新增日志
   await initDataAndSupabase(); // 确保在地图渲染前数据已加载
   // Set up SVG container
   svg = d3.select("#world-map")
@@ -67,7 +66,6 @@ async function initMap() {
 
 // Load the world map data
 function loadWorldMap() {
-  console.log("loadWorldMap 函数被调用"); // 新增日志
   // Load world map data (TopoJSON)
   d3.json("https://unpkg.com/world-atlas@2/countries-110m.json")
     .then(data => {
@@ -635,7 +633,6 @@ function filterMapCountries(searchTerm) {
     // 确保 countryData 存在且包含该 countryCode
     const nameZh = (countryData[countryCode] && countryData[countryCode].name_zh) ? countryData[countryCode].name_zh.toLowerCase() : '';
     const isMatch = searchTerm && (countryName.includes(searchTerm) || countryCode.includes(searchTerm) || nameZh.includes(searchTerm));
-    console.log(`filterMapCountries - D3 loop: Original Name: ${d.properties.name}, Processed Name: ${countryName}, Code: ${countryCode}, name_zh: ${nameZh}, CountryData Entry:`, countryData[countryCode], `Match: ${isMatch}`);
     return isMatch;
   });
 

@@ -26,7 +26,6 @@ function handleSearchInput(event) {
 
 // Initialize the application
 function initApp() {
-  console.log("app.js - initApp 函数被调用"); // 新增日志
   // No category filter needed anymore - app is simplified
   console.log("App initialized");
 
