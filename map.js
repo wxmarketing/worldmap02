@@ -603,7 +603,7 @@ function getCountryCode(countryName) {
 }
 
 // Initialize the map when DOM is ready
-// document.addEventListener("DOMContentLoaded", initMap);
+document.addEventListener("DOMContentLoaded", initMap);
 
 // 全屏按钮事件
 const fullscreenBtn = document.getElementById('fullscreen-btn');
