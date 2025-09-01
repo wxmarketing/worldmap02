@@ -1,9 +1,10 @@
-import { countryData, regionTranslations, updateCountryDetail, initDataAndSupabase } from './data.js';
+import { countryData, regionTranslations, updateCountryDetail, initDataAndSupabase, allWorldCountries } from './data.js';
 
 // Main app functionality
 
 // Global variables
 let selectedCountryData = null;
+const autocompleteResultsContainer = document.getElementById("autocomplete-results");
 
 // Utility function for debouncing
 function debounce(func, delay) {
@@ -18,10 +19,56 @@ function debounce(func, delay) {
 // Handle search input
 function handleSearchInput(event) {
   const searchTerm = event.target.value.toLowerCase();
+  
+  if (searchTerm.length > 0) {
+    const filteredCountries = allWorldCountries.filter(country => {
+      const name = country.name ? country.name.toLowerCase() : '';
+      const name_zh = country.name_zh ? country.name_zh.toLowerCase() : '';
+      return name.includes(searchTerm) || name_zh.includes(searchTerm);
+    });
+    displayAutocompleteResults(filteredCountries);
+  } else {
+    displayAutocompleteResults([]); // Clear results if search term is empty
+  }
+  
   // Call map.js function to filter/highlight countries
   if (typeof window.filterMapCountries === 'function') {
     window.filterMapCountries(searchTerm);
   }
+}
+
+// Display autocomplete results
+function displayAutocompleteResults(results) {
+  autocompleteResultsContainer.innerHTML = '';
+  if (results.length > 0) {
+    results.forEach(country => {
+      const item = document.createElement('div');
+      item.classList.add('autocomplete-item');
+      item.textContent = country.name_zh || country.name;
+      item.dataset.countryCode = country.code;
+      item.dataset.countryName = country.name;
+      item.addEventListener('click', () => selectAutocompleteItem(country.name, country.code));
+      autocompleteResultsContainer.appendChild(item);
+    });
+    autocompleteResultsContainer.classList.remove('hidden');
+  } else {
+    autocompleteResultsContainer.classList.add('hidden');
+  }
+}
+
+// Select an item from autocomplete
+function selectAutocompleteItem(countryName, countryCode) {
+  const searchInput = document.getElementById("country-search");
+  searchInput.value = countryName; // Fill search box with selected country's English name
+  autocompleteResultsContainer.classList.add('hidden');
+  
+  // Trigger map functionality
+  if (typeof window.filterMapCountries === 'function') {
+    window.filterMapCountries(countryName.toLowerCase()); // Use English name for map filter
+  }
+  
+  // Simulate click for detail card (if needed, map.js's filterMapCountries already handles this for single matches)
+  // We might need to directly call onCountryClick if filterMapCountries doesn't always trigger it
 }
 
 // Initialize the application
@@ -33,6 +80,18 @@ function initApp() {
   const searchInput = document.getElementById("country-search");
   if (searchInput) {
     searchInput.addEventListener("input", debounce(handleSearchInput, 300));
+    // Hide autocomplete results when search input loses focus
+    searchInput.addEventListener("blur", () => {
+      setTimeout(() => {
+        autocompleteResultsContainer.classList.add('hidden');
+      }, 150); // Small delay to allow click event on autocomplete item
+    });
+    // Show autocomplete results again when search input gains focus and has value
+    searchInput.addEventListener("focus", (event) => {
+      if (event.target.value.length > 0) {
+        handleSearchInput(event); // Re-trigger search to show results
+      }
+    });
   }
 }
 

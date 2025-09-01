@@ -1283,7 +1283,7 @@ const appStoreData = {
 };
 
 // 完整的世界国家列表（用于管理面板）
-const allWorldCountries = [
+export const allWorldCountries = [
   // 亚洲国家
   { code: "CN", name: "China", name_zh: "中国" },
   { code: "JP", name: "Japan", name_zh: "日本" },
