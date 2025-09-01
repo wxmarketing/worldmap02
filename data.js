@@ -1627,6 +1627,8 @@ function initializeCountryData() {
 // 执行国家数据初始化
 // 确保在任何需要访问 countryData 的代码之前执行
 initializeCountryData();
+console.log("initializeCountryData 调用后，斐济数据：", countryData["FJ"]);
+console.log("initializeCountryData 调用后，科索沃数据：", countryData["XK"]);
 
 // Function to get country information for a specific country
 function getCountryInfo(countryCode, countryName) {
