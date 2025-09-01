@@ -1600,7 +1600,7 @@ function initializeCountryData() {
     // 创建该国家的基本信息
     countryData[countryCode] = {
       name: country.name,
-      name_zh: country.name_zh,
+      name_zh: country.name_zh, // 确保name_zh被正确复制
       region: region,
       region_zh: region_zh,
       officialName: country.name,
