@@ -513,6 +513,31 @@ function filterMapCountries(searchTerm) {
     const nameZh = (countryData[countryCode] && countryData[countryCode].name_zh) ? countryData[countryCode].name_zh.toLowerCase() : '';
     return searchTerm && (countryName.includes(searchTerm) || countryCode.includes(searchTerm) || nameZh.includes(searchTerm));
   });
+
+  // 如果有搜索词，且只匹配到一个国家，则自动触发点击事件
+  if (searchTerm) {
+    const matchedCountry = countries.filter(d => {
+      const countryName = d.properties.name.toLowerCase();
+      const countryCode = getCountryCode(d.properties.name).toLowerCase();
+      const nameZh = (countryData[countryCode] && countryData[countryCode].name_zh) ? countryData[countryCode].name_zh.toLowerCase() : '';
+      return (countryName.includes(searchTerm) || countryCode.includes(searchTerm) || nameZh.includes(searchTerm));
+    });
+
+    if (matchedCountry.size() === 1) {
+      const d = matchedCountry.datum();
+      const node = matchedCountry.node();
+      // 模拟一个事件对象
+      const syntheticEvent = new MouseEvent('click', {
+        view: window,
+        bubbles: true,
+        cancelable: true
+      });
+      handleCountryClick.call(node, syntheticEvent, d);
+    } else if (matchedCountry.size() === 0) {
+      // 如果没有匹配到任何国家，则隐藏详情面板
+      d3.select("#country-detail").classed("hidden", true);
+    }
+  }
 }
 
 // Expose filterMapCountries to the global scope for app.js to call
