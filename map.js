@@ -222,7 +222,7 @@ function handleCountryClick(event, d) {
   
   // Get country name
   const countryName = d.properties.name;
-  const countryCode = getCountryCode(countryName);
+  const countryCode = getCountryCode(countryName).toUpperCase();
   
   // Update country detail panel
   if (typeof window.updateCountryDetail === 'function') {
@@ -631,7 +631,7 @@ if (nightBtn) {
 function filterMapCountries(searchTerm) {
   countries.classed("highlight", d => {
     const countryName = d.properties.name.toLowerCase();
-    const countryCode = getCountryCode(d.properties.name).toLowerCase();
+    const countryCode = getCountryCode(d.properties.name).toUpperCase();
     // 确保 countryData 存在且包含该 countryCode
     const nameZh = (countryData[countryCode] && countryData[countryCode].name_zh) ? countryData[countryCode].name_zh.toLowerCase() : '';
     const isMatch = searchTerm && (countryName.includes(searchTerm) || countryCode.includes(searchTerm) || nameZh.includes(searchTerm));
@@ -643,7 +643,7 @@ function filterMapCountries(searchTerm) {
   if (searchTerm) {
     const matchedCountry = countries.filter(d => {
       const countryName = d.properties.name.toLowerCase();
-      const countryCode = getCountryCode(d.properties.name).toLowerCase();
+      const countryCode = getCountryCode(d.properties.name).toUpperCase();
       const nameZh = (countryData[countryCode] && countryData[countryCode].name_zh) ? countryData[countryCode].name_zh.toLowerCase() : '';
       return (countryName.includes(searchTerm) || countryCode.includes(searchTerm) || nameZh.includes(searchTerm));
     });
