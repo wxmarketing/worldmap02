@@ -511,7 +511,9 @@ function filterMapCountries(searchTerm) {
     const countryCode = getCountryCode(d.properties.name).toLowerCase();
     // 确保 countryData 存在且包含该 countryCode
     const nameZh = (countryData[countryCode] && countryData[countryCode].name_zh) ? countryData[countryCode].name_zh.toLowerCase() : '';
-    return searchTerm && (countryName.includes(searchTerm) || countryCode.includes(searchTerm) || nameZh.includes(searchTerm));
+    const isMatch = searchTerm && (countryName.includes(searchTerm) || countryCode.includes(searchTerm) || nameZh.includes(searchTerm));
+    console.log(`Searching for "${searchTerm}": Country: ${countryName} (${countryCode}), Chinese Name: ${nameZh}, Match: ${isMatch}`);
+    return isMatch;
   });
 
   // 如果有搜索词，且只匹配到一个国家，则自动触发点击事件
