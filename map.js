@@ -1,3 +1,5 @@
+import { countryData } from './data.js';
+
 // Map configuration
 const mapConfig = {
   width: 960,
@@ -501,3 +503,16 @@ if (nightBtn) {
     nightBtn.textContent = document.body.classList.contains('night-mode') ? '日间模式' : '夜间模式';
   });
 }
+
+// Function to filter/highlight countries based on search term
+function filterMapCountries(searchTerm) {
+  countries.classed("highlight", d => {
+    const countryName = d.properties.name.toLowerCase();
+    const countryCode = getCountryCode(d.properties.name).toLowerCase();
+    const nameZh = (countryData[countryCode] && countryData[countryCode].name_zh) ? countryData[countryCode].name_zh.toLowerCase() : '';
+    return searchTerm && (countryName.includes(searchTerm) || countryCode.includes(searchTerm) || nameZh.includes(searchTerm));
+  });
+}
+
+// Expose filterMapCountries to the global scope for app.js to call
+window.filterMapCountries = filterMapCountries;
