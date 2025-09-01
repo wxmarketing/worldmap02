@@ -2310,15 +2310,6 @@ window.updateCountryDetail = updateCountryDetail;
 // 页面加载时自动从 supabase 拉取云端数据
 // 保证云端数据覆盖本地 countryData
 
-document.addEventListener("DOMContentLoaded", async () => {
-  initializeCountryData(); // 确保在加载 Supabase 数据之前初始化本地数据
-  console.log("DOMContentLoaded 事件触发，开始加载 Supabase 数据...");
-  await loadCountryDataFromSupabase();
-  console.log("Supabase 数据加载完成，斐济数据：", countryData["FJ"]);
-  console.log("Supabase 数据加载完成，中国数据：", countryData["CN"]);
-  console.log("Supabase 数据加载完成，美国数据：", countryData["US"]);
-  console.log("Supabase 数据加载完成，科索沃数据：", countryData["XK"]);
-});
 
 // 模板卡片顺序和标题
 const CARD_TEMPLATE_ORDER = [
