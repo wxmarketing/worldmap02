@@ -232,7 +232,6 @@ function handleCountryClick(event, d) {
 
 // Get country code from country name
 function getCountryCode(countryName) {
-  console.log(`getCountryCode: Input countryName = "${countryName}"`);
   const name = countryName.toLowerCase(); // 将输入转换为小写
   // Expanded mapping for demo purposes
   const countryMapping = {
@@ -596,7 +595,6 @@ function getCountryCode(countryName) {
   };
   
   const mappedCode = countryMapping[name];
-  console.log(`getCountryCode: Mapped name = "${name}", Result code = "${mappedCode}"`);
   return mappedCode || countryName; // Return the actual country name if not found in mapping
 }
 
