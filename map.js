@@ -1,4 +1,4 @@
-import { countryData } from './data.js';
+import { countryData, initDataAndSupabase } from './data.js';
 
 // Map configuration
 const mapConfig = {
@@ -18,7 +18,8 @@ let currentZoom = { k: 1, x: 0, y: 0 };
 let selectedCountry = null;
 
 // Initialize the map
-function initMap() {
+async function initMap() {
+  await initDataAndSupabase(); // 确保在地图渲染前数据已加载
   // Set up SVG container
   svg = d3.select("#world-map")
     .attr("width", "100%")
@@ -54,6 +55,13 @@ function initMap() {
 
   // Set up reset button
   d3.select("#reset-zoom").on("click", resetZoom);
+  
+  // Call app.js init function
+  if (typeof window.initApp === 'function') {
+    window.initApp();
+  } else {
+    console.error("app.js initApp function not available.");
+  }
 }
 
 // Load the world map data
@@ -593,7 +601,7 @@ function getCountryCode(countryName) {
 }
 
 // Initialize the map when DOM is ready
-document.addEventListener("DOMContentLoaded", initMap);
+// document.addEventListener("DOMContentLoaded", initMap);
 
 // 全屏按钮事件
 const fullscreenBtn = document.getElementById('fullscreen-btn');

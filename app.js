@@ -1,4 +1,4 @@
-import { countryData, regionTranslations, updateCountryDetail } from './data.js';
+import { countryData, regionTranslations, updateCountryDetail, initDataAndSupabase } from './data.js';
 
 // Main app functionality
 
@@ -51,6 +51,7 @@ function onCountryClick(countryName, countryCode) {
 
 // 挂载到 window，确保 map.js 能访问
 window.onCountryClick = onCountryClick;
+window.initApp = initApp; // 挂载 initApp 到 window，确保 map.js 可以调用它
 
 // Initialize when DOM is ready
-document.addEventListener("DOMContentLoaded", initApp);
+// document.addEventListener("DOMContentLoaded", initApp);
