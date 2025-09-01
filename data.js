@@ -1,7 +1,7 @@
 import { supabase } from './supabase.js';
 
 // 区域中文翻译映射
-const regionTranslations = {
+export const regionTranslations = {
   "North America": "北美洲",
   "South America": "南美洲",
   "Europe": "欧洲",
@@ -13,7 +13,7 @@ const regionTranslations = {
 };
 
 // 初始化国家信息数据（仅包含详细信息的国家）
-let countryData = {
+export let countryData = {
   // United States
   "US": {
     name: "United States",
@@ -1840,7 +1840,7 @@ function getChineseCountryName(englishName) {
 }
 
 // Function to update country detail panel with country information cards
-function updateCountryDetail(countryName, countryCode) {
+export function updateCountryDetail(countryName, countryCode) {
   // Get country information with actual country name
   const data = getCountryInfo(countryCode, countryName);
   
