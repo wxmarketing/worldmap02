@@ -2267,18 +2267,66 @@ document.addEventListener("DOMContentLoaded", initAdminPanel);
 
 // 拉取所有国家卡片数据（supabase）
 async function loadCountryDataFromSupabase() {
-  const { data, error } = await supabase
-    .from('country_cards')
-    .select('*');
-  if (error) {
-    // console.error('拉取国家数据失败', error);
-    return;
-  }
-  data.forEach(row => {
-    if (!countryData[row.country_code]) countryData[row.country_code] = {};
-    countryData[row.country_code].cards = row.cards || [];
-    countryData[row.country_code].detailAnalysisUrl = row.detailAnalysisUrl;
-  });
+    console.log("正在从 Supabase 加载国家数据...");
+
+    try {
+        const { data: countryCardsData, error: countryCardsError } = await supabase
+            .from('country_cards')
+            .select('country_code, detailAnalysisUrl');
+
+        if (countryCardsError) {
+            console.error('从 country_cards 表加载数据失败:', countryCardsError);
+            return;
+        }
+
+        const { data: cardDetailsData, error: cardDetailsError } = await supabase
+            .from('country_card_details')
+            .select('country_code, card_id, title, content, note, order_index');
+
+        if (cardDetailsError) {
+            console.error('从 country_card_details 表加载数据失败:', cardDetailsError);
+            return;
+        }
+
+        const cardsByCountry = cardDetailsData.reduce((acc, card) => {
+            if (!acc[card.country_code]) {
+                acc[card.country_code] = [];
+            }
+            acc[card.country_code].push({
+                id: card.card_id,
+                title: card.title,
+                content: card.content,
+                note: card.note,
+                order_index: card.order_index
+            });
+            return acc;
+        }, {});
+
+        countryCardsData.forEach(item => {
+            const code = item.country_code;
+            if (countryData[code]) {
+                countryData[code].detailAnalysisUrl = item.detailAnalysisUrl;
+                countryData[code].cards = cardsByCountry[code] ? cardsByCountry[code].sort((a, b) => a.order_index - b.order_index) : [];
+            }
+        });
+        console.log('Supabase 国家数据加载完成。');
+
+        // 验证部分数据是否加载成功
+        // const chinaData = countryData['CN'];
+        // if (chinaData) {
+        //     console.log('Supabase 数据加载完成，中国数据:', chinaData);
+        // }
+        // const usData = countryData['US'];
+        // if (usData) {
+        //     console.log('Supabase 数据加载完成，美国数据:', usData);
+        // }
+        // const kosovoData = countryData['XK']; // 科索沃的ISO 3166-1 alpha-2代码是XK
+        // if (kosovoData) {
+        //     console.log('Supabase 数据加载完成，科索沃数据:', kosovoData);
+        // }
+    } catch (error) {
+        console.error("加载 Supabase 数据时发生错误:", error);
+    }
 }
 
 // 保存单个国家卡片数据到supabase
