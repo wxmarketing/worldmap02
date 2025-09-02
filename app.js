@@ -77,6 +77,9 @@ function initApp() {
   // No category filter needed anymore - app is simplified
   console.log("App initialized");
 
+  // 调用数据初始化函数，确保在应用启动时加载 Supabase 数据
+  initDataAndSupabase();
+
   // Initialize search input
   const searchInput = document.getElementById("country-search");
   if (searchInput) {
@@ -114,4 +117,4 @@ window.onCountryClick = onCountryClick;
 window.initApp = initApp; // 挂载 initApp 到 window，确保 map.js 可以调用它
 
 // Initialize when DOM is ready
-// document.addEventListener("DOMContentLoaded", initApp);
+document.addEventListener("DOMContentLoaded", initApp);
