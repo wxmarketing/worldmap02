@@ -2289,8 +2289,6 @@ async function loadCountryDataFromSupabase() {
             return;
         }
 
-        console.log("Supabase 原始 cardDetailsData:", cardDetailsData);
-
         const cardsByCountry = cardDetailsData.reduce((acc, card) => {
             if (!acc[card.country_code]) {
                 acc[card.country_code] = [];
@@ -2304,14 +2302,12 @@ async function loadCountryDataFromSupabase() {
             });
             return acc;
         }, {});
-        console.log("聚合后的 cardsByCountry:", cardsByCountry);
 
         countryCardsData.forEach(item => {
             const code = item.country_code;
             if (countryData[code]) {
                 countryData[code].detailAnalysisUrl = item.detailAnalysisUrl;
                 countryData[code].cards = cardsByCountry[code] ? cardsByCountry[code].sort((a, b) => a.order_index - b.order_index) : [];
-                console.log(`处理国家 ${code} 后，countryData[${code}].cards:`, countryData[code].cards);
             }
         });
         console.log('Supabase 国家数据加载完成。');
