@@ -1888,8 +1888,8 @@ function createCardElement(cardId, cardData) {
   // Create card content
   cardElement.innerHTML = `
     <h3>${cardData.title}</h3>
-    ${cardData.imageUrl ? `<img src="${cardData.imageUrl}" alt="${cardData.title} 图片" class="card-image">` : ''}
     <div>${cardData.content || ''}</div>
+    ${cardData.imageUrl ? `<img src="${cardData.imageUrl}" alt="${cardData.title} 图片" class="card-image">` : ''}
     ${cardData.note ? `<div class="card-note">${cardData.note}</div>` : ''}
   `;
   
