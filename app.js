@@ -74,16 +74,8 @@ function selectAutocompleteItem(countryName, countryCode, countryNameZh) {
 
 // Initialize the application
 function initApp() {
-  // No category filter needed anymore - app is simplified
-  console.log("App initialized");
-
   // 调用数据初始化函数，确保在应用启动时加载 Supabase 数据
-  console.log("准备调用 initDataAndSupabase");
-  initDataAndSupabase().then(() => {
-    console.log("initDataAndSupabase 调用完成");
-  }).catch(error => {
-    console.error("initDataAndSupabase 调用失败:", error);
-  });
+  initDataAndSupabase();
 
   // Initialize search input
   const searchInput = document.getElementById("country-search");

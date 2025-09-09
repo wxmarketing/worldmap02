@@ -1618,7 +1618,6 @@ function initializeCountryData() {
       detailAnalysisUrl: "" // 详细分析链接
     };
   });
-  console.log("initializeCountryData 调用后，countryData 状态:", JSON.parse(JSON.stringify(countryData))); // 深度克隆以避免后续修改影响打印
 }
 
 // 执行国家数据初始化
@@ -1896,19 +1895,13 @@ function createCardElement(cardId, cardData) {
   
   // 为图片添加点击事件监听器
   if (cardData.imageUrl) {
-    console.log(`为卡片 "${cardData.title}" 添加图片点击事件，imageUrl:`, cardData.imageUrl);
     const imageElement = cardElement.querySelector('.card-image');
     if (imageElement) {
       imageElement.addEventListener('click', function(e) {
         e.stopPropagation(); // 防止事件冒泡
-        console.log('图片被点击，准备显示大图:', cardData.imageUrl);
         showImageModal(cardData.imageUrl, cardData.title);
       });
-    } else {
-      console.log('未找到图片元素');
     }
-  } else {
-    console.log(`卡片 "${cardData.title}" 没有 imageUrl`);
   }
   
   return cardElement;
@@ -2347,24 +2340,16 @@ async function saveCardData() {
 
 // 显示图片大图模态框
 function showImageModal(imageUrl, imageTitle) {
-  console.log('showImageModal 被调用，参数:', { imageUrl, imageTitle });
-  
   const modal = document.getElementById('image-modal');
   const modalImage = document.getElementById('modal-image');
   
-  console.log('找到的模态框元素:', modal);
-  console.log('找到的模态框图片元素:', modalImage);
-  
   if (!modal || !modalImage) {
-    console.error('模态框元素未找到');
     return;
   }
   
   modalImage.src = imageUrl;
   modalImage.alt = imageTitle + ' - 大图查看';
   modal.style.display = 'block';
-  
-  console.log('模态框已显示');
   
   // 防止页面滚动
   document.body.style.overflow = 'hidden';
@@ -2408,14 +2393,12 @@ function initImageModal() {
 
 // Initialize when DOM is ready
 document.addEventListener("DOMContentLoaded", function() {
-  console.log("data.js DOMContentLoaded 事件触发");
   initAdminPanel();
   initImageModal();
 });
 
 // 拉取所有国家卡片数据（supabase）
 async function loadCountryDataFromSupabase() {
-    console.log("正在从 Supabase 加载国家数据...");
 
     try {
         const { data: countryCardsData, error: countryCardsError } = await supabase
@@ -2436,11 +2419,6 @@ async function loadCountryDataFromSupabase() {
             return;
         }
 
-        console.log("Supabase 返回的 cardDetailsData:", cardDetailsData); // 添加调试日志
-        
-        // 检查是否有 imageUrl 数据
-        const hasImageUrl = cardDetailsData.some(card => card.imageUrl);
-        console.log("是否有卡片包含 imageUrl:", hasImageUrl);
 
         const cardsByCountry = cardDetailsData.reduce((acc, card) => {
             if (!acc[card.country_code]) {
@@ -2464,21 +2442,6 @@ async function loadCountryDataFromSupabase() {
                 countryData[code].cards = cardsByCountry[code] ? cardsByCountry[code].sort((a, b) => a.order_index - b.order_index) : [];
             }
         });
-        console.log('Supabase 国家数据加载完成。');
-
-        // 验证部分数据是否加载成功
-        // const chinaData = countryData['CN'];
-        // if (chinaData) {
-        //     console.log('Supabase 数据加载完成，中国数据:', chinaData);
-        // }
-        // const usData = countryData['US'];
-        // if (usData) {
-        //     console.log('Supabase 数据加载完成，美国数据:', usData);
-        // }
-        // const kosovoData = countryData['XK']; // 科索沃的ISO 3166-1 alpha-2代码是XK
-        // if (kosovoData) {
-        //     console.log('Supabase 数据加载完成，科索沃数据:', kosovoData);
-        // }
     } catch (error) {
         console.error("加载 Supabase 数据时发生错误:", error);
     }
@@ -2536,11 +2499,8 @@ async function saveCountryDataToSupabase(country_code) {
 
 // 新增导出的初始化函数，统一管理数据加载时序
 export async function initDataAndSupabase() {
-  console.log("initDataAndSupabase 函数被调用");
   initializeCountryData(); // 先初始化本地所有国家数据
-  console.log("initializeCountryData 完成");
   await loadCountryDataFromSupabase(); // 再从Supabase加载数据并覆盖本地数据
-  console.log("loadCountryDataFromSupabase 完成");
 }
 
 // 挂载到 window，确保 map.js 能访问
