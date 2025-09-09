@@ -634,15 +634,20 @@ body.night-mode .autocomplete-item:hover {
 }
 
 .card-image {
-    max-width: 100%;    /* 确保图片不会超出卡片宽度 */
-    max-height: 200px;  /* 限制图片最大高度，避免过高 */
-    width: auto;        /* 保持图片比例 */
+    width: 100%;        /* 图片宽度填满卡片 */
     height: auto;       /* 保持图片比例 */
     display: block;     /* 移除图片底部空白 */
-    margin: 10px auto;  /* 上下留白，居中显示 */
+    margin: 10px 0;     /* 上下留白 */
     border-radius: 5px; /* 轻微圆角 */
     box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 轻微阴影 */
-    object-fit: contain; /* 确保图片完整显示在限定区域内 */
+    cursor: pointer;    /* 鼠标悬停时显示手型，提示可点击 */
+    transition: transform 0.2s ease; /* 添加悬停效果过渡 */
+}
+
+/* 图片悬停效果 */
+.card-image:hover {
+    transform: scale(1.02); /* 轻微放大效果 */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* 增强阴影 */
 }
 
 /* 夜间模式适配 */
@@ -658,4 +663,45 @@ body.night-mode .autocomplete-item:hover {
     border: 1px solid #ddd;
     border-radius: 4px;
     object-fit: contain; /* 确保图片完整显示在框内 */
+}
+
+/* 图片大图查看模态框 */
+.image-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    cursor: pointer;
+}
+
+.image-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.image-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10000;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.image-modal-close:hover {
+    color: #ccc;
 }

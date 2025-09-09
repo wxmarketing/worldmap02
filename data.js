@@ -1894,6 +1894,17 @@ function createCardElement(cardId, cardData) {
     ${cardData.note ? `<div class="card-note">${cardData.note}</div>` : ''}
   `;
   
+  // 为图片添加点击事件监听器
+  if (cardData.imageUrl) {
+    const imageElement = cardElement.querySelector('.card-image');
+    if (imageElement) {
+      imageElement.addEventListener('click', function(e) {
+        e.stopPropagation(); // 防止事件冒泡
+        showImageModal(cardData.imageUrl, cardData.title);
+      });
+    }
+  }
+  
   return cardElement;
 }
 
@@ -2328,8 +2339,60 @@ async function saveCardData() {
   await saveCountryDataToSupabase(countryCode);
 }
 
+// 显示图片大图模态框
+function showImageModal(imageUrl, imageTitle) {
+  const modal = document.getElementById('image-modal');
+  const modalImage = document.getElementById('modal-image');
+  
+  modalImage.src = imageUrl;
+  modalImage.alt = imageTitle + ' - 大图查看';
+  modal.style.display = 'block';
+  
+  // 防止页面滚动
+  document.body.style.overflow = 'hidden';
+}
+
+// 隐藏图片大图模态框
+function hideImageModal() {
+  const modal = document.getElementById('image-modal');
+  modal.style.display = 'none';
+  
+  // 恢复页面滚动
+  document.body.style.overflow = 'auto';
+}
+
+// 初始化图片模态框事件监听器
+function initImageModal() {
+  const modal = document.getElementById('image-modal');
+  const closeBtn = document.querySelector('.image-modal-close');
+  
+  // 点击关闭按钮关闭模态框
+  if (closeBtn) {
+    closeBtn.addEventListener('click', hideImageModal);
+  }
+  
+  // 点击模态框背景关闭模态框
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        hideImageModal();
+      }
+    });
+  }
+  
+  // 按ESC键关闭模态框
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      hideImageModal();
+    }
+  });
+}
+
 // Initialize when DOM is ready
-document.addEventListener("DOMContentLoaded", initAdminPanel);
+document.addEventListener("DOMContentLoaded", function() {
+  initAdminPanel();
+  initImageModal();
+});
 
 // 拉取所有国家卡片数据（supabase）
 async function loadCountryDataFromSupabase() {
