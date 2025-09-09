@@ -2394,16 +2394,27 @@ function initImageModal() {
 // 批量上传功能
 let batchFiles = [];
 
-// 中文文件名匹配映射
-const chineseCountryMapping = {
-  '中国': 'CN', '美国': 'US', '日本': 'JP', '印度': 'IN', '德国': 'DE', '法国': 'FR',
-  '英国': 'GB', '巴西': 'BR', '澳大利亚': 'AU', '加拿大': 'CA', '俄罗斯': 'RU',
-  '韩国': 'KR', '意大利': 'IT', '西班牙': 'ES', '墨西哥': 'MX', '阿根廷': 'AR',
-  '南非': 'ZA', '土耳其': 'TR', '沙特阿拉伯': 'SA', '阿联酋': 'AE', '泰国': 'TH',
-  '越南': 'VN', '印度尼西亚': 'ID', '菲律宾': 'PH', '马来西亚': 'MY', '新加坡': 'SG',
-  '尼泊尔': 'NP', '孟加拉国': 'BD', '巴基斯坦': 'PK', '斯里兰卡': 'LK', '缅甸': 'MM',
-  '柬埔寨': 'KH', '老挝': 'LA', '文莱': 'BN', '东帝汶': 'TL', '蒙古': 'MN'
-};
+// 动态构建中文文件名匹配映射 - 支持所有国家
+function buildChineseCountryMapping() {
+  const mapping = {};
+  
+  // 遍历所有世界国家，构建中文名到国家代码的映射
+  allWorldCountries.forEach(country => {
+    if (country.name_zh && country.code) {
+      mapping[country.name_zh] = country.code;
+    }
+  });
+  
+  return mapping;
+}
+
+// 获取中文国家映射（延迟初始化，确保 allWorldCountries 已加载）
+function getChineseCountryMapping() {
+  if (!window.chineseCountryMappingCache) {
+    window.chineseCountryMappingCache = buildChineseCountryMapping();
+  }
+  return window.chineseCountryMappingCache;
+}
 
 const chineseCardMapping = {
   '游戏市场': 'game_market',
@@ -2423,6 +2434,9 @@ function parseChineseFilename(filename) {
   // 移除文件扩展名
   const nameWithoutExt = filename.replace(/\.[^/.]+$/, '');
   
+  // 获取动态构建的国家映射
+  const chineseCountryMapping = getChineseCountryMapping();
+  
   // 支持的分隔符：- _ 空格
   const separators = ['-', '_', ' '];
   let countryName = '';
@@ -2441,8 +2455,10 @@ function parseChineseFilename(filename) {
   
   // 如果没有分隔符，尝试智能匹配
   if (!countryName && !cardType) {
-    // 尝试找到国家名
-    for (const [chinese, code] of Object.entries(chineseCountryMapping)) {
+    // 尝试找到国家名（按长度排序，优先匹配更长的国家名）
+    const sortedCountries = Object.keys(chineseCountryMapping).sort((a, b) => b.length - a.length);
+    
+    for (const chinese of sortedCountries) {
       if (nameWithoutExt.includes(chinese)) {
         countryName = chinese;
         cardType = nameWithoutExt.replace(chinese, '').trim();
