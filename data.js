@@ -1889,6 +1889,7 @@ function createCardElement(cardId, cardData) {
   // Create card content
   cardElement.innerHTML = `
     <h3>${cardData.title}</h3>
+    ${cardData.imageUrl ? `<img src="${cardData.imageUrl}" alt="${cardData.title} 图片" class="card-image">` : ''}
     <div>${cardData.content || ''}</div>
     ${cardData.note ? `<div class="card-note">${cardData.note}</div>` : ''}
   `;
@@ -2126,6 +2127,12 @@ function addCardEditorItem(container, cardId, cardData = null) {
       <label for="${cardId}_title">卡片标题：</label>
       <input type="text" id="${cardId}_title" name="title" value="${cardData.title}" placeholder="例如：经济环境">
     </div>
+    <div class="card-field image-upload-field">
+      <label for="${cardId}_imageUrl">图片上传：</label>
+      <input type="file" id="${cardId}_file_upload" class="image-file-upload" accept="image/*">
+      <input type="text" id="${cardId}_imageUrl" name="imageUrl" value="${cardData.imageUrl || ''}" placeholder="或直接输入图片URL" class="image-url-input">
+      ${cardData.imageUrl ? `<img src="${cardData.imageUrl}" alt="图片预览" class="image-preview" style="max-width: 100px; max-height: 100px; margin-top: 10px; display: block;">` : `<img src="" alt="图片预览" class="image-preview" style="max-width: 100px; max-height: 100px; margin-top: 10px; display: none;">`}
+    </div>
     <div class="card-field">
       <label>卡片内容：</label>
       <div class="card-content-toolbar">
@@ -2238,21 +2245,48 @@ async function saveCardData() {
   const cardForms = document.querySelectorAll(".card-editor-item");
   // 保存为数组，顺序与DOM一致
   countryData[countryCode].cards = [];
-  cardForms.forEach((form) => {
+
+  for (const form of cardForms) {
     const cardId = form.dataset.cardId;
     const title = form.querySelector("[name='title']").value.trim();
-    // 读取富文本内容
     const content = form.querySelector(".card-content-editor").innerHTML.trim();
     const note = form.querySelector("[name='note']").value.trim();
-    if (title || content) {
+
+    let imageUrl = form.querySelector("[name='imageUrl']").value.trim(); // 获取用户输入的URL
+    const fileInput = form.querySelector('.image-file-upload');
+    const file = fileInput.files[0];
+
+    if (file) {
+      // 如果有文件，上传到 Supabase Storage
+      const filePath = `${countryCode}/${cardId}-${Date.now()}-${file.name}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('card-images')
+        .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+      if (uploadError) {
+        alert('图片上传失败: ' + uploadError.message);
+        console.error('图片上传失败:', uploadError);
+        // 如果上传失败，可以考虑跳过这张卡片或者使用一个默认图片URL
+        continue; 
+      }
+      // 获取公共URL
+      const { data: publicUrlData } = supabase.storage
+        .from('card-images')
+        .getPublicUrl(filePath);
+      imageUrl = publicUrlData.publicUrl;
+    }
+
+    if (title || content || imageUrl) {
       countryData[countryCode].cards.push({
         id: cardId,
         title,
         content,
-        note
+        note,
+        imageUrl // 保存图片URL
       });
     }
-  });
+  }
+
   // Update UI if the country detail panel is showing this country
   const countryDetailName = document.getElementById("country-name").textContent;
   const chineseCountryName = getChineseCountryName(countryData[countryCode].name);
@@ -2334,16 +2368,49 @@ async function loadCountryDataFromSupabase() {
 async function saveCountryDataToSupabase(country_code) {
   const cards = countryData[country_code].cards;
   const detailAnalysisUrl = countryData[country_code].detailAnalysisUrl || '';
-  const payload = {
-    country_code,
-    cards,
-    detailAnalysisUrl
-  };
-  const { error } = await supabase
+
+  // 先清空该国家现有的卡片详情
+  const { error: deleteError } = await supabase
+    .from('country_card_details')
+    .delete()
+    .eq('country_code', country_code);
+
+  if (deleteError) {
+    alert('清空旧卡片数据失败: ' + deleteError.message);
+    return;
+  }
+
+  // 准备要插入的新卡片数据
+  const newCardDetails = cards.map((card, index) => ({
+    country_code: country_code,
+    card_id: card.id, // 使用 card.id 作为卡片唯一标识
+    title: card.title,
+    content: card.content,
+    note: card.note,
+    imageUrl: card.imageUrl || null, // 保存图片URL
+    order_index: index // 保存顺序
+  }));
+
+  // 批量插入新的卡片详情
+  const { error: insertError } = await supabase
+    .from('country_card_details')
+    .insert(newCardDetails);
+
+  if (insertError) {
+    alert('上传新卡片数据失败: ' + insertError.message);
+    return;
+  }
+
+  // 更新 country_cards 表的 detailAnalysisUrl
+  const { error: urlUpdateError } = await supabase
     .from('country_cards')
-    .upsert([payload], { onConflict: 'country_code' });
-  if (error) {
-    alert('上传到数据库失败: ' + error.message);
+    .upsert(
+      { country_code: country_code, detailAnalysisUrl: detailAnalysisUrl },
+      { onConflict: 'country_code' }
+    );
+
+  if (urlUpdateError) {
+    alert('更新详细分析链接失败: ' + urlUpdateError.message);
   }
 }
 
@@ -2391,3 +2458,36 @@ function createTemplateCards() {
     });
   });
 }
+
+// Add new event listeners for image upload and URL input
+const fileInput = cardEditForm.querySelector('.image-file-upload');
+const urlInput = cardEditForm.querySelector('.image-url-input');
+const imagePreview = cardEditForm.querySelector('.image-preview');
+
+fileInput.addEventListener('change', function() {
+  const file = this.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      imagePreview.src = e.target.result;
+      imagePreview.style.display = 'block';
+      urlInput.value = ''; // 清空URL输入框，因为用户选择了文件
+    };
+    reader.readAsDataURL(file);
+  } else {
+    imagePreview.src = '';
+    imagePreview.style.display = 'none';
+  }
+});
+
+urlInput.addEventListener('input', function() {
+  const url = this.value.trim();
+  if (url) {
+    imagePreview.src = url;
+    imagePreview.style.display = 'block';
+    fileInput.value = ''; // 清空文件选择，因为用户输入了URL
+  } else {
+    imagePreview.src = '';
+    imagePreview.style.display = 'none';
+  }
+});
