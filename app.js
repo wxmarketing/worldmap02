@@ -78,7 +78,12 @@ function initApp() {
   console.log("App initialized");
 
   // 调用数据初始化函数，确保在应用启动时加载 Supabase 数据
-  initDataAndSupabase();
+  console.log("准备调用 initDataAndSupabase");
+  initDataAndSupabase().then(() => {
+    console.log("initDataAndSupabase 调用完成");
+  }).catch(error => {
+    console.error("initDataAndSupabase 调用失败:", error);
+  });
 
   // Initialize search input
   const searchInput = document.getElementById("country-search");

@@ -2408,6 +2408,7 @@ function initImageModal() {
 
 // Initialize when DOM is ready
 document.addEventListener("DOMContentLoaded", function() {
+  console.log("data.js DOMContentLoaded 事件触发");
   initAdminPanel();
   initImageModal();
 });
@@ -2535,8 +2536,11 @@ async function saveCountryDataToSupabase(country_code) {
 
 // 新增导出的初始化函数，统一管理数据加载时序
 export async function initDataAndSupabase() {
+  console.log("initDataAndSupabase 函数被调用");
   initializeCountryData(); // 先初始化本地所有国家数据
+  console.log("initializeCountryData 完成");
   await loadCountryDataFromSupabase(); // 再从Supabase加载数据并覆盖本地数据
+  console.log("loadCountryDataFromSupabase 完成");
 }
 
 // 挂载到 window，确保 map.js 能访问
