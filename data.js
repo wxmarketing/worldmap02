@@ -2301,14 +2301,10 @@ async function saveCardData() {
       if (uploadError) {
         alert('图片上传失败: ' + uploadError.message);
         console.error('图片上传失败:', uploadError);
-        // 如果上传失败，可以考虑跳过这张卡片或者使用一个默认图片URL
         continue; 
       }
-      // 获取公共URL
-      const { data: publicUrlData } = supabase.storage
-        .from('card-images')
-        .getPublicUrl(filePath);
-      imageUrl = publicUrlData.publicUrl;
+      // 手动构建公共URL，因为getPublicUrl可能返回不正确的格式
+      imageUrl = `${supabaseUrl}/storage/v1/object/public/card-images/${filePath}`;
     }
 
     if (title || content || imageUrl) {
