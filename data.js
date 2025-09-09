@@ -2197,6 +2197,39 @@ function addCardEditorItem(container, cardId, cardData = null) {
     }
   });
   
+  // Add new event listeners for image upload and URL input (moved inside function)
+  const fileInput = cardEditForm.querySelector('.image-file-upload');
+  const urlInput = cardEditForm.querySelector('.image-url-input');
+  const imagePreview = cardEditForm.querySelector('.image-preview');
+  
+  fileInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        imagePreview.src = e.target.result;
+        imagePreview.style.display = 'block';
+        urlInput.value = ''; // 清空URL输入框，因为用户选择了文件
+      };
+      reader.readAsDataURL(file);
+    } else {
+      imagePreview.src = '';
+      imagePreview.style.display = 'none';
+    }
+  });
+  
+  urlInput.addEventListener('input', function() {
+    const url = this.value.trim();
+    if (url) {
+      imagePreview.src = url;
+      imagePreview.style.display = 'block';
+      fileInput.value = ''; // 清空文件选择，因为用户输入了URL
+    } else {
+      imagePreview.src = '';
+      imagePreview.style.display = 'none';
+    }
+  });
+  
   return cardEditForm;
 }
 
@@ -2429,15 +2462,10 @@ window.updateCountryDetail = updateCountryDetail;
 
 // 模板卡片顺序和标题
 const CARD_TEMPLATE_ORDER = [
-  { key: 'economic_environment', title: '经济环境' },
-  { key: 'payment_habits', title: '付费习惯' },
-  { key: 'infrastructure', title: '基础设施' },
-  { key: 'demographics', title: '人口特征' },
   { key: 'game_market', title: '游戏市场' },
-  { key: 'game_preferences', title: '游戏偏好' },
-  { key: 'app_usage', title: '应用使用' },
-  { key: 'mobile_payment', title: '移动支付' },
-  { key: 'cultural_customs', title: '文化习俗' }
+  { key: 'infrastructure', title: '基础设施' },
+  { key: 'mobile_device', title: '互联网使用' },
+  { key: 'culture', title: '文化习俗' }
 ];
 
 // 一键创建模板卡片
@@ -2458,36 +2486,3 @@ function createTemplateCards() {
     });
   });
 }
-
-// Add new event listeners for image upload and URL input
-const fileInput = cardEditForm.querySelector('.image-file-upload');
-const urlInput = cardEditForm.querySelector('.image-url-input');
-const imagePreview = cardEditForm.querySelector('.image-preview');
-
-fileInput.addEventListener('change', function() {
-  const file = this.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      imagePreview.src = e.target.result;
-      imagePreview.style.display = 'block';
-      urlInput.value = ''; // 清空URL输入框，因为用户选择了文件
-    };
-    reader.readAsDataURL(file);
-  } else {
-    imagePreview.src = '';
-    imagePreview.style.display = 'none';
-  }
-});
-
-urlInput.addEventListener('input', function() {
-  const url = this.value.trim();
-  if (url) {
-    imagePreview.src = url;
-    imagePreview.style.display = 'block';
-    fileInput.value = ''; // 清空文件选择，因为用户输入了URL
-  } else {
-    imagePreview.src = '';
-    imagePreview.style.display = 'none';
-  }
-});
