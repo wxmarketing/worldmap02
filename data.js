@@ -1860,6 +1860,10 @@ export function updateCountryDetail(countryName, countryCode) {
   } else if (data.cards && typeof data.cards === 'object') {
     cardsArr = Object.values(data.cards);
   }
+  
+  // 临时调试：查看数据结构
+  console.log('Cards data structure:', data.cards);
+  console.log('Cards array:', cardsArr);
   if (cardsArr.length > 0) {
     cardsArr.forEach(cardData => {
       const cardElement = createCardElement(cardData.id || '', cardData);
