@@ -634,10 +634,11 @@ body.night-mode .autocomplete-item:hover {
 }
 
 .card-image {
-    width: 100%;        /* 图片宽度填满卡片 */
+    max-width: 100%;    /* 图片最大宽度不超过卡片 */
+    width: auto;        /* 宽度自适应 */
     height: auto;       /* 保持图片比例 */
     display: block;     /* 移除图片底部空白 */
-    margin: 10px 0;     /* 上下留白 */
+    margin: 10px auto;  /* 上下留白，水平居中 */
     border-radius: 5px; /* 轻微圆角 */
     box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 轻微阴影 */
     cursor: pointer;    /* 鼠标悬停时显示手型，提示可点击 */
