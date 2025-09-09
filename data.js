@@ -2354,6 +2354,8 @@ async function loadCountryDataFromSupabase() {
             return;
         }
 
+        console.log("Supabase 返回的 cardDetailsData:", cardDetailsData); // 添加调试日志
+
         const cardsByCountry = cardDetailsData.reduce((acc, card) => {
             if (!acc[card.country_code]) {
                 acc[card.country_code] = [];
