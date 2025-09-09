@@ -2347,7 +2347,7 @@ async function loadCountryDataFromSupabase() {
 
         const { data: cardDetailsData, error: cardDetailsError } = await supabase
             .from('country_card_details')
-            .select('country_code, card_id, title, content, note, order_index');
+            .select('country_code, card_id, title, content, note, order_index, imageUrl');
 
         if (cardDetailsError) {
             console.error('从 country_card_details 表加载数据失败:', cardDetailsError);
@@ -2363,7 +2363,8 @@ async function loadCountryDataFromSupabase() {
                 title: card.title,
                 content: card.content,
                 note: card.note,
-                order_index: card.order_index
+                order_index: card.order_index,
+                imageUrl: card.imageUrl
             });
             return acc;
         }, {});
