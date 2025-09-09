@@ -54,25 +54,51 @@
       <button id="close-admin">×</button>
     </div>
     <div class="admin-content">
-      <div class="data-management">
-        <h3>Data Management</h3>
-        <select id="admin-country-select">
-          <option value="">Select Country</option>
-          <!-- Countries will be added dynamically -->
-        </select>
-        
-        <div id="cards-editor" class="cards-editor">
-          <h4>Edit Country Information Cards</h4>
-          <div class="card-controls">
-            <button id="add-card">添加卡片</button>
-            <button id="create-template">创建模板</button>
+        <div class="data-management">
+          <h3>Data Management</h3>
+          
+          <!-- 批量上传区域 -->
+          <div class="batch-upload-section">
+            <h4>批量上传图片</h4>
+            <div id="batch-drop-zone" class="batch-drop-zone">
+              <div class="drop-zone-content">
+                <p>📁 拖拽图片文件到此处，或点击选择文件</p>
+                <p class="drop-zone-hint">支持中文文件名：如 "中国-游戏市场.jpg"</p>
+                <input type="file" id="batch-file-input" multiple accept="image/*" style="display: none;">
+                <button id="select-files-btn" class="batch-btn">选择文件</button>
+              </div>
+            </div>
+            <div id="batch-preview" class="batch-preview hidden">
+              <h5>上传预览</h5>
+              <div id="batch-preview-list"></div>
+              <div class="batch-controls">
+                <button id="batch-upload-btn" class="batch-btn primary">开始批量上传</button>
+                <button id="batch-cancel-btn" class="batch-btn">取消</button>
+              </div>
+            </div>
           </div>
-          <div id="card-editor-list">
-            <!-- 卡片编辑表单将由JavaScript动态生成 -->
+          
+          <!-- 单个编辑区域 -->
+          <div class="single-edit-section">
+            <h4>单个编辑</h4>
+            <select id="admin-country-select">
+              <option value="">Select Country</option>
+              <!-- Countries will be added dynamically -->
+            </select>
+            
+            <div id="cards-editor" class="cards-editor">
+              <h4>Edit Country Information Cards</h4>
+              <div class="card-controls">
+                <button id="add-card">添加卡片</button>
+                <button id="create-template">创建模板</button>
+              </div>
+              <div id="card-editor-list">
+                <!-- 卡片编辑表单将由JavaScript动态生成 -->
+              </div>
+              <button id="save-data" class="save-button">保存更改</button>
+            </div>
           </div>
-          <button id="save-data" class="save-button">保存更改</button>
         </div>
-      </div>
     </div>
   </div>
 

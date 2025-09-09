@@ -2391,10 +2391,297 @@ function initImageModal() {
   });
 }
 
+// 批量上传功能
+let batchFiles = [];
+
+// 中文文件名匹配映射
+const chineseCountryMapping = {
+  '中国': 'CN', '美国': 'US', '日本': 'JP', '印度': 'IN', '德国': 'DE', '法国': 'FR',
+  '英国': 'GB', '巴西': 'BR', '澳大利亚': 'AU', '加拿大': 'CA', '俄罗斯': 'RU',
+  '韩国': 'KR', '意大利': 'IT', '西班牙': 'ES', '墨西哥': 'MX', '阿根廷': 'AR',
+  '南非': 'ZA', '土耳其': 'TR', '沙特阿拉伯': 'SA', '阿联酋': 'AE', '泰国': 'TH',
+  '越南': 'VN', '印度尼西亚': 'ID', '菲律宾': 'PH', '马来西亚': 'MY', '新加坡': 'SG',
+  '尼泊尔': 'NP', '孟加拉国': 'BD', '巴基斯坦': 'PK', '斯里兰卡': 'LK', '缅甸': 'MM',
+  '柬埔寨': 'KH', '老挝': 'LA', '文莱': 'BN', '东帝汶': 'TL', '蒙古': 'MN'
+};
+
+const chineseCardMapping = {
+  '游戏市场': 'game_market',
+  '基础设施': 'infrastructure', 
+  '互联网使用': 'mobile_device',
+  '文化习俗': 'culture',
+  '经济环境': 'economic_environment',
+  '付费习惯': 'payment_habits',
+  '人口特征': 'demographics',
+  '游戏偏好': 'game_preferences',
+  '应用使用': 'app_usage',
+  '移动支付': 'mobile_payment'
+};
+
+// 智能解析中文文件名
+function parseChineseFilename(filename) {
+  // 移除文件扩展名
+  const nameWithoutExt = filename.replace(/\.[^/.]+$/, '');
+  
+  // 支持的分隔符：- _ 空格
+  const separators = ['-', '_', ' '];
+  let countryName = '';
+  let cardType = '';
+  
+  for (const separator of separators) {
+    if (nameWithoutExt.includes(separator)) {
+      const parts = nameWithoutExt.split(separator);
+      if (parts.length >= 2) {
+        countryName = parts[0].trim();
+        cardType = parts[1].trim();
+        break;
+      }
+    }
+  }
+  
+  // 如果没有分隔符，尝试智能匹配
+  if (!countryName && !cardType) {
+    // 尝试找到国家名
+    for (const [chinese, code] of Object.entries(chineseCountryMapping)) {
+      if (nameWithoutExt.includes(chinese)) {
+        countryName = chinese;
+        cardType = nameWithoutExt.replace(chinese, '').trim();
+        break;
+      }
+    }
+  }
+  
+  const countryCode = chineseCountryMapping[countryName];
+  const cardId = chineseCardMapping[cardType];
+  
+  return {
+    countryName,
+    countryCode,
+    cardType,
+    cardId,
+    isValid: !!(countryCode && cardId)
+  };
+}
+
+// 初始化批量上传功能
+function initBatchUpload() {
+  const dropZone = document.getElementById('batch-drop-zone');
+  const fileInput = document.getElementById('batch-file-input');
+  const selectBtn = document.getElementById('select-files-btn');
+  const preview = document.getElementById('batch-preview');
+  const previewList = document.getElementById('batch-preview-list');
+  const uploadBtn = document.getElementById('batch-upload-btn');
+  const cancelBtn = document.getElementById('batch-cancel-btn');
+  
+  if (!dropZone || !fileInput) return;
+  
+  // 点击选择文件
+  selectBtn.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('click', () => fileInput.click());
+  
+  // 文件选择事件
+  fileInput.addEventListener('change', handleFileSelect);
+  
+  // 拖拽事件
+  dropZone.addEventListener('dragover', handleDragOver);
+  dropZone.addEventListener('dragleave', handleDragLeave);
+  dropZone.addEventListener('drop', handleDrop);
+  
+  // 按钮事件
+  uploadBtn.addEventListener('click', startBatchUpload);
+  cancelBtn.addEventListener('click', cancelBatchUpload);
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('dragover');
+}
+
+function handleDragLeave(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  const files = Array.from(e.dataTransfer.files);
+  processFiles(files);
+}
+
+function handleFileSelect(e) {
+  const files = Array.from(e.target.files);
+  processFiles(files);
+}
+
+function processFiles(files) {
+  // 过滤图片文件
+  const imageFiles = files.filter(file => file.type.startsWith('image/'));
+  
+  if (imageFiles.length === 0) {
+    alert('请选择图片文件！');
+    return;
+  }
+  
+  batchFiles = imageFiles.map(file => {
+    const parseResult = parseChineseFilename(file.name);
+    return {
+      file,
+      filename: file.name,
+      ...parseResult
+    };
+  });
+  
+  displayBatchPreview();
+}
+
+function displayBatchPreview() {
+  const preview = document.getElementById('batch-preview');
+  const previewList = document.getElementById('batch-preview-list');
+  
+  previewList.innerHTML = '';
+  
+  batchFiles.forEach((item, index) => {
+    const previewItem = document.createElement('div');
+    previewItem.className = 'batch-preview-item';
+    
+    // 创建缩略图
+    const thumbnail = document.createElement('img');
+    thumbnail.className = 'batch-preview-thumbnail';
+    thumbnail.src = URL.createObjectURL(item.file);
+    
+    // 创建信息区域
+    const info = document.createElement('div');
+    info.className = 'batch-preview-info';
+    
+    const filename = document.createElement('div');
+    filename.className = 'batch-preview-filename';
+    filename.textContent = item.filename;
+    
+    const match = document.createElement('div');
+    match.className = `batch-preview-match ${item.isValid ? 'success' : 'error'}`;
+    
+    if (item.isValid) {
+      match.textContent = `✓ ${item.countryName} - ${item.cardType}`;
+    } else {
+      match.textContent = `✗ 无法识别文件名格式`;
+    }
+    
+    info.appendChild(filename);
+    info.appendChild(match);
+    previewItem.appendChild(thumbnail);
+    previewItem.appendChild(info);
+    previewList.appendChild(previewItem);
+  });
+  
+  preview.classList.remove('hidden');
+}
+
+async function startBatchUpload() {
+  const validFiles = batchFiles.filter(item => item.isValid);
+  
+  if (validFiles.length === 0) {
+    alert('没有可上传的有效文件！');
+    return;
+  }
+  
+  const uploadBtn = document.getElementById('batch-upload-btn');
+  uploadBtn.textContent = '上传中...';
+  uploadBtn.disabled = true;
+  
+  let successCount = 0;
+  let errorCount = 0;
+  
+  for (const item of validFiles) {
+    try {
+      // 生成安全的文件名
+      const fileExtension = item.file.name.split('.').pop();
+      const safeFileName = `${item.cardId}-${Date.now()}.${fileExtension}`;
+      const filePath = `${item.countryCode}/${safeFileName}`;
+      
+      // 上传到 Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('card-images')
+        .upload(filePath, item.file, { cacheControl: '3600', upsert: false });
+      
+      if (uploadError) {
+        console.error(`上传失败 ${item.filename}:`, uploadError);
+        errorCount++;
+        continue;
+      }
+      
+      // 构建图片URL
+      const imageUrl = `${supabaseUrl}/storage/v1/object/public/card-images/${filePath}`;
+      
+      // 保存到数据库
+      await saveBatchImageToDatabase(item.countryCode, item.cardId, imageUrl);
+      successCount++;
+      
+    } catch (error) {
+      console.error(`处理文件失败 ${item.filename}:`, error);
+      errorCount++;
+    }
+  }
+  
+  // 显示结果
+  alert(`批量上传完成！\n成功: ${successCount} 个\n失败: ${errorCount} 个`);
+  
+  // 重置界面
+  cancelBatchUpload();
+}
+
+async function saveBatchImageToDatabase(countryCode, cardId, imageUrl) {
+  // 确保国家数据存在
+  if (!countryData[countryCode]) {
+    const countryInfo = allWorldCountries.find(country => country.code === countryCode);
+    if (countryInfo) {
+      countryData[countryCode] = {
+        name: countryInfo.name,
+        name_zh: countryInfo.name_zh,
+        region: getRegionForCountry(countryCode),
+        region_zh: getChineseRegionName(getRegionForCountry(countryCode)),
+        flagUrl: `https://flagcdn.com/${countryCode.toLowerCase()}.svg`,
+        cards: [],
+        detailAnalysisUrl: ""
+      };
+    }
+  }
+  
+  // 查找或创建卡片
+  let existingCard = countryData[countryCode].cards.find(card => card.id === cardId);
+  
+  if (existingCard) {
+    // 更新现有卡片的图片
+    existingCard.imageUrl = imageUrl;
+  } else {
+    // 创建新卡片
+    const cardTitle = Object.keys(chineseCardMapping).find(key => chineseCardMapping[key] === cardId) || cardId;
+    countryData[countryCode].cards.push({
+      id: cardId,
+      title: cardTitle,
+      content: '',
+      note: '',
+      imageUrl: imageUrl
+    });
+  }
+  
+  // 保存到 Supabase
+  await saveCountryDataToSupabase(countryCode);
+}
+
+function cancelBatchUpload() {
+  batchFiles = [];
+  document.getElementById('batch-preview').classList.add('hidden');
+  document.getElementById('batch-file-input').value = '';
+  document.getElementById('batch-upload-btn').textContent = '开始批量上传';
+  document.getElementById('batch-upload-btn').disabled = false;
+}
+
 // Initialize when DOM is ready
 document.addEventListener("DOMContentLoaded", function() {
   initAdminPanel();
   initImageModal();
+  initBatchUpload();
 });
 
 // 拉取所有国家卡片数据（supabase）

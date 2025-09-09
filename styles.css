@@ -708,3 +708,152 @@ body.night-mode .autocomplete-item:hover {
 .image-modal-close:hover {
     color: #ccc;
 }
+
+/* 批量上传样式 */
+.batch-upload-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.single-edit-section {
+    padding: 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+}
+
+.batch-drop-zone {
+    border: 3px dashed #ccc;
+    border-radius: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    background-color: #fafafa;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.batch-drop-zone:hover,
+.batch-drop-zone.dragover {
+    border-color: #4CAF50;
+    background-color: #f0f8f0;
+}
+
+.drop-zone-content p {
+    margin: 10px 0;
+    color: #666;
+}
+
+.drop-zone-hint {
+    font-size: 12px !important;
+    color: #999 !important;
+}
+
+.batch-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.batch-btn.primary {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.batch-btn.primary:hover {
+    background-color: #45a049;
+}
+
+.batch-btn:not(.primary) {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.batch-btn:not(.primary):hover {
+    background-color: #e0e0e0;
+}
+
+.batch-preview {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: white;
+}
+
+.batch-preview-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    gap: 15px;
+}
+
+.batch-preview-item:last-child {
+    border-bottom: none;
+}
+
+.batch-preview-thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.batch-preview-info {
+    flex: 1;
+}
+
+.batch-preview-filename {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.batch-preview-match {
+    font-size: 12px;
+    color: #666;
+}
+
+.batch-preview-match.success {
+    color: #4CAF50;
+}
+
+.batch-preview-match.error {
+    color: #f44336;
+}
+
+.batch-controls {
+    text-align: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+/* 夜间模式适配 */
+.dark-mode .batch-upload-section,
+.dark-mode .single-edit-section {
+    background-color: #2a2a2a;
+    border-color: #444;
+}
+
+.dark-mode .batch-drop-zone {
+    background-color: #333;
+    border-color: #555;
+}
+
+.dark-mode .batch-drop-zone:hover,
+.dark-mode .batch-drop-zone.dragover {
+    background-color: #2d4a2d;
+}
+
+.dark-mode .batch-preview {
+    background-color: #2a2a2a;
+    border-color: #444;
+}
