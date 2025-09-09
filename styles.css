@@ -632,3 +632,30 @@ body.night-mode .autocomplete-results {
 body.night-mode .autocomplete-item:hover {
   background-color: #3e3e3e !important;
 }
+
+.card-image {
+    max-width: 100%;    /* 确保图片不会超出卡片宽度 */
+    max-height: 200px;  /* 限制图片最大高度，避免过高 */
+    width: auto;        /* 保持图片比例 */
+    height: auto;       /* 保持图片比例 */
+    display: block;     /* 移除图片底部空白 */
+    margin: 10px auto;  /* 上下留白，居中显示 */
+    border-radius: 5px; /* 轻微圆角 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 轻微阴影 */
+    object-fit: contain; /* 确保图片完整显示在限定区域内 */
+}
+
+/* 夜间模式适配 */
+.dark-mode .card-image {
+    filter: brightness(0.8); /* 在夜间模式下稍微调暗图片 */
+}
+
+/* 管理面板中的图片预览样式 */
+.image-preview {
+    max-width: 100px;
+    max-height: 100px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    object-fit: contain; /* 确保图片完整显示在框内 */
+}
