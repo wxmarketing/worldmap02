@@ -1,4 +1,4 @@
-import { supabase } from './supabase.js';
+import { supabase, supabaseUrl } from './supabase.js';
 
 // 区域中文翻译映射
 export const regionTranslations = {
