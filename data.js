@@ -2291,7 +2291,9 @@ async function saveCardData() {
 
     if (file) {
       // 如果有文件，上传到 Supabase Storage
-      const filePath = `${countryCode}/${cardId}-${Date.now()}-${file.name}`;
+      const fileExtension = file.name.split('.').pop(); // 获取文件扩展名
+      const safeFileName = `${cardId}-${Date.now()}.${fileExtension}`; // 构建一个安全的文件名
+      const filePath = `${countryCode}/${safeFileName}`;
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('card-images')
         .upload(filePath, file, { cacheControl: '3600', upsert: false });
