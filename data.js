@@ -2364,7 +2364,7 @@ async function loadCountryDataFromSupabase() {
                 content: card.content,
                 note: card.note,
                 order_index: card.order_index,
-                imageUrl: card.imageUrl
+                imageUrl: card.imageUrl // 确保加载 imageUrl
             });
             return acc;
         }, {});
