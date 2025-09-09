@@ -1889,8 +1889,8 @@ function createCardElement(cardId, cardData) {
   cardElement.innerHTML = `
     <h3>${cardData.title}</h3>
     <div>${cardData.content || ''}</div>
-    ${cardData.imageUrl ? `<img src="${cardData.imageUrl}" alt="${cardData.title} 图片" class="card-image">` : ''}
     ${cardData.note ? `<div class="card-note">${cardData.note}</div>` : ''}
+    ${cardData.imageUrl ? `<img src="${cardData.imageUrl}" alt="${cardData.title} 图片" class="card-image">` : ''}
   `;
   
   // 为图片添加点击事件监听器
