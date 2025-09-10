@@ -636,12 +636,10 @@ body.night-mode .country.has-data {
   color: #333;
   outline: none;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .modern-search-input:focus {
   border-color: var(--accent-color);
-  box-shadow: 0 4px 20px rgba(76, 175, 80, 0.2);
   transform: translateY(-1px);
 }
 
@@ -746,7 +744,6 @@ body.night-mode .modern-search-input::placeholder {
 
 body.night-mode .modern-search-input:focus {
   border-color: var(--accent-color) !important;
-  box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3) !important;
 }
 
 body.night-mode .search-icon {
