@@ -2439,8 +2439,8 @@ function parseChineseFilename(filename) {
   
   // 特殊匹配规则：xxx国社媒→互联网使用，xx国手机→基础设施
   const specialPatterns = [
-    { pattern: /(.+)国社媒$/, cardType: '互联网使用', cardId: 'mobile_device' },
-    { pattern: /(.+)国手机$/, cardType: '基础设施', cardId: 'infrastructure' }
+    { pattern: /(.+)社媒$/, cardType: '互联网使用', cardId: 'mobile_device' },
+    { pattern: /(.+)手机$/, cardType: '基础设施', cardId: 'infrastructure' }
   ];
   
   // 检查特殊模式
