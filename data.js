@@ -2437,6 +2437,31 @@ function parseChineseFilename(filename) {
   // 获取动态构建的国家映射
   const chineseCountryMapping = getChineseCountryMapping();
   
+  // 特殊匹配规则：xxx国社媒→互联网使用，xx国手机→基础设施
+  const specialPatterns = [
+    { pattern: /(.+)国社媒$/, cardType: '互联网使用', cardId: 'mobile_device' },
+    { pattern: /(.+)国手机$/, cardType: '基础设施', cardId: 'infrastructure' }
+  ];
+  
+  // 检查特殊模式
+  for (const { pattern, cardType, cardId } of specialPatterns) {
+    const match = nameWithoutExt.match(pattern);
+    if (match) {
+      const countryNamePart = match[1]; // 提取国家名部分
+      const countryCode = chineseCountryMapping[countryNamePart];
+      
+      if (countryCode) {
+        return {
+          countryName: countryNamePart,
+          countryCode,
+          cardType,
+          cardId,
+          isValid: true
+        };
+      }
+    }
+  }
+  
   // 支持的分隔符：- _ 空格
   const separators = ['-', '_', ' '];
   let countryName = '';
