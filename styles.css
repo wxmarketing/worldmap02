@@ -132,7 +132,7 @@ select {
 
 /* Main Layout */
 main {
-  padding: 1rem 2rem 2rem 2rem;
+  padding: 0.5rem 2rem 2rem 2rem;
 }
 
 .dashboard-container {
@@ -500,7 +500,7 @@ footer p {
   
   /* 移动端搜索框样式 */
   .search-section {
-    padding: 8px 20px;
+    padding: 12px 20px;
   }
   
   .search-container {
@@ -611,7 +611,7 @@ body.night-mode .country.has-data {
 /* 搜索框区域样式 */
 .search-section {
   background-color: var(--background-color);
-  padding: 10px 0;
+  padding: 15px 0;
   display: flex;
   justify-content: center;
   align-items: center;
