@@ -72,49 +72,10 @@ function selectAutocompleteItem(countryName, countryCode, countryNameZh) {
   // We might need to directly call onCountryClick if filterMapCountries doesn't always trigger it
 }
 
-// Initialize logo with fallback handling
-function initLogo() {
-  const logo = document.getElementById('site-logo');
-  const fallback = document.getElementById('logo-fallback');
-  
-  if (logo && fallback) {
-    // Hide fallback initially
-    fallback.style.display = 'none';
-    
-    // Handle logo load error
-    logo.addEventListener('error', () => {
-      logo.style.display = 'none';
-      fallback.style.display = 'block';
-    });
-    
-    // Handle successful logo load
-    logo.addEventListener('load', () => {
-      logo.style.display = 'block';
-      fallback.style.display = 'none';
-    });
-    
-    // Check if logo is already loaded (for cached images)
-    if (logo.complete) {
-      if (logo.naturalWidth === 0) {
-        // Image failed to load
-        logo.style.display = 'none';
-        fallback.style.display = 'block';
-      } else {
-        // Image loaded successfully
-        logo.style.display = 'block';
-        fallback.style.display = 'none';
-      }
-    }
-  }
-}
-
 // Initialize the application
 function initApp() {
   // 调用数据初始化函数，确保在应用启动时加载 Supabase 数据
   initDataAndSupabase();
-
-  // Initialize logo fallback
-  initLogo();
 
   // Initialize search input
   const searchInput = document.getElementById("country-search");

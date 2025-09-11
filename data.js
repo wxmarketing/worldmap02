@@ -59,7 +59,7 @@ async function generateCountryCards(countryName, countryNameZh) {
   const prompt = `你是一个专业的国家市场分析师。请为${countryNameZh || countryName}生成以下4个方面的分析内容。
 
 要求：
-1. 每个内容部分控制在30-50字
+1. 每个内容部分控制在80-150字
 2. 注释部分包含具体数据和年份（2023-2024年）
 3. 数据要真实可信，符合该国实际情况
 4. 语言风格要专业简洁
