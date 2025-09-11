@@ -20,6 +20,19 @@ Deno.serve(async (req) => {
     const { prompt, model = "deepseek-chat", max_tokens = 2000, temperature = 0.7 } = await req.json();
     if (!prompt) return new Response(JSON.stringify({ error: "Missing prompt" }), { status: 400, headers: corsJson() });
 
+    // 轻量健康检查：避免依赖 Logs 也能快速判断密钥与 CORS 状态
+    if (prompt === "__health__") {
+      return new Response(
+        JSON.stringify({
+          ok: true,
+          hasKey: Boolean(DEEPSEEK_API_KEY),
+          keyLen: DEEPSEEK_API_KEY?.length || 0,
+          allowOrigin: ALLOW_ORIGIN
+        }),
+        { status: 200, headers: corsJson() }
+      );
+    }
+
     const upstream = await fetch(DEEPSEEK_API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${DEEPSEEK_API_KEY}` },
