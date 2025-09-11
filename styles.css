@@ -293,7 +293,6 @@ main {
   border-top: 1px solid var(--border-color);
   margin-top: 1.2rem;
   padding-top: 0.75rem;
-  font-style: italic;
 }
 
 /* 管理面板的卡片编辑样式 */

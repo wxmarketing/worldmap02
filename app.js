@@ -81,6 +81,28 @@ function initApp() {
   const searchInput = document.getElementById("country-search");
   if (searchInput) {
     searchInput.addEventListener("input", debounce(handleSearchInput, 300));
+    
+    // Add Enter key search functionality
+    searchInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        const searchTerm = event.target.value.trim().toLowerCase();
+        if (searchTerm) {
+          // Find the first matching country
+          const matchedCountry = allWorldCountries.find(country => {
+            const name = country.name ? country.name.toLowerCase() : '';
+            const name_zh = country.name_zh ? country.name_zh.toLowerCase() : '';
+            return name.includes(searchTerm) || name_zh.includes(searchTerm);
+          });
+          
+          if (matchedCountry) {
+            // Select the first match
+            selectAutocompleteItem(matchedCountry.name, matchedCountry.code, matchedCountry.name_zh);
+          }
+        }
+      }
+    });
+    
     // Hide autocomplete results when search input loses focus
     searchInput.addEventListener("blur", () => {
       setTimeout(() => {
