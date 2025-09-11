@@ -2154,6 +2154,10 @@ function addAIMoreActions(container, onRegenerate) {
 
 // Helper function to add detail analysis button
 function addDetailAnalysisButton(container, countryData, countryCode) {
+  // 若未配置链接，直接不渲染按钮
+  if (!countryData.detailAnalysisUrl || countryData.detailAnalysisUrl.trim() === "") {
+    return;
+  }
   // Create button container
   const buttonContainer = document.createElement("div");
   buttonContainer.className = "detail-analysis-container";
@@ -2191,17 +2195,8 @@ function addDetailAnalysisButton(container, countryData, countryCode) {
         url = "https://" + url;
       }
       window.open(url, "_blank");
-    } else {
-      alert("该国家暂未设置详细分析链接，请在管理面板中进行配置。");
     }
   });
-  
-  // Check if URL is available and style accordingly
-  if (!countryData.detailAnalysisUrl || countryData.detailAnalysisUrl.trim() === "") {
-    analysisButton.style.backgroundColor = "#cccccc";
-    analysisButton.style.cursor = "not-allowed";
-    analysisButton.title = "请在管理面板中设置分析链接";
-  }
   
   buttonContainer.appendChild(analysisButton);
   container.appendChild(buttonContainer);
