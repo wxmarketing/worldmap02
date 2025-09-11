@@ -2119,12 +2119,30 @@ function addAIMoreActions(container, onRegenerate) {
   bar.style.marginTop = '12px';
 
   const regenBtn = document.createElement('button');
-  regenBtn.textContent = '🔄 重新生成';
-  regenBtn.style.padding = '8px 14px';
-  regenBtn.style.border = '1px solid #ddd';
-  regenBtn.style.borderRadius = '16px';
+  // 使用图标+文字的清晰按钮样式
+  regenBtn.innerHTML = `
+    <span style="display:inline-flex;align-items:center;gap:6px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 12a8 8 0 1 1-2.34-5.66" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M20 4v6h-6" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>重新生成</span>
+    </span>`;
+  regenBtn.style.padding = '8px 16px';
+  regenBtn.style.border = '1px solid var(--border-color)';
+  regenBtn.style.borderRadius = '18px';
   regenBtn.style.background = '#fff';
   regenBtn.style.cursor = 'pointer';
+  regenBtn.style.fontSize = '14px';
+  regenBtn.style.color = 'var(--text-color)';
+  regenBtn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.06)';
+
+  regenBtn.addEventListener('mouseenter', function(){
+    this.style.background = '#f7f7f7';
+  });
+  regenBtn.addEventListener('mouseleave', function(){
+    this.style.background = '#fff';
+  });
 
   regenBtn.addEventListener('click', () => {
     if (typeof onRegenerate === 'function') onRegenerate();
