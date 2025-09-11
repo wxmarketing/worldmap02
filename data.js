@@ -1,4 +1,4 @@
-import { supabase, supabaseUrl } from './supabase.js';
+import { supabase, supabaseUrl, supabaseAnonKey } from './supabase.js';
 
 // DeepSeek 代理（Supabase Edge Function）配置
 const EDGE_URL = 'https://jpptkbrygzcfjboicowo.supabase.co/functions/v1/deepseek';
@@ -13,7 +13,11 @@ async function callDeepSeekAPI(prompt) {
   try {
     const response = await fetch(EDGE_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        // Supabase Functions 可能要求 Authorization 头（anon key）
+        'Authorization': `Bearer ${supabaseAnonKey}`
+      },
       body: JSON.stringify({
         prompt,
         model: DEEPSEEK_CONFIG.model,
