@@ -1983,7 +1983,7 @@ export function updateCountryDetail(countryName, countryCode) {
   } else {
     const noDataCard = document.createElement("div");
     noDataCard.className = "country-card";
-    noDataCard.innerHTML = `<h3>数据待更新</h3><p>该国家/地区的详细卡片信息正在整理中，您可以尝试使用Deepseek自动生成。</p>`;
+    noDataCard.innerHTML = `<h3>数据待更新</h3><p>该国家/地区的详细卡片信息正在整理中，您可以点击下方按钮使用AI自动生成相关内容。</p>`;
     cardsContainer.appendChild(noDataCard);
 
     // AI 生成按钮区域
@@ -2005,7 +2005,7 @@ export function updateCountryDetail(countryName, countryCode) {
     aiHint.style.fontSize = '12px';
     aiHint.style.color = '#888';
     aiHint.style.marginTop = '6px';
-    aiHint.textContent = '说明：内容为AI临时生成，仅供参考，离开本页面后不保留。';
+    aiHint.textContent = '说明：内容通过DeepSeek-V3.1生成，仅供参考，离开本页面后不保留。';
 
     aiContainer.appendChild(aiBtn);
     aiContainer.appendChild(aiHint);
