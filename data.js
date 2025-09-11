@@ -4,15 +4,15 @@ import { supabase, supabaseUrl } from './supabase.js';
 const DEEPSEEK_CONFIG = {
   apiUrl: 'https://api.deepseek.com/chat/completions',
   model: 'deepseek-chat',
-  apiKey: '', // 用户需要在这里设置API密钥
+  apiKey: 'sk-3b761fcc330447d48416d73626a4d2fc',
   maxTokens: 2000,
   temperature: 0.7
 };
 
 // DeepSeek API调用函数
 async function callDeepSeekAPI(prompt) {
-  if (!DEEPSEEK_CONFIG.apiKey) {
-    throw new Error('请先设置DeepSeek API密钥');
+  if (!DEEPSEEK_CONFIG.apiKey || DEEPSEEK_CONFIG.apiKey === 'YOUR_API_KEY_HERE') {
+    throw new Error('DeepSeek API密钥未正确配置，请联系开发者');
   }
 
   try {
@@ -121,21 +121,8 @@ async function generateCountryCards(countryName, countryNameZh) {
   }
 }
 
-// 设置DeepSeek API密钥的函数
-function setDeepSeekAPIKey(apiKey) {
-  DEEPSEEK_CONFIG.apiKey = apiKey;
-  console.log('DeepSeek API密钥已设置');
-}
-
-// 检查API密钥是否已设置
-function isDeepSeekAPIKeySet() {
-  return !!DEEPSEEK_CONFIG.apiKey;
-}
-
 // 导出AI相关函数供外部使用
 window.generateCountryCards = generateCountryCards;
-window.setDeepSeekAPIKey = setDeepSeekAPIKey;
-window.isDeepSeekAPIKeySet = isDeepSeekAPIKeySet;
 
 // 区域中文翻译映射
 export const regionTranslations = {
