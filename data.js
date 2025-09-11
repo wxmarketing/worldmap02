@@ -1,38 +1,24 @@
 import { supabase, supabaseUrl } from './supabase.js';
 
-// DeepSeek API 配置
+// DeepSeek 代理（Supabase Edge Function）配置
+const EDGE_URL = 'https://jpptkbrygzcfjboicowo.supabase.co/functions/v1/deepseek';
 const DEEPSEEK_CONFIG = {
-  apiUrl: 'https://api.deepseek.com/chat/completions',
   model: 'deepseek-chat',
-  apiKey: 'sk-3b761fcc330447d48416d73626a4d2fc',
   maxTokens: 2000,
   temperature: 0.7
 };
 
-// DeepSeek API调用函数
+// DeepSeek API调用函数（通过后端代理）
 async function callDeepSeekAPI(prompt) {
-  if (!DEEPSEEK_CONFIG.apiKey || DEEPSEEK_CONFIG.apiKey === 'YOUR_API_KEY_HERE') {
-    throw new Error('DeepSeek API密钥未正确配置，请联系开发者');
-  }
-
   try {
-    const response = await fetch(DEEPSEEK_CONFIG.apiUrl, {
+    const response = await fetch(EDGE_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${DEEPSEEK_CONFIG.apiKey}`
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        prompt,
         model: DEEPSEEK_CONFIG.model,
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
         max_tokens: DEEPSEEK_CONFIG.maxTokens,
-        temperature: DEEPSEEK_CONFIG.temperature,
-        stream: false
+        temperature: DEEPSEEK_CONFIG.temperature
       })
     });
 
@@ -42,12 +28,13 @@ async function callDeepSeekAPI(prompt) {
     }
 
     const data = await response.json();
-    
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      throw new Error('DeepSeek API返回数据格式异常');
+
+    const content = data?.data?.choices?.[0]?.message?.content;
+    if (!content) {
+      throw new Error('DeepSeek API返回数据为空');
     }
 
-    return data.choices[0].message.content;
+    return content;
   } catch (error) {
     console.error('DeepSeek API调用错误:', error);
     throw error;
