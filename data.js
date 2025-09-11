@@ -1992,8 +1992,68 @@ export function updateCountryDetail(countryName, countryCode) {
   } else {
     const noDataCard = document.createElement("div");
     noDataCard.className = "country-card";
-    noDataCard.innerHTML = `<h3>数据待更新</h3><p>该国家/地区的详细卡片信息正在整理中，敬请期待。</p>`;
+    noDataCard.innerHTML = `<h3>数据待更新</h3><p>该国家/地区的详细卡片信息正在整理中，您可以尝试使用AI自动生成。</p>`;
     cardsContainer.appendChild(noDataCard);
+
+    // AI 生成按钮区域
+    const aiContainer = document.createElement('div');
+    aiContainer.style.margin = '16px 0 4px 0';
+    aiContainer.style.textAlign = 'center';
+
+    const aiBtn = document.createElement('button');
+    aiBtn.textContent = '🤖 使用AI生成国家信息';
+    aiBtn.style.padding = '10px 16px';
+    aiBtn.style.border = 'none';
+    aiBtn.style.borderRadius = '20px';
+    aiBtn.style.backgroundColor = '#4CAF50';
+    aiBtn.style.color = '#fff';
+    aiBtn.style.cursor = 'pointer';
+    aiBtn.style.fontWeight = '600';
+
+    const aiHint = document.createElement('div');
+    aiHint.style.fontSize = '12px';
+    aiHint.style.color = '#888';
+    aiHint.style.marginTop = '6px';
+    aiHint.textContent = '说明：内容为临时生成，刷新后不保留，可多次重新生成。';
+
+    aiContainer.appendChild(aiBtn);
+    aiContainer.appendChild(aiHint);
+    cardsContainer.appendChild(aiContainer);
+
+    // 生成中状态元素
+    const loadingEl = document.createElement('div');
+    loadingEl.style.marginTop = '10px';
+    loadingEl.style.textAlign = 'center';
+    loadingEl.style.color = '#4CAF50';
+    loadingEl.style.display = 'none';
+    loadingEl.textContent = 'AI 正在分析并生成内容，请稍候…';
+    cardsContainer.appendChild(loadingEl);
+
+    // 绑定点击事件
+    aiBtn.addEventListener('click', async () => {
+      aiBtn.disabled = true;
+      aiBtn.style.opacity = '0.7';
+      loadingEl.style.display = 'block';
+      try {
+        const result = await generateCountryCards(data.name, chineseCountryName);
+        // 渲染AI结果（临时，不写入数据库）
+        renderAIGeneratedCards(cardsContainer, result);
+        // 添加重新生成按钮
+        addAIMoreActions(cardsContainer, () => {
+          // 重新生成：清理并再次触发
+          document.getElementById('country-cards').innerHTML = '';
+          // 将无数据分支重新执行
+          // 简单处理：递归调用当前渲染函数
+          showCountryDetail(countryCode);
+        });
+      } catch (err) {
+        alert('生成失败：' + (err?.message || '网络异常'));
+      } finally {
+        loadingEl.style.display = 'none';
+        aiBtn.disabled = false;
+        aiBtn.style.opacity = '1';
+      }
+    });
   }
   
   // Add "查看详细分析" button if URL is available
@@ -2029,6 +2089,49 @@ function createCardElement(cardId, cardData) {
   }
   
   return cardElement;
+}
+
+// 渲染AI生成的四个固定卡片（临时）
+function renderAIGeneratedCards(container, aiData) {
+  const titleMap = {
+    game_market: '游戏市场',
+    infrastructure: '基础设施',
+    mobile_device: '互联网使用',
+    culture: '文化习俗'
+  };
+  // 清空占位
+  container.innerHTML = '';
+  ['game_market','infrastructure','mobile_device','culture'].forEach(key => {
+    const payload = {
+      title: titleMap[key],
+      content: aiData[key]?.content || '信息待更新',
+      note: aiData[key]?.note || ''
+    };
+    const el = createCardElement(key, payload);
+    container.appendChild(el);
+  });
+}
+
+// 添加“重新生成”操作区域（不保存到数据库）
+function addAIMoreActions(container, onRegenerate) {
+  const bar = document.createElement('div');
+  bar.style.textAlign = 'center';
+  bar.style.marginTop = '12px';
+
+  const regenBtn = document.createElement('button');
+  regenBtn.textContent = '🔄 重新生成';
+  regenBtn.style.padding = '8px 14px';
+  regenBtn.style.border = '1px solid #ddd';
+  regenBtn.style.borderRadius = '16px';
+  regenBtn.style.background = '#fff';
+  regenBtn.style.cursor = 'pointer';
+
+  regenBtn.addEventListener('click', () => {
+    if (typeof onRegenerate === 'function') onRegenerate();
+  });
+
+  bar.appendChild(regenBtn);
+  container.appendChild(bar);
 }
 
 // Helper function to add detail analysis button
