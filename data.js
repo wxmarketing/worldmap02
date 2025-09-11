@@ -1,5 +1,142 @@
 import { supabase, supabaseUrl } from './supabase.js';
 
+// DeepSeek API 配置
+const DEEPSEEK_CONFIG = {
+  apiUrl: 'https://api.deepseek.com/chat/completions',
+  model: 'deepseek-chat',
+  apiKey: '', // 用户需要在这里设置API密钥
+  maxTokens: 2000,
+  temperature: 0.7
+};
+
+// DeepSeek API调用函数
+async function callDeepSeekAPI(prompt) {
+  if (!DEEPSEEK_CONFIG.apiKey) {
+    throw new Error('请先设置DeepSeek API密钥');
+  }
+
+  try {
+    const response = await fetch(DEEPSEEK_CONFIG.apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${DEEPSEEK_CONFIG.apiKey}`
+      },
+      body: JSON.stringify({
+        model: DEEPSEEK_CONFIG.model,
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        max_tokens: DEEPSEEK_CONFIG.maxTokens,
+        temperature: DEEPSEEK_CONFIG.temperature,
+        stream: false
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`DeepSeek API调用失败: ${response.status} ${response.statusText}. ${errorData.error?.message || ''}`);
+    }
+
+    const data = await response.json();
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('DeepSeek API返回数据格式异常');
+    }
+
+    return data.choices[0].message.content;
+  } catch (error) {
+    console.error('DeepSeek API调用错误:', error);
+    throw error;
+  }
+}
+
+// 生成国家卡片内容的主函数
+async function generateCountryCards(countryName, countryNameZh) {
+  const prompt = `你是一个专业的国家市场分析师。请为${countryNameZh || countryName}生成以下4个方面的分析内容。
+
+要求：
+1. 每个内容部分控制在30-50字
+2. 注释部分包含具体数据和年份（2023-2024年）
+3. 数据要真实可信，符合该国实际情况
+4. 语言风格要专业简洁
+
+参考格式示例（美国）：
+游戏市场：游戏市场规模约510亿美元，手游占比45%，主机和PC游戏发达。
+注：2023年市场同比增长3.2%，预计2025年达570亿美元
+
+请为${countryNameZh || countryName}生成以下内容，返回严格的JSON格式：
+
+{
+  "game_market": {
+    "content": "游戏市场相关内容",
+    "note": "注：具体数据和年份"
+  },
+  "infrastructure": {
+    "content": "基础设施相关内容", 
+    "note": "注：具体数据和年份"
+  },
+  "mobile_device": {
+    "content": "互联网使用相关内容",
+    "note": "注：具体数据和年份"
+  },
+  "culture": {
+    "content": "文化习俗相关内容",
+    "note": "注：具体数据和年份"
+  }
+}
+
+只返回JSON，不要包含其他文字说明。`;
+
+  try {
+    const response = await callDeepSeekAPI(prompt);
+    
+    // 尝试解析JSON响应
+    let parsedData;
+    try {
+      // 清理响应文本，移除可能的markdown代码块标记
+      const cleanResponse = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      parsedData = JSON.parse(cleanResponse);
+    } catch (parseError) {
+      console.error('JSON解析失败:', parseError);
+      console.error('原始响应:', response);
+      throw new Error('AI返回的数据格式不正确，请重试');
+    }
+
+    // 验证数据结构
+    const requiredKeys = ['game_market', 'infrastructure', 'mobile_device', 'culture'];
+    for (const key of requiredKeys) {
+      if (!parsedData[key] || !parsedData[key].content || !parsedData[key].note) {
+        throw new Error(`生成的数据缺少必要字段: ${key}`);
+      }
+    }
+
+    return parsedData;
+  } catch (error) {
+    console.error('生成国家卡片内容失败:', error);
+    throw error;
+  }
+}
+
+// 设置DeepSeek API密钥的函数
+function setDeepSeekAPIKey(apiKey) {
+  DEEPSEEK_CONFIG.apiKey = apiKey;
+  console.log('DeepSeek API密钥已设置');
+}
+
+// 检查API密钥是否已设置
+function isDeepSeekAPIKeySet() {
+  return !!DEEPSEEK_CONFIG.apiKey;
+}
+
+// 导出AI相关函数供外部使用
+window.generateCountryCards = generateCountryCards;
+window.setDeepSeekAPIKey = setDeepSeekAPIKey;
+window.isDeepSeekAPIKeySet = isDeepSeekAPIKeySet;
+
 // 区域中文翻译映射
 export const regionTranslations = {
   "North America": "北美洲",
