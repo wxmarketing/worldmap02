@@ -19,13 +19,45 @@ let selectedCountry = null;
 
 // 微型国家质心坐标（经纬度）备用，Topo 数据难以点击时用于回退定位
 const tinyCountryCentroids = [
-  { names: ["singapore", "新加坡"], code: "SG", lng: 103.8198, lat: 1.3521 },
-  { names: ["monaco", "摩纳哥"], code: "MC", lng: 7.4246, lat: 43.7384 },
-  { names: ["san marino", "圣马力诺"], code: "SM", lng: 12.4578, lat: 43.9424 },
-  { names: ["vatican city", "vatican", "梵蒂冈"], code: "VA", lng: 12.4534, lat: 41.9029 },
-  { names: ["andorra", "安道尔"], code: "AD", lng: 1.5211, lat: 42.5063 },
-  { names: ["malta", "马耳他"], code: "MT", lng: 14.3754, lat: 35.9375 },
-  { names: ["liechtenstein", "列支敦士登"], code: "LI", lng: 9.5554, lat: 47.1660 }
+  // 欧洲微型国家
+  { names: ["singapore", "新加坡"], nameZh: "新加坡", code: "SG", lng: 103.8198, lat: 1.3521 },
+  { names: ["monaco", "摩纳哥"], nameZh: "摩纳哥", code: "MC", lng: 7.4246, lat: 43.7384 },
+  { names: ["san marino", "圣马力诺"], nameZh: "圣马力诺", code: "SM", lng: 12.4578, lat: 43.9424 },
+  { names: ["vatican city", "vatican", "梵蒂冈"], nameZh: "梵蒂冈", code: "VA", lng: 12.4534, lat: 41.9029 },
+  { names: ["andorra", "安道尔"], nameZh: "安道尔", code: "AD", lng: 1.5211, lat: 42.5063 },
+  { names: ["malta", "马耳他"], nameZh: "马耳他", code: "MT", lng: 14.3754, lat: 35.9375 },
+  { names: ["liechtenstein", "列支敦士登"], nameZh: "列支敦士登", code: "LI", lng: 9.5554, lat: 47.1660 },
+  { names: ["luxembourg", "卢森堡"], nameZh: "卢森堡", code: "LU", lng: 6.1296, lat: 49.8153 },
+  { names: ["monte carlo", "蒙特卡洛"], nameZh: "摩纳哥", code: "MC", lng: 7.4246, lat: 43.7384 },
+  
+  // 中东海湾小国
+  { names: ["bahrain", "巴林"], nameZh: "巴林", code: "BH", lng: 50.5577, lat: 26.0667 },
+  { names: ["qatar", "卡塔尔"], nameZh: "卡塔尔", code: "QA", lng: 51.5310, lat: 25.2854 },
+  { names: ["kuwait", "科威特"], nameZh: "科威特", code: "KW", lng: 47.9783, lat: 29.3697 },
+  
+  // 印度洋与太平洋岛国（部分）
+  { names: ["maldives", "马尔代夫"], nameZh: "马尔代夫", code: "MV", lng: 73.2207, lat: 3.2028 },
+  { names: ["seychelles", "塞舌尔"], nameZh: "塞舌尔", code: "SC", lng: 55.4513, lat: -4.6796 },
+  { names: ["mauritius", "毛里求斯"], nameZh: "毛里求斯", code: "MU", lng: 57.5522, lat: -20.3484 },
+  { names: ["comoros", "科摩罗"], nameZh: "科摩罗", code: "KM", lng: 43.2551, lat: -11.6455 },
+  { names: ["nauru", "瑙鲁"], nameZh: "瑙鲁", code: "NR", lng: 166.9315, lat: -0.5228 },
+  { names: ["tuvalu", "图瓦卢"], nameZh: "图瓦卢", code: "TV", lng: 179.1940, lat: -8.5172 },
+  { names: ["palau", "帕劳"], nameZh: "帕劳", code: "PW", lng: 134.5548, lat: 7.5150 },
+  { names: ["micronesia", "密克罗尼西亚"], nameZh: "密克罗尼西亚", code: "FM", lng: 158.1850, lat: 6.8870 },
+  { names: ["marshall islands", "马绍尔群岛"], nameZh: "马绍尔群岛", code: "MH", lng: 171.1845, lat: 7.1315 },
+  { names: ["samoa", "萨摩亚"], nameZh: "萨摩亚", code: "WS", lng: -171.7514, lat: -13.8507 },
+  { names: ["tonga", "汤加"], nameZh: "汤加", code: "TO", lng: -175.1982, lat: -21.1789 },
+  { names: ["kiribati", "基里巴斯"], nameZh: "基里巴斯", code: "KI", lng: -157.3768, lat: 1.8709 },
+  { names: ["vanuatu", "瓦努阿图"], nameZh: "瓦努阿图", code: "VU", lng: 168.3219, lat: -17.7333 },
+  
+  // 加勒比海小国
+  { names: ["antigua and barbuda", "安提瓜和巴布达"], nameZh: "安提瓜和巴布达", code: "AG", lng: -61.7964, lat: 17.0608 },
+  { names: ["dominica", "多米尼克"], nameZh: "多米尼克", code: "DM", lng: -61.3709, lat: 15.4150 },
+  { names: ["saint lucia", "圣卢西亚"], nameZh: "圣卢西亚", code: "LC", lng: -60.9789, lat: 13.9094 },
+  { names: ["saint vincent", "saint vincent and the grenadines", "圣文森特和格林纳丁斯"], nameZh: "圣文森特和格林纳丁斯", code: "VC", lng: -61.2872, lat: 13.2528 },
+  { names: ["grenada", "格林纳达"], nameZh: "格林纳达", code: "GD", lng: -61.7486, lat: 12.1165 },
+  { names: ["barbados", "巴巴多斯"], nameZh: "巴巴多斯", code: "BB", lng: -59.5432, lat: 13.1939 },
+  { names: ["saint kitts and nevis", "圣基茨和尼维斯"], nameZh: "圣基茨和尼维斯", code: "KN", lng: -62.7830, lat: 17.3578 }
 ];
 
 // Initialize the map
@@ -244,9 +276,11 @@ function handleCountryClick(event, d) {
   // Zoom to the selected country
   zoomToCountry(d);
   
-  // Get country name
-  const countryName = d.properties.name;
-  const countryCode = getCountryCode(countryName).toUpperCase();
+  // Get country name（优先中文名）
+  const rawName = d.properties.name;
+  // 若是回退点要素，properties.name 已替换为中文
+  const countryName = rawName;
+  const countryCode = getCountryCode(rawName).toUpperCase();
   
   // Update country detail panel
   if (typeof window.updateCountryDetail === 'function') {
@@ -686,7 +720,7 @@ function filterMapCountries(searchTerm) {
       if (tiny && typeof projection === 'function') {
         const sgObj = {
           type: 'Feature',
-          properties: { name: tiny.names[0] },
+          properties: { name: tiny.nameZh || tiny.names[0] },
           geometry: { type: 'Point', coordinates: [tiny.lng, tiny.lat] }
         };
         const syntheticEvent = new MouseEvent('click', { view: window, bubbles: true, cancelable: true });
