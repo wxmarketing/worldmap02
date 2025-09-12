@@ -6,7 +6,7 @@ const mapConfig = {
   height: 500,
   scale: 150,
   minZoom: 1,
-  maxZoom: 8,
+  maxZoom: 14,
   initialScale: 150,
   initialTranslate: [480, 250]
 };
@@ -185,7 +185,22 @@ function zoomToCountry(d) {
   const y = (bounds[0][1] + bounds[1][1]) / 2;
   
   // Calculate the appropriate scale
-  const scale = Math.max(1, Math.min(8, 0.9 / Math.max(dx / mapConfig.width, dy / mapConfig.height)));
+  let scale = Math.max(1, Math.min(mapConfig.maxZoom, 0.9 / Math.max(dx / mapConfig.width, dy / mapConfig.height)));
+  // 对极小国家提升放大倍数（如新加坡、圣马力诺、摩纳哥、梵蒂冈、安道尔、马耳他等）
+  const tinyThreshold = 8; // 像素阈值，bbox 边长都很小视为微型国家
+  if (dx < tinyThreshold && dy < tinyThreshold) {
+    scale = Math.max(scale, 12); // 强制提高放大等级
+    // 在质心位置绘制一次性的脉冲标记，帮助用户定位
+    const [cx, cy] = path.centroid(d);
+    const pulse = g.append('circle')
+      .attr('cx', cx)
+      .attr('cy', cy)
+      .attr('r', 0.5)
+      .attr('fill', '#4CAF50')
+      .attr('opacity', 0.9);
+    pulse.transition().duration(1200).attr('r', 10).attr('opacity', 0)
+      .on('end', () => pulse.remove());
+  }
   
   // Calculate the transform
   const translate = [mapConfig.width / 2 - scale * x, mapConfig.height / 2 - scale * y];
