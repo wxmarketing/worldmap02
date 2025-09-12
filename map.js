@@ -17,6 +17,17 @@ let projection; // projection声明为全局变量
 let currentZoom = { k: 1, x: 0, y: 0 };
 let selectedCountry = null;
 
+// 微型国家质心坐标（经纬度）备用，Topo 数据难以点击时用于回退定位
+const tinyCountryCentroids = [
+  { names: ["singapore", "新加坡"], code: "SG", lng: 103.8198, lat: 1.3521 },
+  { names: ["monaco", "摩纳哥"], code: "MC", lng: 7.4246, lat: 43.7384 },
+  { names: ["san marino", "圣马力诺"], code: "SM", lng: 12.4578, lat: 43.9424 },
+  { names: ["vatican city", "vatican", "梵蒂冈"], code: "VA", lng: 12.4534, lat: 41.9029 },
+  { names: ["andorra", "安道尔"], code: "AD", lng: 1.5211, lat: 42.5063 },
+  { names: ["malta", "马耳他"], code: "MT", lng: 14.3754, lat: 35.9375 },
+  { names: ["liechtenstein", "列支敦士登"], code: "LI", lng: 9.5554, lat: 47.1660 }
+];
+
 // Initialize the map
 async function initMap() {
   await initDataAndSupabase(); // 确保在地图渲染前数据已加载
@@ -669,7 +680,20 @@ function filterMapCountries(searchTerm) {
       });
       handleCountryClick.call(node, syntheticEvent, d);
     } else if (matchedCountry.size() === 0) {
-      // 如果没有匹配到任何国家，则隐藏详情面板
+      // 0 命中：尝试按微型国家质心回退
+      const lc = searchTerm.toLowerCase();
+      const tiny = tinyCountryCentroids.find(t => t.names.some(n => n.toLowerCase().includes(lc)) || t.code.toLowerCase() === lc);
+      if (tiny && typeof projection === 'function') {
+        const sgObj = {
+          type: 'Feature',
+          properties: { name: tiny.names[0] },
+          geometry: { type: 'Point', coordinates: [tiny.lng, tiny.lat] }
+        };
+        const syntheticEvent = new MouseEvent('click', { view: window, bubbles: true, cancelable: true });
+        handleCountryClick.call(svg.node(), syntheticEvent, sgObj);
+        return;
+      }
+      // 没有任何匹配与回退，隐藏详情面板
       d3.select("#country-detail").classed("hidden", true);
     }
   }
