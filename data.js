@@ -1963,6 +1963,9 @@ export function updateCountryDetail(countryName, countryCode) {
   // Update country name and region in panel with Chinese names
   document.getElementById("country-name").textContent = chineseCountryName;
   document.getElementById("country-region").textContent = chineseRegionName;
+
+  // 在标题下方渲染“阅读报告”按钮（若存在PDF）
+  renderReportBar(countryCode, chineseCountryName, data);
   
   // Get the cards container
   const cardsContainer = document.getElementById("country-cards");
@@ -2049,33 +2052,43 @@ export function updateCountryDetail(countryName, countryCode) {
   
   // Add "查看详细分析" button if URL is available
   addDetailAnalysisButton(cardsContainer, data, countryCode);
-
-  // 若该国有 PDF 报告，添加“阅读报告”入口（M1）
-  if (Array.isArray(data.pdfs) && data.pdfs.length > 0) {
-    const pdfBar = document.createElement('div');
-    pdfBar.style.marginTop = '12px';
-    pdfBar.style.textAlign = 'center';
-    const btn = document.createElement('button');
-    btn.textContent = '阅读报告';
-    btn.style.padding = '8px 14px';
-    btn.style.borderRadius = '18px';
-    btn.style.border = '1px solid var(--border-color)';
-    btn.style.background = '#fff';
-    btn.style.cursor = 'pointer';
-    btn.addEventListener('click', () => {
-      const first = data.pdfs[0];
-      if (first && window.openPdfViewer) {
-        window.openPdfViewer(first.url, first.title || chineseCountryName + ' - 报告');
-      } else if (first) {
-        window.open(first.url, '_blank');
-      }
-    });
-    pdfBar.appendChild(btn);
-    cardsContainer.appendChild(pdfBar);
-  }
   
   // Show country detail panel
   document.getElementById("country-detail").classList.remove("hidden");
+}
+
+function renderReportBar(countryCode, chineseCountryName, data) {
+  const header = document.querySelector('.country-header');
+  if (!header) return;
+  // 清除旧的
+  let old = document.getElementById('report-bar');
+  if (old) old.remove();
+  if (!Array.isArray(data.pdfs) || data.pdfs.length === 0) return;
+  const bar = document.createElement('div');
+  bar.id = 'report-bar';
+  bar.style.width = '100%';
+  bar.style.display = 'flex';
+  bar.style.justifyContent = 'center';
+  bar.style.margin = '6px 0 2px';
+  const btn = document.createElement('button');
+  btn.textContent = '阅读报告';
+  btn.style.padding = '6px 14px';
+  btn.style.border = '1px solid var(--border-color)';
+  btn.style.borderRadius = '20px';
+  btn.style.background = '#4CAF50';
+  btn.style.color = '#fff';
+  btn.style.fontWeight = '600';
+  btn.style.cursor = 'pointer';
+  btn.addEventListener('click', () => {
+    const first = data.pdfs[0];
+    if (first && window.openPdfViewer) {
+      window.openPdfViewer(first.url, first.title || (chineseCountryName + ' - 报告'));
+    } else if (first) {
+      window.open(first.url, '_blank');
+    }
+  });
+  bar.appendChild(btn);
+  header.after(bar);
 }
 
 // Helper function to create a country info card element

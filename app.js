@@ -129,7 +129,9 @@ function initApp() {
   function openPdfViewer(url, title = 'PDF 报告') {
     if (!overlay || !drawer || !frame) return;
     titleEl && (titleEl.textContent = title);
-    frame.src = `/pdfjs/web/viewer.html?file=${encodeURIComponent(url)}`;
+    // 使用 CDN 版 PDF.js 官方阅读器，避免本地缺少 /pdfjs 目录导致 404
+    const viewerCdn = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/web/viewer.html';
+    frame.src = `${viewerCdn}?file=${encodeURIComponent(url)}`;
     overlay.classList.remove('hidden');
     drawer.classList.remove('hidden');
     drawer.setAttribute('aria-hidden', 'false');
