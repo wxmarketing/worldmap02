@@ -2068,47 +2068,68 @@ function renderReportBar(countryCode, chineseCountryName, data) {
   wrap.id = 'report-bar';
   wrap.style.width = '100%';
   wrap.style.display = 'flex';
-  wrap.style.flexDirection = 'column';
-  wrap.style.alignItems = 'center';
-  wrap.style.gap = '6px';
-  wrap.style.margin = '6px 0 2px';
+  wrap.style.justifyContent = 'center';
+  wrap.style.margin = '8px 0 4px';
 
-  // 标题
-  const caption = document.createElement('div');
-  caption.textContent = '报告列表';
-  caption.style.fontSize = '12px';
-  caption.style.color = 'var(--secondary-color)';
-  caption.style.marginBottom = '2px';
-  wrap.appendChild(caption);
+  const card = document.createElement('div');
+  card.style.width = 'min(820px, 96%)';
+  card.style.background = '#fff';
+  card.style.border = '1px solid var(--border-color)';
+  card.style.borderRadius = '10px';
+  card.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)';
+  card.style.padding = '12px 14px';
 
-  // 列表（chips）
+  const titleRow = document.createElement('div');
+  titleRow.textContent = '报告列表';
+  titleRow.style.fontWeight = '600';
+  titleRow.style.fontSize = '15px';
+  titleRow.style.marginBottom = '8px';
+  titleRow.style.color = 'var(--text-color)';
+  card.appendChild(titleRow);
+
   const list = document.createElement('div');
   list.style.display = 'flex';
-  list.style.flexWrap = 'wrap';
-  list.style.justifyContent = 'center';
-  list.style.gap = '8px';
+  list.style.flexDirection = 'column';
+  list.style.gap = '6px';
 
   data.pdfs.forEach((item, idx) => {
-    const chip = document.createElement('button');
-    chip.type = 'button';
-    chip.textContent = item.title || `${chineseCountryName} 报告 ${idx+1}`;
-    chip.style.padding = '6px 12px';
-    chip.style.border = '1px solid var(--border-color)';
-    chip.style.borderRadius = '18px';
-    chip.style.background = '#fff';
-    chip.style.cursor = 'pointer';
-    chip.style.fontSize = '14px';
-    chip.addEventListener('click', () => {
+    const row = document.createElement('div');
+    row.style.display = 'flex';
+    row.style.alignItems = 'center';
+    row.style.justifyContent = 'space-between';
+    row.style.padding = '10px 12px';
+    row.style.border = '1px solid var(--border-color)';
+    row.style.borderRadius = '8px';
+    row.style.background = '#fafafa';
+    row.style.cursor = 'pointer';
+    row.addEventListener('mouseenter', ()=> row.style.background = '#f2f2f2');
+    row.addEventListener('mouseleave', ()=> row.style.background = '#fafafa');
+    row.addEventListener('click', () => {
       if (window.openPdfViewer) {
         window.openPdfViewer(item.url, item.title || (chineseCountryName + ' - 报告'));
       } else {
         window.open(item.url, '_blank');
       }
     });
-    list.appendChild(chip);
+
+    const tt = document.createElement('div');
+    tt.textContent = item.title || `${chineseCountryName} 报告 ${idx+1}`;
+    tt.style.fontSize = '15px';
+    tt.style.color = 'var(--text-color)';
+    tt.style.fontWeight = '500';
+
+    const action = document.createElement('span');
+    action.textContent = '阅读';
+    action.style.color = '#4CAF50';
+    action.style.fontSize = '14px';
+
+    row.appendChild(tt);
+    row.appendChild(action);
+    list.appendChild(row);
   });
 
-  wrap.appendChild(list);
+  card.appendChild(list);
+  wrap.appendChild(card);
   header.after(wrap);
 }
 
