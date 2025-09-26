@@ -605,20 +605,26 @@ body.night-mode .country.has-data {
 .pdf-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(2px);
   z-index: 999;
+  animation: fadeIn 180ms ease-out;
 }
 .pdf-drawer {
   position: fixed;
-  top: 0;
-  right: 0;
-  width: min(960px, 100%);
-  height: 100%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(96vw, 1100px);
+  height: min(88vh, 92vh);
   background: #fff;
   z-index: 1000;
-  box-shadow: -4px 0 16px rgba(0,0,0,0.2);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  animation: scaleIn 180ms ease-out;
 }
 .pdf-drawer.hidden,
 .pdf-overlay.hidden { display: none; }
@@ -627,9 +633,9 @@ body.night-mode .country.has-data {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-bottom: 1px solid var(--border-color);
-  background: #f9f9f9;
+  background: #ffffff;
 }
 .pdf-title { font-weight: 600; }
 .pdf-actions { display: flex; gap: 8px; }
@@ -649,6 +655,15 @@ body.night-mode .pdf-drawer { background: #1f1f1f; }
 body.night-mode .pdf-toolbar { background: #2a2a2a; border-bottom-color: #444; }
 body.night-mode .pdf-btn { background: #2a2a2a; color: #f2f2f2; border-color: #444; }
 body.night-mode .pdf-btn.primary { background: #4CAF50; border-color: #4CAF50; color: #fff; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
 .country-card div,
 .country-card p {
   text-indent: 0 !important;
