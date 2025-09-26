@@ -638,23 +638,27 @@ body.night-mode .country.has-data {
   background: #ffffff;
 }
 .pdf-title { font-weight: 600; }
-.pdf-actions { display: flex; gap: 8px; }
-.pdf-btn {
+.pdf-actions { display: flex; gap: 10px; }
+.pdf-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
   border: 1px solid var(--border-color);
   background: #fff;
-  padding: 6px 10px;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
-  text-decoration: none;
-  color: inherit;
+  color: #333;
 }
-.pdf-btn.primary { background: #4CAF50; color: #fff; border-color: #4CAF50; }
+.pdf-icon-btn.primary { background: #4CAF50; border-color: #4CAF50; color: #fff; }
+.pdf-icon-btn:hover { background: #f5f5f5; }
 .pdf-frame { flex: 1; width: 100%; border: none; }
 
 body.night-mode .pdf-drawer { background: #1f1f1f; }
 body.night-mode .pdf-toolbar { background: #2a2a2a; border-bottom-color: #444; }
-body.night-mode .pdf-btn { background: #2a2a2a; color: #f2f2f2; border-color: #444; }
-body.night-mode .pdf-btn.primary { background: #4CAF50; border-color: #4CAF50; color: #fff; }
+body.night-mode .pdf-icon-btn { background: #2a2a2a; color: #f2f2f2; border-color: #444; }
+body.night-mode .pdf-icon-btn.primary { background: #4CAF50; border-color: #4CAF50; color: #fff; }
 
 @keyframes fadeIn {
   from { opacity: 0; }

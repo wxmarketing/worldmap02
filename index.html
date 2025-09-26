@@ -145,9 +145,21 @@
     <div class="pdf-toolbar">
       <div class="pdf-title" id="pdf-title">PDF 报告</div>
       <div class="pdf-actions">
-        <a id="pdf-open-new" class="pdf-btn" target="_blank" rel="noopener">新标签打开</a>
-        <a id="pdf-download" class="pdf-btn" download>下载</a>
-        <button id="pdf-close" class="pdf-btn primary">关闭</button>
+        <a id="pdf-open-new" class="pdf-icon-btn" target="_blank" rel="noopener" aria-label="新标签打开" title="新标签打开">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v7h-7"/><path d="M3 10v11h11"/>
+          </svg>
+        </a>
+        <a id="pdf-download" class="pdf-icon-btn" download aria-label="下载" title="下载">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v12"/><path d="M8 11l4 4 4-4"/><path d="M5 21h14"/>
+          </svg>
+        </a>
+        <button id="pdf-close" class="pdf-icon-btn primary" aria-label="关闭" title="关闭">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6L6 18"/><path d="M6 6l12 12"/>
+          </svg>
+        </button>
       </div>
     </div>
     <iframe id="pdf-frame" class="pdf-frame" title="PDF 文档" loading="lazy"></iframe>
