@@ -2066,44 +2066,20 @@ function renderReportBar(countryCode, chineseCountryName, data) {
   if (!Array.isArray(data.pdfs) || data.pdfs.length === 0) return;
   const wrap = document.createElement('div');
   wrap.id = 'report-bar';
-  wrap.style.width = '100%';
-  wrap.style.display = 'flex';
-  wrap.style.justifyContent = 'center';
-  wrap.style.margin = '8px 0 4px';
 
+  // 使用与信息卡片一致的外观
   const card = document.createElement('div');
-  card.style.width = 'min(820px, 96%)';
-  card.style.background = '#fff';
-  card.style.border = '1px solid var(--border-color)';
-  card.style.borderRadius = '10px';
-  card.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)';
-  card.style.padding = '12px 14px';
-
-  const titleRow = document.createElement('div');
-  titleRow.textContent = '报告列表';
-  titleRow.style.fontWeight = '600';
-  titleRow.style.fontSize = '15px';
-  titleRow.style.marginBottom = '8px';
-  titleRow.style.color = 'var(--text-color)';
-  card.appendChild(titleRow);
+  card.className = 'country-card';
+  const titleEl = document.createElement('h3');
+  titleEl.textContent = '报告列表';
+  card.appendChild(titleEl);
 
   const list = document.createElement('div');
-  list.style.display = 'flex';
-  list.style.flexDirection = 'column';
-  list.style.gap = '6px';
+  list.className = 'report-list';
 
   data.pdfs.forEach((item, idx) => {
     const row = document.createElement('div');
-    row.style.display = 'flex';
-    row.style.alignItems = 'center';
-    row.style.justifyContent = 'space-between';
-    row.style.padding = '10px 12px';
-    row.style.border = '1px solid var(--border-color)';
-    row.style.borderRadius = '8px';
-    row.style.background = '#fafafa';
-    row.style.cursor = 'pointer';
-    row.addEventListener('mouseenter', ()=> row.style.background = '#f2f2f2');
-    row.addEventListener('mouseleave', ()=> row.style.background = '#fafafa');
+    row.className = 'report-item';
     row.addEventListener('click', () => {
       if (window.openPdfViewer) {
         window.openPdfViewer(item.url, item.title || (chineseCountryName + ' - 报告'));
@@ -2113,15 +2089,12 @@ function renderReportBar(countryCode, chineseCountryName, data) {
     });
 
     const tt = document.createElement('div');
+    tt.className = 'report-title';
     tt.textContent = item.title || `${chineseCountryName} 报告 ${idx+1}`;
-    tt.style.fontSize = '15px';
-    tt.style.color = 'var(--text-color)';
-    tt.style.fontWeight = '500';
 
     const action = document.createElement('span');
+    action.className = 'report-action';
     action.textContent = '阅读';
-    action.style.color = '#4CAF50';
-    action.style.fontSize = '14px';
 
     row.appendChild(tt);
     row.appendChild(action);
@@ -2130,7 +2103,14 @@ function renderReportBar(countryCode, chineseCountryName, data) {
 
   card.appendChild(list);
   wrap.appendChild(card);
-  header.after(wrap);
+  // 插入到可滚动区域（与信息卡片同容器）
+  const info = document.querySelector('.country-info');
+  const cardsContainer = document.getElementById('country-cards');
+  if (info && cardsContainer) {
+    info.insertBefore(wrap, cardsContainer);
+  } else {
+    header.after(wrap);
+  }
 }
 
 // Helper function to create a country info card element

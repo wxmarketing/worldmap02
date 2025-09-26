@@ -1,3 +1,18 @@
+.report-list { display: flex; flex-direction: column; gap: 8px; }
+.report-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: #fafafa;
+  cursor: pointer;
+}
+.report-item:hover { background: #f2f2f2; }
+.report-title { font-size: 15px; font-weight: 500; color: var(--text-color); }
+.report-action { color: #4CAF50; font-size: 14px; }
+
 @font-face {
   font-family: 'Tencent Sans W7';
   src: url('./fonts/腾讯体_W7.ttf') format('truetype');
