@@ -3150,7 +3150,7 @@ async function loadCountryDataFromSupabase() {
     try {
         const { data: countryCardsData, error: countryCardsError } = await supabase
             .from('country_cards')
-            .select('country_code, detailAnalysisUrl');
+            .select('country_code, detailAnalysisUrl, pdfs');
 
         if (countryCardsError) {
             console.error('从 country_cards 表加载数据失败:', countryCardsError);
@@ -3187,6 +3187,8 @@ async function loadCountryDataFromSupabase() {
             if (countryData[code]) {
                 countryData[code].detailAnalysisUrl = item.detailAnalysisUrl;
                 countryData[code].cards = cardsByCountry[code] ? cardsByCountry[code].sort((a, b) => a.order_index - b.order_index) : [];
+                // 同步PDF列表
+                countryData[code].pdfs = Array.isArray(item.pdfs) ? item.pdfs : (item.pdfs ? item.pdfs : []);
             }
         });
     } catch (error) {
