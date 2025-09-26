@@ -129,8 +129,8 @@ function initApp() {
   function openPdfViewer(url, title = 'PDF 报告') {
     if (!overlay || !drawer || !frame) return;
     titleEl && (titleEl.textContent = title);
-    // 使用 CDN 版 PDF.js 官方阅读器，避免本地缺少 /pdfjs 目录导致 404
-    const viewerCdn = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/web/viewer.html';
+    // 使用官方托管的 PDF.js Viewer，最稳定
+    const viewerCdn = 'https://mozilla.github.io/pdf.js/web/viewer.html';
     frame.src = `${viewerCdn}?file=${encodeURIComponent(url)}`;
     overlay.classList.remove('hidden');
     drawer.classList.remove('hidden');
