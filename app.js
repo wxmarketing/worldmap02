@@ -1,4 +1,5 @@
 import { countryData, regionTranslations, updateCountryDetail, initDataAndSupabase, allWorldCountries } from './data.js';
+import { supabaseUrl, supabaseAnonKey } from './supabase.js';
 
 // Main app functionality
 
@@ -124,6 +125,7 @@ function initApp() {
   const btnClose = document.getElementById('pdf-close');
   const btnOpenNew = document.getElementById('pdf-open-new');
   const btnDownload = document.getElementById('pdf-download');
+  const btnAiRead = document.getElementById('pdf-ai-read');
   const titleEl = document.getElementById('pdf-title');
 
   function openPdfViewer(url, title = 'PDF 报告') {
@@ -138,6 +140,7 @@ function initApp() {
     document.body.style.overflow = 'hidden';
     btnOpenNew && (btnOpenNew.href = url);
     btnDownload && (btnDownload.href = url);
+    lastPdfUrl = url;
   }
 
   function closePdfViewer() {
@@ -157,6 +160,154 @@ function initApp() {
   // 暴露给全局（供 data.js 或详情按钮调用）
   window.openPdfViewer = openPdfViewer;
   window.closePdfViewer = closePdfViewer;
+
+  // AI 助手抽屉逻辑（骨架）
+  const aiOverlay = document.getElementById('ai-overlay');
+  const aiDrawer = document.getElementById('ai-drawer');
+  const aiClose = document.getElementById('ai-close');
+  const aiSummary = document.getElementById('ai-summary');
+  const aiAsk = document.getElementById('ai-ask');
+  const aiInput = document.getElementById('ai-question');
+  let lastPdfUrl = '';
+
+  function openAiDrawer() {
+    if (!aiOverlay || !aiDrawer) return;
+    aiOverlay.classList.remove('hidden');
+    aiDrawer.classList.remove('hidden');
+    aiDrawer.setAttribute('aria-hidden', 'false');
+    // 占位：后续填充提取与总结
+    if (aiSummary) aiSummary.innerHTML = '<div style="padding:6px 0;">正在分析报告，请稍候…</div>';
+  }
+  function closeAiDrawer() {
+    if (!aiOverlay || !aiDrawer) return;
+    aiOverlay.classList.add('hidden');
+    aiDrawer.classList.add('hidden');
+    aiDrawer.setAttribute('aria-hidden', 'true');
+  }
+  aiOverlay && aiOverlay.addEventListener('click', closeAiDrawer);
+  aiClose && aiClose.addEventListener('click', closeAiDrawer);
+  btnAiRead && btnAiRead.addEventListener('click', openAiDrawer);
+  aiAsk && aiAsk.addEventListener('click', ()=>{
+    if (!aiInput) return;
+    const q = aiInput.value.trim();
+    if (!q) return;
+    if (aiSummary) {
+      const p = document.createElement('div');
+      p.textContent = 'Q: ' + q;
+      aiSummary.appendChild(p);
+    }
+    aiInput.value = '';
+  });
+
+  // ====== AI 阅读：PDF 抽取与总结 (v1) ======
+  const edgeUrl = `${supabaseUrl}/functions/v1/deepseek`;
+  async function callDeepSeek(prompt) {
+    const resp = await fetch(edgeUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseAnonKey}` },
+      body: JSON.stringify({ prompt, model: 'deepseek-chat', max_tokens: 1200, temperature: 0.4 })
+    });
+    if (!resp.ok) throw new Error('LLM错误');
+    const j = await resp.json();
+    const content = j?.data?.choices?.[0]?.message?.content;
+    if (!content) throw new Error('LLM返回为空');
+    return content;
+  }
+
+  async function loadPdfJs() {
+    if (window.pdfjsLib) return window.pdfjsLib;
+    await import('https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js');
+    await import('https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js');
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+      return window.pdfjsLib;
+    }
+    throw new Error('pdf.js 加载失败');
+  }
+
+  async function extractPdfText(url) {
+    const pdfjsLib = await loadPdfJs();
+    const pdf = await pdfjsLib.getDocument({ url }).promise;
+    const pages = [];
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const tc = await page.getTextContent();
+      const text = tc.items.map(it => it.str).join(' ');
+      pages.push({ page: i, text });
+    }
+    return pages;
+  }
+
+  function chunkPages(pages, charsPerChunk = 3500, overlap = 300) {
+    const chunks = [];
+    let buf = '';
+    let start = 1;
+    for (const p of pages) {
+      const clean = p.text.replace(/\s+/g, ' ').trim();
+      if ((buf + ' ' + clean).length > charsPerChunk && buf.length > 0) {
+        chunks.push({ from: start, to: p.page - 1, text: buf });
+        const tail = buf.slice(-overlap);
+        buf = tail + ' ' + clean;
+        start = Math.max(start, p.page);
+      } else {
+        buf = (buf + ' ' + clean).trim();
+      }
+    }
+    if (buf.length) {
+      const lastPage = pages.length ? pages[pages.length - 1].page : 1;
+      chunks.push({ from: start, to: lastPage, text: buf });
+    }
+    return chunks.slice(0, 30);
+  }
+
+  async function summarizePdf(url) {
+    const pages = await extractPdfText(url);
+    const chunks = chunkPages(pages);
+    const mapResults = [];
+    for (const c of chunks) {
+      const prompt = `你是一名中文分析师。请基于下列报告片段（第${c.from}-${c.to}页）提炼3-5条要点，保留关键数字、时间、国家/主体名词，每条≤120字。\n返回JSON：{\n  "bullets": ["…", "…"]\n}\n\n片段：\n${c.text}`;
+      try {
+        const raw = await callDeepSeek(prompt);
+        const json = JSON.parse(raw);
+        mapResults.push(json.bullets || []);
+      } catch (e) {
+        mapResults.push([`第${c.from}-${c.to}页摘要失败，原文摘录：` + c.text.slice(0, 120)]);
+      }
+    }
+    const flat = mapResults.flat().slice(0, 60);
+    const reducePrompt = `基于这些要点（中文）输出：1) Top 10 要点列表；2) 300~500字结论；返回JSON：{top10:["…"], conclusion:"…"}\n要点：\n${flat.map((b,i)=>`${i+1}. ${b}`).join('\n')}`;
+    let summary;
+    try {
+      const reduceRaw = await callDeepSeek(reducePrompt);
+      summary = JSON.parse(reduceRaw);
+    } catch {
+      summary = { top10: flat.slice(0,10), conclusion: '总结生成失败，请重试。' };
+    }
+    return summary;
+  }
+
+  // 将“帮我读”按钮与总结流程打通
+  async function openAiAndSummarize() {
+    openAiDrawer();
+    try {
+      const summary = await summarizePdf(lastPdfUrl);
+      if (aiSummary) {
+        aiSummary.innerHTML = '';
+        const ul = document.createElement('ul');
+        (summary.top10 || []).forEach(t => {
+          const li = document.createElement('li'); li.textContent = t; ul.appendChild(li);
+        });
+        const concl = document.createElement('div');
+        concl.style.marginTop = '8px';
+        concl.textContent = summary.conclusion || '';
+        aiSummary.appendChild(ul); aiSummary.appendChild(concl);
+      }
+    } catch (e) {
+      if (aiSummary) aiSummary.textContent = '分析失败：' + (e?.message || '未知错误');
+    }
+  }
+  btnAiRead && btnAiRead.removeEventListener('click', openAiDrawer);
+  btnAiRead && btnAiRead.addEventListener('click', openAiAndSummarize);
 }
 
 // Handle country click event (to be called from map.js)
