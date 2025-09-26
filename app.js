@@ -227,9 +227,21 @@ function initApp() {
 
   async function extractPdfText(url) {
     const pdfjsLib = await loadPdfJs();
-    const pdf = await pdfjsLib.getDocument({ url }).promise;
+    // 优先以 ArrayBuffer 方式加载，规避部分对象存储的 CORS/Range 限制
+    let loadingTask;
+    try {
+      const res = await fetch(url, { mode: 'cors' });
+      if (!res.ok) throw new Error('fetch failed');
+      const buf = await res.arrayBuffer();
+      loadingTask = pdfjsLib.getDocument({ data: buf });
+    } catch (e) {
+      // 回退使用 url 直连
+      loadingTask = pdfjsLib.getDocument({ url });
+    }
+    const pdf = await loadingTask.promise;
     const pages = [];
-    for (let i = 1; i <= pdf.numPages; i++) {
+    const maxPages = Math.min(pdf.numPages, 80); // 安全上限，过大文档先限制
+    for (let i = 1; i <= maxPages; i++) {
       const page = await pdf.getPage(i);
       const tc = await page.getTextContent();
       const text = tc.items.map(it => it.str).join(' ');
@@ -290,6 +302,8 @@ function initApp() {
   async function openAiAndSummarize() {
     openAiDrawer();
     try {
+      if (!lastPdfUrl) throw new Error('未获取到PDF地址');
+      if (aiSummary) aiSummary.innerHTML = '<div>正在提取文本…</div>';
       const summary = await summarizePdf(lastPdfUrl);
       if (aiSummary) {
         aiSummary.innerHTML = '';
