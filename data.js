@@ -2064,31 +2064,52 @@ function renderReportBar(countryCode, chineseCountryName, data) {
   let old = document.getElementById('report-bar');
   if (old) old.remove();
   if (!Array.isArray(data.pdfs) || data.pdfs.length === 0) return;
-  const bar = document.createElement('div');
-  bar.id = 'report-bar';
-  bar.style.width = '100%';
-  bar.style.display = 'flex';
-  bar.style.justifyContent = 'center';
-  bar.style.margin = '6px 0 2px';
-  const btn = document.createElement('button');
-  btn.textContent = '阅读报告';
-  btn.style.padding = '6px 14px';
-  btn.style.border = '1px solid var(--border-color)';
-  btn.style.borderRadius = '20px';
-  btn.style.background = '#4CAF50';
-  btn.style.color = '#fff';
-  btn.style.fontWeight = '600';
-  btn.style.cursor = 'pointer';
-  btn.addEventListener('click', () => {
-    const first = data.pdfs[0];
-    if (first && window.openPdfViewer) {
-      window.openPdfViewer(first.url, first.title || (chineseCountryName + ' - 报告'));
-    } else if (first) {
-      window.open(first.url, '_blank');
-    }
+  const wrap = document.createElement('div');
+  wrap.id = 'report-bar';
+  wrap.style.width = '100%';
+  wrap.style.display = 'flex';
+  wrap.style.flexDirection = 'column';
+  wrap.style.alignItems = 'center';
+  wrap.style.gap = '6px';
+  wrap.style.margin = '6px 0 2px';
+
+  // 标题
+  const caption = document.createElement('div');
+  caption.textContent = '报告列表';
+  caption.style.fontSize = '12px';
+  caption.style.color = 'var(--secondary-color)';
+  caption.style.marginBottom = '2px';
+  wrap.appendChild(caption);
+
+  // 列表（chips）
+  const list = document.createElement('div');
+  list.style.display = 'flex';
+  list.style.flexWrap = 'wrap';
+  list.style.justifyContent = 'center';
+  list.style.gap = '8px';
+
+  data.pdfs.forEach((item, idx) => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.textContent = item.title || `${chineseCountryName} 报告 ${idx+1}`;
+    chip.style.padding = '6px 12px';
+    chip.style.border = '1px solid var(--border-color)';
+    chip.style.borderRadius = '18px';
+    chip.style.background = '#fff';
+    chip.style.cursor = 'pointer';
+    chip.style.fontSize = '14px';
+    chip.addEventListener('click', () => {
+      if (window.openPdfViewer) {
+        window.openPdfViewer(item.url, item.title || (chineseCountryName + ' - 报告'));
+      } else {
+        window.open(item.url, '_blank');
+      }
+    });
+    list.appendChild(chip);
   });
-  bar.appendChild(btn);
-  header.after(bar);
+
+  wrap.appendChild(list);
+  header.after(wrap);
 }
 
 // Helper function to create a country info card element
