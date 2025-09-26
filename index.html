@@ -138,5 +138,19 @@
   <script type="module" src="app.js"></script>
   <!-- 测试脚本 - 自动点击美国以显示国家详情面板 -->
   <script type="module" src="test-click.js"></script>
+
+  <!-- PDF 阅读抽屉（M1）-->
+  <div id="pdf-overlay" class="pdf-overlay hidden"></div>
+  <div id="pdf-drawer" class="pdf-drawer hidden" aria-hidden="true" role="dialog" aria-label="PDF 阅读器">
+    <div class="pdf-toolbar">
+      <div class="pdf-title" id="pdf-title">PDF 报告</div>
+      <div class="pdf-actions">
+        <a id="pdf-open-new" class="pdf-btn" target="_blank" rel="noopener">新标签打开</a>
+        <a id="pdf-download" class="pdf-btn" download>下载</a>
+        <button id="pdf-close" class="pdf-btn primary">关闭</button>
+      </div>
+    </div>
+    <iframe id="pdf-frame" class="pdf-frame" title="PDF 文档" loading="lazy"></iframe>
+  </div>
 </body>
 </html>

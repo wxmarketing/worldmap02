@@ -116,6 +116,45 @@ function initApp() {
       }
     });
   }
+
+  // PDF 抽屉 open/close
+  const overlay = document.getElementById('pdf-overlay');
+  const drawer = document.getElementById('pdf-drawer');
+  const frame = document.getElementById('pdf-frame');
+  const btnClose = document.getElementById('pdf-close');
+  const btnOpenNew = document.getElementById('pdf-open-new');
+  const btnDownload = document.getElementById('pdf-download');
+  const titleEl = document.getElementById('pdf-title');
+
+  function openPdfViewer(url, title = 'PDF 报告') {
+    if (!overlay || !drawer || !frame) return;
+    titleEl && (titleEl.textContent = title);
+    frame.src = `/pdfjs/web/viewer.html?file=${encodeURIComponent(url)}`;
+    overlay.classList.remove('hidden');
+    drawer.classList.remove('hidden');
+    drawer.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    btnOpenNew && (btnOpenNew.href = url);
+    btnDownload && (btnDownload.href = url);
+  }
+
+  function closePdfViewer() {
+    if (!overlay || !drawer || !frame) return;
+    overlay.classList.add('hidden');
+    drawer.classList.add('hidden');
+    drawer.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    frame.src = '';
+  }
+
+  if (overlay && drawer) {
+    overlay.addEventListener('click', closePdfViewer);
+    btnClose && btnClose.addEventListener('click', closePdfViewer);
+  }
+
+  // 暴露给全局（供 data.js 或详情按钮调用）
+  window.openPdfViewer = openPdfViewer;
+  window.closePdfViewer = closePdfViewer;
 }
 
 // Handle country click event (to be called from map.js)

@@ -2049,6 +2049,30 @@ export function updateCountryDetail(countryName, countryCode) {
   
   // Add "查看详细分析" button if URL is available
   addDetailAnalysisButton(cardsContainer, data, countryCode);
+
+  // 若该国有 PDF 报告，添加“阅读报告”入口（M1）
+  if (Array.isArray(data.pdfs) && data.pdfs.length > 0) {
+    const pdfBar = document.createElement('div');
+    pdfBar.style.marginTop = '12px';
+    pdfBar.style.textAlign = 'center';
+    const btn = document.createElement('button');
+    btn.textContent = '阅读报告';
+    btn.style.padding = '8px 14px';
+    btn.style.borderRadius = '18px';
+    btn.style.border = '1px solid var(--border-color)';
+    btn.style.background = '#fff';
+    btn.style.cursor = 'pointer';
+    btn.addEventListener('click', () => {
+      const first = data.pdfs[0];
+      if (first && window.openPdfViewer) {
+        window.openPdfViewer(first.url, first.title || chineseCountryName + ' - 报告');
+      } else if (first) {
+        window.open(first.url, '_blank');
+      }
+    });
+    pdfBar.appendChild(btn);
+    cardsContainer.appendChild(pdfBar);
+  }
   
   // Show country detail panel
   document.getElementById("country-detail").classList.remove("hidden");
@@ -2329,6 +2353,9 @@ function populateCardEditor(countryCode) {
   cardEditorList.innerHTML = "";
   // Add detail analysis URL editor
   addDetailAnalysisEditor(cardEditorList, countryCode, data);
+
+  // PDF 报告管理（M1）
+  addPdfManager(cardEditorList, countryCode, data);
   // 只用数组顺序渲染卡片
   if (Array.isArray(data.cards) && data.cards.length > 0) {
     data.cards.forEach(card => {
@@ -2340,6 +2367,154 @@ function populateCardEditor(countryCode) {
     noCardsMessage.style.marginTop = "20px";
     cardEditorList.appendChild(noCardsMessage);
   }
+}
+
+// ===== PDF 报告管理（管理面板） =====
+function addPdfManager(container, countryCode, countryObj) {
+  const section = document.createElement('div');
+  section.style.border = '1px solid #ddd';
+  section.style.borderRadius = '6px';
+  section.style.padding = '12px';
+  section.style.margin = '10px 0 16px';
+
+  const header = document.createElement('div');
+  header.style.display = 'flex';
+  header.style.justifyContent = 'space-between';
+  header.style.alignItems = 'center';
+  const h4 = document.createElement('h4');
+  h4.textContent = 'PDF 报告';
+  h4.style.margin = '0 0 8px 0';
+  header.appendChild(h4);
+  section.appendChild(header);
+
+  const form = document.createElement('div');
+  form.style.display = 'grid';
+  form.style.gridTemplateColumns = '1fr auto';
+  form.style.gap = '8px';
+
+  const titleInput = document.createElement('input');
+  titleInput.type = 'text';
+  titleInput.placeholder = '报告标题（必填）';
+  titleInput.style.padding = '8px';
+  titleInput.style.border = '1px solid #ccc';
+  titleInput.style.borderRadius = '4px';
+
+  const row2 = document.createElement('div');
+  row2.style.display = 'flex';
+  row2.style.gap = '8px';
+  row2.style.alignItems = 'center';
+
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'application/pdf';
+
+  const uploadBtn = document.createElement('button');
+  uploadBtn.textContent = '上传并关联';
+  uploadBtn.style.padding = '8px 12px';
+  uploadBtn.style.border = '1px solid #ddd';
+  uploadBtn.style.borderRadius = '6px';
+  uploadBtn.style.cursor = 'pointer';
+
+  form.appendChild(titleInput);
+  const filler = document.createElement('div');
+  form.appendChild(filler);
+  row2.appendChild(fileInput);
+  row2.appendChild(uploadBtn);
+  section.appendChild(form);
+  section.appendChild(row2);
+
+  const listWrap = document.createElement('div');
+  listWrap.style.marginTop = '10px';
+  section.appendChild(listWrap);
+
+  container.appendChild(section);
+
+  let pdfs = Array.isArray(countryObj.pdfs) ? [...countryObj.pdfs] : [];
+  renderPdfList(listWrap, pdfs, countryCode);
+
+  uploadBtn.addEventListener('click', async () => {
+    const file = fileInput.files && fileInput.files[0];
+    const title = titleInput.value.trim();
+    if (!title) { alert('请填写报告标题'); return; }
+    if (!file) { alert('请选择PDF文件'); return; }
+    if (file.type !== 'application/pdf') { alert('仅支持PDF文件'); return; }
+
+    uploadBtn.disabled = true; uploadBtn.textContent = '上传中…';
+    try {
+      const saved = await uploadPdfAndSave(countryCode, file, title, pdfs);
+      pdfs = saved;
+      renderPdfList(listWrap, pdfs, countryCode);
+      titleInput.value = '';
+      fileInput.value = '';
+      alert('已上传并关联');
+    } catch (e) {
+      console.error(e);
+      alert('上传失败：' + (e?.message || '未知错误'));
+    } finally {
+      uploadBtn.disabled = false; uploadBtn.textContent = '上传并关联';
+    }
+  });
+}
+
+async function uploadPdfAndSave(countryCode, file, title, currentPdfs) {
+  const safeName = `${Date.now()}_${file.name.replace(/[^A-Za-z0-9_.-]/g,'_')}`;
+  const path = `${countryCode}/${safeName}`;
+  const { data: up, error: upErr } = await supabase.storage
+    .from('country-pdfs')
+    .upload(path, file, { contentType: file.type || 'application/pdf', upsert: false });
+  if (upErr) throw upErr;
+  const { data: pub } = supabase.storage.from('country-pdfs').getPublicUrl(path);
+  const newItem = { title, url: pub.publicUrl, path, updatedAt: new Date().toISOString() };
+  const next = [...currentPdfs, newItem];
+  const { error: dbErr } = await supabase.from('country_cards').update({ pdfs: next }).eq('country_code', countryCode);
+  if (dbErr) throw dbErr;
+  // 同步到内存数据，以便详情页立即显示
+  if (!countryData[countryCode]) countryData[countryCode] = {};
+  countryData[countryCode].pdfs = next;
+  return next;
+}
+
+function renderPdfList(wrap, pdfs, countryCode) {
+  wrap.innerHTML = '';
+  if (!pdfs || pdfs.length === 0) {
+    const tip = document.createElement('div');
+    tip.textContent = '尚未关联任何报告';
+    tip.style.color = '#666';
+    tip.style.fontSize = '12px';
+    wrap.appendChild(tip);
+    return;
+  }
+  pdfs.forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.style.display = 'flex';
+    row.style.justifyContent = 'space-between';
+    row.style.alignItems = 'center';
+    row.style.padding = '6px 0';
+    const left = document.createElement('div');
+    left.textContent = item.title || `报告${idx+1}`;
+    const actions = document.createElement('div');
+    actions.style.display = 'flex';
+    actions.style.gap = '8px';
+    const aView = document.createElement('a'); aView.textContent = '预览'; aView.href = item.url; aView.target = '_blank';
+    const aOpen = document.createElement('button'); aOpen.textContent = '在阅读器打开'; aOpen.style.cursor='pointer';
+    aOpen.addEventListener('click', ()=> window.openPdfViewer && window.openPdfViewer(item.url, item.title));
+    const del = document.createElement('button'); del.textContent = '删除'; del.style.cursor='pointer';
+    del.addEventListener('click', async ()=>{
+      if (!confirm('确认删除该报告关联？此操作会从数据库移除，并尝试从存储删除文件。')) return;
+      const next = pdfs.filter(p => p !== item);
+      const { error: dbErr } = await supabase.from('country_cards').update({ pdfs: next }).eq('country_code', countryCode);
+      if (dbErr) { alert('数据库更新失败'); return; }
+      // 试图删除存储文件（忽略失败）
+      if (item.path) await supabase.storage.from('country-pdfs').remove([item.path]).catch(()=>{});
+      pdfs.splice(0, pdfs.length, ...next);
+      if (!countryData[countryCode]) countryData[countryCode] = {};
+      countryData[countryCode].pdfs = next;
+      renderPdfList(wrap, next, countryCode);
+    });
+    actions.appendChild(aView); actions.appendChild(aOpen); actions.appendChild(del);
+    row.appendChild(left); row.appendChild(actions);
+    wrap.appendChild(row);
+  });
 }
 
 // Add a new card editor item to the editor list
