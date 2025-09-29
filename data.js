@@ -2100,11 +2100,11 @@ function renderReportBar(countryCode, chineseCountryName, data) {
 
     row.appendChild(tt);
     row.appendChild(action);
-    // 摘要展示（只读）
-    if (item.summary) {
+    // 卡片中摘要展示（只读，使用 summaryCard）
+    if (item.summaryCard) {
       const sum = document.createElement('div');
       sum.className = 'report-summary';
-      sum.textContent = item.summary;
+      sum.textContent = item.summaryCard;
       row.appendChild(sum);
     }
     list.appendChild(row);
@@ -2508,7 +2508,7 @@ async function uploadPdfAndSave(countryCode, file, title, currentPdfs) {
     .upload(path, file, { contentType: file.type || 'application/pdf', upsert: false });
   if (upErr) throw upErr;
   const { data: pub } = supabase.storage.from('country-pdfs').getPublicUrl(path);
-  const newItem = { title, url: pub.publicUrl, path, updatedAt: new Date().toISOString(), summary: '' };
+  const newItem = { title, url: pub.publicUrl, path, updatedAt: new Date().toISOString(), summaryCard: '', summaryReader: '' };
   const next = [...currentPdfs, newItem];
   const { error: dbErr } = await supabase.from('country_cards').update({ pdfs: next }).eq('country_code', countryCode);
   if (dbErr) throw dbErr;
@@ -2564,14 +2564,23 @@ function renderPdfList(wrap, pdfs, countryCode) {
     const editor = document.createElement('div');
     editor.style.margin = '6px 0 12px 0';
     editor.style.display = 'none';
-    const ta = document.createElement('textarea');
-    ta.style.width = '100%';
-    ta.style.minHeight = '90px';
-    ta.style.border = '1px solid #ddd';
-    ta.style.borderRadius = '6px';
-    ta.style.padding = '8px';
-    ta.placeholder = '请输入该报告的摘要（用户前端将只读显示）';
-    ta.value = item.summary || '';
+    const taCard = document.createElement('textarea');
+    taCard.style.width = '100%';
+    taCard.style.minHeight = '70px';
+    taCard.style.border = '1px solid #ddd';
+    taCard.style.borderRadius = '6px';
+    taCard.style.padding = '8px';
+    taCard.placeholder = '卡片中显示的摘要（summaryCard）';
+    taCard.value = item.summaryCard || '';
+    const taReader = document.createElement('textarea');
+    taReader.style.width = '100%';
+    taReader.style.minHeight = '70px';
+    taReader.style.border = '1px solid #ddd';
+    taReader.style.borderRadius = '6px';
+    taReader.style.padding = '8px';
+    taReader.style.marginTop = '6px';
+    taReader.placeholder = '帮我读中显示的摘要（summaryReader）';
+    taReader.value = item.summaryReader || '';
     const save = document.createElement('button');
     save.textContent = '保存摘要';
     save.style.marginTop = '6px';
@@ -2579,7 +2588,8 @@ function renderPdfList(wrap, pdfs, countryCode) {
     save.style.border = '1px solid #ddd';
     save.style.borderRadius = '6px';
     save.style.cursor = 'pointer';
-    editor.appendChild(ta);
+    editor.appendChild(taCard);
+    editor.appendChild(taReader);
     editor.appendChild(save);
     wrap.appendChild(editor);
 
@@ -2588,7 +2598,7 @@ function renderPdfList(wrap, pdfs, countryCode) {
       ta.focus();
     });
     save.addEventListener('click', async ()=>{
-      const next = pdfs.map(p => p === item ? { ...p, summary: ta.value.trim() } : p);
+      const next = pdfs.map(p => p === item ? { ...p, summaryCard: taCard.value.trim(), summaryReader: taReader.value.trim() } : p);
       const { error: dbErr } = await supabase.from('country_cards').update({ pdfs: next }).eq('country_code', countryCode);
       if (dbErr) { alert('保存失败：' + (dbErr.message || '数据库错误')); return; }
       // 同步内存
