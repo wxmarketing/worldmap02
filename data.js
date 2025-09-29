@@ -2081,6 +2081,8 @@ function renderReportBar(countryCode, chineseCountryName, data) {
     const row = document.createElement('div');
     row.className = 'report-item';
     row.addEventListener('click', () => {
+      // 记录当前报告元信息，供“帮我读”展示摘要
+      window.currentReportMeta = { countryCode, ...item };
       if (window.openPdfViewer) {
         window.openPdfViewer(item.url, item.title || (chineseCountryName + ' - 报告'));
       } else {
@@ -2098,6 +2100,13 @@ function renderReportBar(countryCode, chineseCountryName, data) {
 
     row.appendChild(tt);
     row.appendChild(action);
+    // 摘要展示（只读）
+    if (item.summary) {
+      const sum = document.createElement('div');
+      sum.className = 'report-summary';
+      sum.textContent = item.summary;
+      row.appendChild(sum);
+    }
     list.appendChild(row);
   });
 
@@ -2499,7 +2508,7 @@ async function uploadPdfAndSave(countryCode, file, title, currentPdfs) {
     .upload(path, file, { contentType: file.type || 'application/pdf', upsert: false });
   if (upErr) throw upErr;
   const { data: pub } = supabase.storage.from('country-pdfs').getPublicUrl(path);
-  const newItem = { title, url: pub.publicUrl, path, updatedAt: new Date().toISOString() };
+  const newItem = { title, url: pub.publicUrl, path, updatedAt: new Date().toISOString(), summary: '' };
   const next = [...currentPdfs, newItem];
   const { error: dbErr } = await supabase.from('country_cards').update({ pdfs: next }).eq('country_code', countryCode);
   if (dbErr) throw dbErr;
@@ -2533,6 +2542,7 @@ function renderPdfList(wrap, pdfs, countryCode) {
     const aView = document.createElement('a'); aView.textContent = '预览'; aView.href = item.url; aView.target = '_blank';
     const aOpen = document.createElement('button'); aOpen.textContent = '在阅读器打开'; aOpen.style.cursor='pointer';
     aOpen.addEventListener('click', ()=> window.openPdfViewer && window.openPdfViewer(item.url, item.title));
+    const edit = document.createElement('button'); edit.textContent = '编辑摘要'; edit.style.cursor='pointer';
     const del = document.createElement('button'); del.textContent = '删除'; del.style.cursor='pointer';
     del.addEventListener('click', async ()=>{
       if (!confirm('确认删除该报告关联？此操作会从数据库移除，并尝试从存储删除文件。')) return;
@@ -2546,9 +2556,48 @@ function renderPdfList(wrap, pdfs, countryCode) {
       countryData[countryCode].pdfs = next;
       renderPdfList(wrap, next, countryCode);
     });
-    actions.appendChild(aView); actions.appendChild(aOpen); actions.appendChild(del);
+    actions.appendChild(aView); actions.appendChild(aOpen); actions.appendChild(edit); actions.appendChild(del);
     row.appendChild(left); row.appendChild(actions);
     wrap.appendChild(row);
+
+    // 摘要编辑区
+    const editor = document.createElement('div');
+    editor.style.margin = '6px 0 12px 0';
+    editor.style.display = 'none';
+    const ta = document.createElement('textarea');
+    ta.style.width = '100%';
+    ta.style.minHeight = '90px';
+    ta.style.border = '1px solid #ddd';
+    ta.style.borderRadius = '6px';
+    ta.style.padding = '8px';
+    ta.placeholder = '请输入该报告的摘要（用户前端将只读显示）';
+    ta.value = item.summary || '';
+    const save = document.createElement('button');
+    save.textContent = '保存摘要';
+    save.style.marginTop = '6px';
+    save.style.padding = '6px 10px';
+    save.style.border = '1px solid #ddd';
+    save.style.borderRadius = '6px';
+    save.style.cursor = 'pointer';
+    editor.appendChild(ta);
+    editor.appendChild(save);
+    wrap.appendChild(editor);
+
+    edit.addEventListener('click', ()=>{
+      editor.style.display = editor.style.display === 'none' ? 'block' : 'none';
+      ta.focus();
+    });
+    save.addEventListener('click', async ()=>{
+      const next = pdfs.map(p => p === item ? { ...p, summary: ta.value.trim() } : p);
+      const { error: dbErr } = await supabase.from('country_cards').update({ pdfs: next }).eq('country_code', countryCode);
+      if (dbErr) { alert('保存失败：' + (dbErr.message || '数据库错误')); return; }
+      // 同步内存
+      if (!countryData[countryCode]) countryData[countryCode] = {};
+      countryData[countryCode].pdfs = next;
+      // 更新本地数组以便后续继续编辑
+      pdfs.splice(0, pdfs.length, ...next);
+      alert('已保存');
+    });
   });
 }
 

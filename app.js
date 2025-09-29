@@ -161,13 +161,11 @@ function initApp() {
   window.openPdfViewer = openPdfViewer;
   window.closePdfViewer = closePdfViewer;
 
-  // AI 助手抽屉逻辑（骨架）
+  // 报告摘要抽屉逻辑（只读展示，内容来自数据库）
   const aiOverlay = document.getElementById('ai-overlay');
   const aiDrawer = document.getElementById('ai-drawer');
   const aiClose = document.getElementById('ai-close');
   const aiSummary = document.getElementById('ai-summary');
-  const aiAsk = document.getElementById('ai-ask');
-  const aiInput = document.getElementById('ai-question');
   let lastPdfUrl = '';
 
   function openAiDrawer() {
@@ -175,8 +173,17 @@ function initApp() {
     aiOverlay.classList.remove('hidden');
     aiDrawer.classList.remove('hidden');
     aiDrawer.setAttribute('aria-hidden', 'false');
-    // 占位：后续填充提取与总结
-    if (aiSummary) aiSummary.innerHTML = '<div style="padding:6px 0;">正在分析报告，请稍候…</div>';
+    // 打开时从内存数据加载当前报告摘要（由后台维护）
+    try {
+      const meta = window.currentReportMeta || {};
+      const code = (meta.countryCode || '').toUpperCase();
+      const url = meta.url || lastPdfUrl || '';
+      const list = (countryData && countryData[code] && Array.isArray(countryData[code].pdfs)) ? countryData[code].pdfs : [];
+      const found = list.find(p => p.url === url);
+      if (aiSummary) aiSummary.innerText = (found && found.summary) ? found.summary : '';
+    } catch (_) {
+      if (aiSummary) aiSummary.innerText = '';
+    }
   }
   function closeAiDrawer() {
     if (!aiOverlay || !aiDrawer) return;
@@ -187,141 +194,11 @@ function initApp() {
   aiOverlay && aiOverlay.addEventListener('click', closeAiDrawer);
   aiClose && aiClose.addEventListener('click', closeAiDrawer);
   btnAiRead && btnAiRead.addEventListener('click', openAiDrawer);
-  aiAsk && aiAsk.addEventListener('click', ()=>{
-    if (!aiInput) return;
-    const q = aiInput.value.trim();
-    if (!q) return;
-    if (aiSummary) {
-      const p = document.createElement('div');
-      p.textContent = 'Q: ' + q;
-      aiSummary.appendChild(p);
-    }
-    aiInput.value = '';
-  });
+  // 导出到全局（供其他模块触发打开）
+  window.openAiDrawer = openAiDrawer;
 
-  // ====== AI 阅读：PDF 抽取与总结 (v1) ======
-  const edgeUrl = `${supabaseUrl}/functions/v1/deepseek`;
-  async function callDeepSeek(prompt) {
-    const resp = await fetch(edgeUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseAnonKey}` },
-      body: JSON.stringify({ prompt, model: 'deepseek-chat', max_tokens: 1200, temperature: 0.4 })
-    });
-    if (!resp.ok) throw new Error('LLM错误');
-    const j = await resp.json();
-    const content = j?.data?.choices?.[0]?.message?.content;
-    if (!content) throw new Error('LLM返回为空');
-    return content;
-  }
-
-  async function loadPdfJs() {
-    if (window.pdfjsLib) return window.pdfjsLib;
-    await import('https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js');
-    await import('https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js');
-    if (window.pdfjsLib) {
-      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
-      return window.pdfjsLib;
-    }
-    throw new Error('pdf.js 加载失败');
-  }
-
-  async function extractPdfText(url) {
-    const pdfjsLib = await loadPdfJs();
-    // 优先以 ArrayBuffer 方式加载，规避部分对象存储的 CORS/Range 限制
-    let loadingTask;
-    try {
-      const res = await fetch(url, { mode: 'cors' });
-      if (!res.ok) throw new Error('fetch failed');
-      const buf = await res.arrayBuffer();
-      loadingTask = pdfjsLib.getDocument({ data: buf });
-    } catch (e) {
-      // 回退使用 url 直连
-      loadingTask = pdfjsLib.getDocument({ url });
-    }
-    const pdf = await loadingTask.promise;
-    const pages = [];
-    const maxPages = Math.min(pdf.numPages, 80); // 安全上限，过大文档先限制
-    for (let i = 1; i <= maxPages; i++) {
-      const page = await pdf.getPage(i);
-      const tc = await page.getTextContent();
-      const text = tc.items.map(it => it.str).join(' ');
-      pages.push({ page: i, text });
-    }
-    return pages;
-  }
-
-  function chunkPages(pages, charsPerChunk = 3500, overlap = 300) {
-    const chunks = [];
-    let buf = '';
-    let start = 1;
-    for (const p of pages) {
-      const clean = p.text.replace(/\s+/g, ' ').trim();
-      if ((buf + ' ' + clean).length > charsPerChunk && buf.length > 0) {
-        chunks.push({ from: start, to: p.page - 1, text: buf });
-        const tail = buf.slice(-overlap);
-        buf = tail + ' ' + clean;
-        start = Math.max(start, p.page);
-      } else {
-        buf = (buf + ' ' + clean).trim();
-      }
-    }
-    if (buf.length) {
-      const lastPage = pages.length ? pages[pages.length - 1].page : 1;
-      chunks.push({ from: start, to: lastPage, text: buf });
-    }
-    return chunks.slice(0, 30);
-  }
-
-  async function summarizePdf(url) {
-    const pages = await extractPdfText(url);
-    const chunks = chunkPages(pages);
-    const mapResults = [];
-    for (const c of chunks) {
-      const prompt = `你是一名中文分析师。请基于下列报告片段（第${c.from}-${c.to}页）提炼3-5条要点，保留关键数字、时间、国家/主体名词，每条≤120字。\n返回JSON：{\n  "bullets": ["…", "…"]\n}\n\n片段：\n${c.text}`;
-      try {
-        const raw = await callDeepSeek(prompt);
-        const json = JSON.parse(raw);
-        mapResults.push(json.bullets || []);
-      } catch (e) {
-        mapResults.push([`第${c.from}-${c.to}页摘要失败，原文摘录：` + c.text.slice(0, 120)]);
-      }
-    }
-    const flat = mapResults.flat().slice(0, 60);
-    const reducePrompt = `基于这些要点（中文）输出：1) Top 10 要点列表；2) 300~500字结论；返回JSON：{top10:["…"], conclusion:"…"}\n要点：\n${flat.map((b,i)=>`${i+1}. ${b}`).join('\n')}`;
-    let summary;
-    try {
-      const reduceRaw = await callDeepSeek(reducePrompt);
-      summary = JSON.parse(reduceRaw);
-    } catch {
-      summary = { top10: flat.slice(0,10), conclusion: '总结生成失败，请重试。' };
-    }
-    return summary;
-  }
-
-  // 将“帮我读”按钮与总结流程打通
-  async function openAiAndSummarize() {
-    openAiDrawer();
-    try {
-      if (!lastPdfUrl) throw new Error('未获取到PDF地址');
-      if (aiSummary) aiSummary.innerHTML = '<div>正在提取文本…</div>';
-      const summary = await summarizePdf(lastPdfUrl);
-      if (aiSummary) {
-        aiSummary.innerHTML = '';
-        const ul = document.createElement('ul');
-        (summary.top10 || []).forEach(t => {
-          const li = document.createElement('li'); li.textContent = t; ul.appendChild(li);
-        });
-        const concl = document.createElement('div');
-        concl.style.marginTop = '8px';
-        concl.textContent = summary.conclusion || '';
-        aiSummary.appendChild(ul); aiSummary.appendChild(concl);
-      }
-    } catch (e) {
-      if (aiSummary) aiSummary.textContent = '分析失败：' + (e?.message || '未知错误');
-    }
-  }
-  btnAiRead && btnAiRead.removeEventListener('click', openAiDrawer);
-  btnAiRead && btnAiRead.addEventListener('click', openAiAndSummarize);
+  // “帮我读”仅打开摘要抽屉（无AI调用）
+  btnAiRead && btnAiRead.addEventListener('click', openAiDrawer);
 }
 
 // Handle country click event (to be called from map.js)
