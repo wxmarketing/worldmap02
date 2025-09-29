@@ -2089,7 +2089,10 @@ function renderReportBar(countryCode, chineseCountryName, data) {
         window.open(item.url, '_blank');
       }
     };
-    row.addEventListener('click', openHandler);
+    // 仅在标题行绑定点击，避免编辑区域误触
+    const headerRow = document.createElement('div');
+    headerRow.className = 'report-row';
+    headerRow.addEventListener('click', openHandler);
 
     const tt = document.createElement('div');
     tt.className = 'report-title';
@@ -2099,9 +2102,9 @@ function renderReportBar(countryCode, chineseCountryName, data) {
     action.className = 'report-action';
     action.textContent = '阅读';
 
-    row.appendChild(tt);
-    row.appendChild(action);
-    list.appendChild(row);
+    headerRow.appendChild(tt);
+    headerRow.appendChild(action);
+    row.appendChild(headerRow);
 
     // 卡片中摘要展示（单独一行，避免被横向 flex 压缩）
     if (item.summaryCard) {
@@ -2110,8 +2113,9 @@ function renderReportBar(countryCode, chineseCountryName, data) {
       sum.textContent = item.summaryCard;
       // 摘要也支持点击打开
       sum.addEventListener('click', openHandler);
-      list.appendChild(sum);
+      row.appendChild(sum);
     }
+    list.appendChild(row);
   });
 
   card.appendChild(list);
