@@ -12,7 +12,7 @@
 .report-item:hover { background: #f2f2f2; }
 .report-title { font-size: 15px; font-weight: 500; color: var(--text-color); }
 .report-action { color: #4CAF50; font-size: 14px; }
-.report-summary { margin-top: 6px; font-size: 13px; color: var(--secondary-color); line-height: 1.6; }
+.report-summary { margin: 6px 12px 10px 12px; font-size: 13px; color: var(--secondary-color); line-height: 1.6; cursor: pointer; }
 
 @font-face {
   font-family: 'Tencent Sans W7';

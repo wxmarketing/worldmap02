@@ -2080,7 +2080,7 @@ function renderReportBar(countryCode, chineseCountryName, data) {
   data.pdfs.forEach((item, idx) => {
     const row = document.createElement('div');
     row.className = 'report-item';
-    row.addEventListener('click', () => {
+    const openHandler = () => {
       // 记录当前报告元信息，供“帮我读”展示摘要
       window.currentReportMeta = { countryCode, ...item };
       if (window.openPdfViewer) {
@@ -2088,7 +2088,8 @@ function renderReportBar(countryCode, chineseCountryName, data) {
       } else {
         window.open(item.url, '_blank');
       }
-    });
+    };
+    row.addEventListener('click', openHandler);
 
     const tt = document.createElement('div');
     tt.className = 'report-title';
@@ -2100,14 +2101,17 @@ function renderReportBar(countryCode, chineseCountryName, data) {
 
     row.appendChild(tt);
     row.appendChild(action);
-    // 卡片中摘要展示（只读，使用 summaryCard）
+    list.appendChild(row);
+
+    // 卡片中摘要展示（单独一行，避免被横向 flex 压缩）
     if (item.summaryCard) {
       const sum = document.createElement('div');
       sum.className = 'report-summary';
       sum.textContent = item.summaryCard;
-      row.appendChild(sum);
+      // 摘要也支持点击打开
+      sum.addEventListener('click', openHandler);
+      list.appendChild(sum);
     }
-    list.appendChild(row);
   });
 
   card.appendChild(list);
