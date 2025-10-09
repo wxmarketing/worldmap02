@@ -220,6 +220,7 @@ function initApp() {
         const tt = document.createElement('div');
         tt.className = 'report-title';
         const countryNames = (item.countries || [item.countryCode])
+          .filter(c => c && c !== 'GLOBAL')
           .map(c => (countryData[c]?.name_zh) || c)
           .filter(Boolean)
           .join('、');
