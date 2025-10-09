@@ -3296,12 +3296,22 @@ async function loadCountryDataFromSupabase() {
 
         countryCardsData.forEach(item => {
             const code = item.country_code;
-            if (countryData[code]) {
-                countryData[code].detailAnalysisUrl = item.detailAnalysisUrl;
-                countryData[code].cards = cardsByCountry[code] ? cardsByCountry[code].sort((a, b) => a.order_index - b.order_index) : [];
-                // 同步PDF列表
-                countryData[code].pdfs = Array.isArray(item.pdfs) ? item.pdfs : (item.pdfs ? item.pdfs : []);
+            // 若初始化数据中不存在该 code（例如 GLOBAL），则创建占位对象
+            if (!countryData[code]) {
+                countryData[code] = {
+                    name: code,
+                    name_zh: code === 'GLOBAL' ? '全局' : code,
+                    region: 'Global',
+                    region_zh: '全局',
+                    flagUrl: '',
+                    cards: [],
+                    detailAnalysisUrl: ''
+                };
             }
+            countryData[code].detailAnalysisUrl = item.detailAnalysisUrl;
+            countryData[code].cards = cardsByCountry[code] ? cardsByCountry[code].sort((a, b) => a.order_index - b.order_index) : [];
+            // 同步PDF列表
+            countryData[code].pdfs = Array.isArray(item.pdfs) ? item.pdfs : (item.pdfs ? item.pdfs : []);
         });
     } catch (error) {
         console.error("加载 Supabase 数据时发生错误:", error);
