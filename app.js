@@ -187,20 +187,40 @@ function initApp() {
       const pdfs = countryData[code]?.pdfs || [];
       pdfs.forEach(p => all.push({ countryCode: code, ...p }));
     });
-    if (all.length === 0) {
+
+    // 按报告标题去重合并（同名报告合并为一条，展示关联国家）
+    const groups = new Map();
+    for (const it of all) {
+      const key = (it.title || '').trim();
+      if (!groups.has(key)) {
+        groups.set(key, { ...it, countries: [it.countryCode] });
+      } else {
+        const g = groups.get(key);
+        if (!g.countries.includes(it.countryCode)) g.countries.push(it.countryCode);
+        if (!g.summaryCard && it.summaryCard) g.summaryCard = it.summaryCard;
+        if (!g.url && it.url) g.url = it.url;
+      }
+    }
+    const merged = Array.from(groups.values());
+
+    if (merged.length === 0) {
       const tip = document.createElement('div');
       tip.textContent = '暂无任何报告';
       tip.style.padding = '10px';
       repList.appendChild(tip);
     } else {
-      all.forEach((item, idx) => {
+      merged.forEach((item, idx) => {
         const card = document.createElement('div');
         card.className = 'report-item';
         const headerRow = document.createElement('div');
         headerRow.className = 'report-row';
         const tt = document.createElement('div');
         tt.className = 'report-title';
-        const cname = (countryData[item.countryCode]?.name_zh) ? `（${countryData[item.countryCode].name_zh}）` : '';
+        const countryNames = (item.countries || [item.countryCode])
+          .map(c => (countryData[c]?.name_zh) || c)
+          .filter(Boolean)
+          .join('、');
+        const cname = countryNames ? `（${countryNames}）` : '';
         tt.textContent = (item.title || `报告${idx+1}`) + cname;
         const action = document.createElement('span');
         action.className = 'report-action';
@@ -208,7 +228,8 @@ function initApp() {
         headerRow.appendChild(tt);
         headerRow.appendChild(action);
         const open = () => {
-          window.currentReportMeta = { countryCode: item.countryCode, ...item };
+          const cc = (item.countries && item.countries[0]) || item.countryCode;
+          window.currentReportMeta = { countryCode: cc, ...item };
           openPdfViewer(item.url, item.title || 'PDF 报告');
         };
         headerRow.addEventListener('click', open);
