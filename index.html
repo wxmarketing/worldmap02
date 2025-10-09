@@ -23,6 +23,7 @@
     <div class="header-center">
       <span class="header-subtitle">点击地图查看国家详细信息</span>
       <button id="night-mode-btn" class="map-reset-btn">夜间模式</button>
+      <button id="global-reports-btn" class="map-reset-btn">报告列表</button>
     </div>
   </header>
   
@@ -188,6 +189,22 @@
     <div id="ai-body" class="ai-body">
       <div id="ai-summary" class="ai-summary" aria-label="报告摘要"></div>
     </div>
+  </div>
+
+  <!-- 全部报告抽屉 -->
+  <div id="reports-overlay" class="pdf-overlay hidden"></div>
+  <div id="reports-drawer" class="pdf-drawer hidden" aria-hidden="true" role="dialog" aria-label="报告列表">
+    <div class="pdf-toolbar">
+      <div class="pdf-title">全部报告</div>
+      <div class="pdf-actions">
+        <button id="reports-close" class="pdf-icon-btn primary" aria-label="关闭" title="关闭">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6L6 18"/><path d="M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div id="reports-list" style="padding:10px 14px; overflow:auto; height:100%;"></div>
   </div>
 </body>
 </html>

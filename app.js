@@ -127,6 +127,12 @@ function initApp() {
   const btnDownload = document.getElementById('pdf-download');
   const btnAiRead = document.getElementById('pdf-ai-read');
   const titleEl = document.getElementById('pdf-title');
+  // 全部报告抽屉元素
+  const globalBtn = document.getElementById('global-reports-btn');
+  const repOverlay = document.getElementById('reports-overlay');
+  const repDrawer = document.getElementById('reports-drawer');
+  const repClose = document.getElementById('reports-close');
+  const repList = document.getElementById('reports-list');
 
   function openPdfViewer(url, title = 'PDF 报告') {
     if (!overlay || !drawer || !frame) return;
@@ -160,6 +166,64 @@ function initApp() {
   // 暴露给全局（供 data.js 或详情按钮调用）
   window.openPdfViewer = openPdfViewer;
   window.closePdfViewer = closePdfViewer;
+  function openReportsDrawer() {
+    if (!repOverlay || !repDrawer || !repList) return;
+    // 聚合所有国家的报告
+    repList.innerHTML = '';
+    const all = [];
+    Object.keys(countryData || {}).forEach(code => {
+      const pdfs = countryData[code]?.pdfs || [];
+      pdfs.forEach(p => all.push({ countryCode: code, ...p }));
+    });
+    if (all.length === 0) {
+      const tip = document.createElement('div');
+      tip.textContent = '暂无任何报告';
+      tip.style.padding = '10px';
+      repList.appendChild(tip);
+    } else {
+      all.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'report-item';
+        const headerRow = document.createElement('div');
+        headerRow.className = 'report-row';
+        const tt = document.createElement('div');
+        tt.className = 'report-title';
+        const cname = (countryData[item.countryCode]?.name_zh) ? `（${countryData[item.countryCode].name_zh}）` : '';
+        tt.textContent = (item.title || `报告${idx+1}`) + cname;
+        const action = document.createElement('span');
+        action.className = 'report-action';
+        action.textContent = '阅读';
+        headerRow.appendChild(tt);
+        headerRow.appendChild(action);
+        const open = () => {
+          window.currentReportMeta = { countryCode: item.countryCode, ...item };
+          openPdfViewer(item.url, item.title || 'PDF 报告');
+        };
+        headerRow.addEventListener('click', open);
+        card.appendChild(headerRow);
+        if (item.summaryCard) {
+          const sum = document.createElement('div');
+          sum.className = 'report-summary';
+          sum.textContent = item.summaryCard;
+          sum.addEventListener('click', open);
+          card.appendChild(sum);
+        }
+        repList.appendChild(card);
+      });
+    }
+    repOverlay.classList.remove('hidden');
+    repDrawer.classList.remove('hidden');
+    repDrawer.setAttribute('aria-hidden','false');
+  }
+  function closeReportsDrawer() {
+    if (!repOverlay || !repDrawer) return;
+    repOverlay.classList.add('hidden');
+    repDrawer.classList.add('hidden');
+    repDrawer.setAttribute('aria-hidden','true');
+  }
+  globalBtn && globalBtn.addEventListener('click', openReportsDrawer);
+  repOverlay && repOverlay.addEventListener('click', closeReportsDrawer);
+  repClose && repClose.addEventListener('click', closeReportsDrawer);
 
   // 报告摘要抽屉逻辑（只读展示，内容来自数据库）
   const aiOverlay = document.getElementById('ai-overlay');
