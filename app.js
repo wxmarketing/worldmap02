@@ -249,6 +249,9 @@ function initApp() {
     aiOverlay.classList.remove('hidden');
     aiDrawer.classList.remove('hidden');
     aiDrawer.setAttribute('aria-hidden', 'false');
+    // 置顶摘要抽屉，确保不被 PDF/报告列表覆盖
+    aiOverlay.style.zIndex = '2500';
+    aiDrawer.style.zIndex = '2501';
     // 打开时从内存数据加载当前报告摘要（由后台维护）
     try {
       const meta = window.currentReportMeta || {};
