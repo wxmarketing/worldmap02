@@ -61,6 +61,15 @@ function displayAutocompleteResults(results) {
 // Select an item from autocomplete
 function selectAutocompleteItem(countryName, countryCode, countryNameZh) {
   const searchInput = document.getElementById("country-search");
+  // 将全局报告列表按钮移动到搜索区左侧作为悬浮按钮
+  const globalBtnHeader = document.getElementById('global-reports-btn');
+  const searchSection = document.querySelector('.search-section');
+  if (globalBtnHeader && searchSection) {
+    try {
+      searchSection.appendChild(globalBtnHeader);
+      globalBtnHeader.classList.add('floating-reports-btn');
+    } catch(_) {}
+  }
   searchInput.value = countryNameZh || countryName; // 优先显示中文名
   autocompleteResultsContainer.classList.add('hidden');
   
@@ -142,6 +151,9 @@ function initApp() {
     frame.src = `${viewerCdn}?file=${encodeURIComponent(url)}`;
     overlay.classList.remove('hidden');
     drawer.classList.remove('hidden');
+    // 置顶层级，避免被其他抽屉覆盖
+    overlay.style.zIndex = '2000';
+    drawer.style.zIndex = '2001';
     drawer.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
     btnOpenNew && (btnOpenNew.href = url);
