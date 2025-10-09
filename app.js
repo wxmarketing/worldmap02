@@ -187,6 +187,9 @@ function initApp() {
       const pdfs = countryData[code]?.pdfs || [];
       pdfs.forEach(p => all.push({ countryCode: code, ...p }));
     });
+    // 追加 GLOBAL 的报告（若有）
+    const globalPdfs = (countryData['GLOBAL'] && Array.isArray(countryData['GLOBAL'].pdfs)) ? countryData['GLOBAL'].pdfs : [];
+    globalPdfs.forEach(p => all.push({ countryCode: 'GLOBAL', ...p }));
 
     // 按报告标题去重合并（同名报告合并为一条，展示关联国家）
     const groups = new Map();

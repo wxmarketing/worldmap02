@@ -2327,6 +2327,12 @@ function initAdminPanel() {
     option.textContent = country.name_zh || country.name;
     adminCountrySelect.appendChild(option);
   });
+
+  // 额外增加“全局（仅报告列表）”，用于上传仅出现在报告列表的报告
+  const globalOpt = document.createElement('option');
+  globalOpt.value = 'GLOBAL';
+  globalOpt.textContent = '全局（仅报告列表）';
+  adminCountrySelect.appendChild(globalOpt);
   
   // Add event listener to country select
   adminCountrySelect.addEventListener("change", function() {
@@ -2517,7 +2523,24 @@ async function uploadPdfAndSave(countryCode, file, title, currentPdfs) {
   if (upErr) throw upErr;
   const { data: pub } = supabase.storage.from('country-pdfs').getPublicUrl(path);
   const newItem = { title, url: pub.publicUrl, path, updatedAt: new Date().toISOString(), summaryCard: '', summaryReader: '' };
-  const next = [...currentPdfs, newItem];
+  // 若为全局报告，确保存在 GLOBAL 行，并读取现有 pdfs 再更新
+  let basePdfs = currentPdfs;
+  if (countryCode === 'GLOBAL') {
+    const { data: exist, error: selErr } = await supabase
+      .from('country_cards')
+      .select('pdfs')
+      .eq('country_code', 'GLOBAL')
+      .single();
+    if (selErr && selErr.code === 'PGRST116') {
+      // 行不存在则创建
+      const { error: insErr } = await supabase.from('country_cards').insert([{ country_code: 'GLOBAL', pdfs: [] }]);
+      if (insErr) throw insErr;
+      basePdfs = [];
+    } else if (!selErr) {
+      basePdfs = Array.isArray(exist?.pdfs) ? exist.pdfs : [];
+    }
+  }
+  const next = [...(basePdfs || currentPdfs || []), newItem];
   const { error: dbErr } = await supabase.from('country_cards').update({ pdfs: next }).eq('country_code', countryCode);
   if (dbErr) throw dbErr;
   // 同步到内存数据，以便详情页立即显示
