@@ -90,8 +90,10 @@ function updateAuthUI() {
       authReportsToggle.classList.remove('auth-btn');
     }
     
-    userInfo.textContent = `欢迎，${currentUser.email}`;
-    userInfo.classList.remove('hidden');
+    if (userInfo) {
+      userInfo.textContent = `欢迎，${currentUser.email}`;
+      userInfo.classList.remove('hidden');
+    }
     
     // 显示管理面板按钮
     if (adminToggle) adminToggle.style.display = 'inline-block';
@@ -102,7 +104,9 @@ function updateAuthUI() {
       authReportsToggle.classList.add('auth-btn');
     }
     
-    userInfo.classList.add('hidden');
+    if (userInfo) {
+      userInfo.classList.add('hidden');
+    }
     
     // 隐藏管理面板按钮
     if (adminToggle) adminToggle.style.display = 'none';
