@@ -2087,13 +2087,33 @@ function renderReportBar(countryCode, chineseCountryName, data) {
   data.pdfs.forEach((item, idx) => {
     const row = document.createElement('div');
     row.className = 'report-item';
-    const openHandler = () => {
+    const openHandler = async () => {
       // 记录当前报告元信息，供"帮我读"展示摘要
-      window.currentReportMeta = { countryCode, ...item };
-      if (window.openPdfViewer) {
-        window.openPdfViewer(item.url, item.title || (chineseCountryName + ' - 报告'));
-      } else {
-        window.open(item.url, '_blank');
+      try {
+        const extractPath = (possibleUrl) => {
+          if (!possibleUrl) return '';
+          try {
+            const u = new URL(possibleUrl);
+            const m = u.pathname.match(/\/object\/(?:sign|public)\/country-pdfs\/(.*)$/);
+            if (m && m[1]) return decodeURIComponent(m[1]);
+            const i = u.pathname.indexOf('/country-pdfs/');
+            if (i >= 0) return decodeURIComponent(u.pathname.slice(i + '/country-pdfs/'.length));
+          } catch(_) {}
+          return '';
+        };
+        const path = item.path || extractPath(item.url);
+        if (!path) throw new Error('无有效路径');
+        const { data: signed, error } = await supabase.storage.from('country-pdfs').createSignedUrl(path, 60 * 60);
+        if (error) throw error;
+        const url = signed?.signedUrl || '';
+        window.currentReportMeta = { countryCode, ...item, path, url };
+        if (window.openPdfViewer) {
+          window.openPdfViewer(url, item.title || (chineseCountryName + ' - 报告'));
+        } else {
+          window.open(url, '_blank');
+        }
+      } catch (e) {
+        alert('生成阅读链接失败');
       }
     };
     // 仅在标题行绑定点击，避免编辑区域误触
