@@ -198,6 +198,8 @@ async function initApp() {
         if (!g.countries.includes(it.countryCode)) g.countries.push(it.countryCode);
         if (!g.summaryCard && it.summaryCard) g.summaryCard = it.summaryCard;
         if (!g.url && it.url) g.url = it.url;
+        // 合并isRecent：只要有一条为true就为true
+        g.isRecent = !!(g.isRecent || it.isRecent);
       }
     }
     const merged = Array.from(groups.values());
@@ -208,7 +210,63 @@ async function initApp() {
       tip.style.padding = '10px';
       repList.appendChild(tip);
     } else {
+      // 先渲染最近更新分区
+      const recents = merged.filter(it => it.isRecent);
+      const renderedKeys = new Set();
+      if (recents.length > 0) {
+        const header = document.createElement('div');
+        header.textContent = '最近更新';
+        header.style.fontWeight = '600';
+        header.style.margin = '8px 0';
+        repList.appendChild(header);
+        recents.forEach((item, idx) => {
+          const card = document.createElement('div');
+          card.className = 'report-item';
+          const headerRow = document.createElement('div');
+          headerRow.className = 'report-row';
+          const tt = document.createElement('div');
+          tt.className = 'report-title';
+          const countryNames = (item.countries || [item.countryCode])
+            .filter(c => c && c !== 'GLOBAL')
+            .map(c => (countryData[c]?.name_zh) || c)
+            .filter(Boolean)
+            .join('、');
+          const cname = countryNames ? `（${countryNames}）` : '';
+          tt.textContent = (item.title || `报告${idx+1}`) + cname;
+          const action = document.createElement('span');
+          action.className = 'report-action';
+          action.textContent = '阅读';
+          headerRow.appendChild(tt);
+          headerRow.appendChild(action);
+          const open = () => {
+            const cc = (item.countries && item.countries[0]) || item.countryCode;
+            window.currentReportMeta = { countryCode: cc, ...item };
+            openPdfViewer(item.url, item.title || 'PDF 报告');
+          };
+          headerRow.addEventListener('click', open);
+          card.appendChild(headerRow);
+          if (item.summaryCard) {
+            const sum = document.createElement('div');
+            sum.className = 'report-summary';
+            sum.textContent = item.summaryCard;
+            sum.addEventListener('click', open);
+            card.appendChild(sum);
+          }
+          repList.appendChild(card);
+          renderedKeys.add((item.title || '').trim());
+        });
+        // 分隔线
+        const hr = document.createElement('div');
+        hr.style.height = '1px';
+        hr.style.background = 'var(--border-color)';
+        hr.style.margin = '10px 0';
+        repList.appendChild(hr);
+      }
+
+      // 再渲染全部报告（排除已在最近更新中出现的）
       merged.forEach((item, idx) => {
+        const key = (item.title || '').trim();
+        if (renderedKeys.has(key)) return;
         const card = document.createElement('div');
         card.className = 'report-item';
         const headerRow = document.createElement('div');

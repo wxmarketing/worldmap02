@@ -18,6 +18,7 @@
 .report-title { font-size: 15px; font-weight: 500; color: var(--text-color); }
 .report-action { color: #4CAF50; font-size: 14px; }
 .report-summary { margin: 0 12px 12px 12px; font-size: 13px; color: var(--secondary-color); line-height: 1.6; cursor: pointer; }
+.report-section-title{font-size:14px;font-weight:600;color:var(--text-color);margin:6px 0}
 
 /* 悬浮的"报告列表/登录"按钮（放在搜索区左侧） */
 #auth-reports-toggle.floating-reports-btn {

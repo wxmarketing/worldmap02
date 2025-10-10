@@ -1964,7 +1964,7 @@ export function updateCountryDetail(countryName, countryCode) {
   document.getElementById("country-name").textContent = chineseCountryName;
   document.getElementById("country-region").textContent = chineseRegionName;
 
-  // 在标题下方渲染“阅读报告”按钮（若存在PDF）
+  // 在标题下方渲染"阅读报告"按钮（若存在PDF）
   renderReportBar(countryCode, chineseCountryName, data);
   
   // Get the cards container
@@ -2050,7 +2050,7 @@ export function updateCountryDetail(countryName, countryCode) {
     });
   }
   
-  // Add "查看详细分析" button if URL is available
+  // Add "查看详细分析"按钮 if URL is available
   addDetailAnalysisButton(cardsContainer, data, countryCode);
   
   // Show country detail panel
@@ -2088,7 +2088,7 @@ function renderReportBar(countryCode, chineseCountryName, data) {
     const row = document.createElement('div');
     row.className = 'report-item';
     const openHandler = () => {
-      // 记录当前报告元信息，供“帮我读”展示摘要
+      // 记录当前报告元信息，供"帮我读"展示摘要
       window.currentReportMeta = { countryCode, ...item };
       if (window.openPdfViewer) {
         window.openPdfViewer(item.url, item.title || (chineseCountryName + ' - 报告'));
@@ -2186,7 +2186,7 @@ function renderAIGeneratedCards(container, aiData) {
   });
 }
 
-// 添加“重新生成”操作区域（不保存到数据库）
+// 添加"重新生成"操作区域（不保存到数据库）
 function addAIMoreActions(container, onRegenerate) {
   const bar = document.createElement('div');
   bar.style.textAlign = 'center';
@@ -2335,7 +2335,7 @@ function initAdminPanel() {
     adminCountrySelect.appendChild(option);
   });
 
-  // 额外增加“全局（仅报告列表）”，用于上传仅出现在报告列表的报告
+  // 额外增加"全局（仅报告列表）"，用于上传仅出现在报告列表的报告
   const globalOpt = document.createElement('option');
   globalOpt.value = 'GLOBAL';
   globalOpt.textContent = '全局（仅报告列表）';
@@ -2539,7 +2539,7 @@ async function uploadPdfAndSave(countryCode, file, title, currentPdfs) {
     .upload(path, file, { contentType: file.type || 'application/pdf', upsert: false });
   if (upErr) throw upErr;
   const { data: pub } = supabase.storage.from('country-pdfs').getPublicUrl(path);
-  const newItem = { title, url: pub.publicUrl, path, updatedAt: new Date().toISOString(), summaryCard: '', summaryReader: '' };
+  const newItem = { title, url: pub.publicUrl, path, updatedAt: new Date().toISOString(), summaryCard: '', summaryReader: '', isRecent: false };
   // 若为全局报告，确保存在 GLOBAL 行，并读取现有 pdfs 再更新
   let basePdfs = currentPdfs;
   if (countryCode === 'GLOBAL') {
@@ -2590,6 +2590,19 @@ function renderPdfList(wrap, pdfs, countryCode) {
     const aView = document.createElement('a'); aView.textContent = '预览'; aView.href = item.url; aView.target = '_blank';
     const aOpen = document.createElement('button'); aOpen.textContent = '在阅读器打开'; aOpen.style.cursor='pointer';
     aOpen.addEventListener('click', ()=> window.openPdfViewer && window.openPdfViewer(item.url, item.title));
+    // 最近更新切换
+    const toggleRecent = document.createElement('button');
+    toggleRecent.textContent = item.isRecent ? '取消置顶' : '置于最近更新';
+    toggleRecent.style.cursor = 'pointer';
+    toggleRecent.addEventListener('click', async () => {
+      const next = pdfs.map(p => p === item ? { ...p, isRecent: !item.isRecent } : p);
+      const { error: dbErr } = await supabase.from('country_cards').update({ pdfs: next }).eq('country_code', countryCode);
+      if (dbErr) { alert('保存失败：' + (dbErr.message || '数据库错误')); return; }
+      pdfs.splice(0, pdfs.length, ...next);
+      if (!countryData[countryCode]) countryData[countryCode] = {};
+      countryData[countryCode].pdfs = next;
+      renderPdfList(wrap, next, countryCode);
+    });
     const edit = document.createElement('button'); edit.textContent = '编辑摘要'; edit.style.cursor='pointer';
     const del = document.createElement('button'); del.textContent = '删除'; del.style.cursor='pointer';
     del.addEventListener('click', async ()=>{
@@ -2604,7 +2617,7 @@ function renderPdfList(wrap, pdfs, countryCode) {
       countryData[countryCode].pdfs = next;
       renderPdfList(wrap, next, countryCode);
     });
-    actions.appendChild(aView); actions.appendChild(aOpen); actions.appendChild(edit); actions.appendChild(del);
+    actions.appendChild(aView); actions.appendChild(aOpen); actions.appendChild(toggleRecent); actions.appendChild(edit); actions.appendChild(del);
     row.appendChild(left); row.appendChild(actions);
     wrap.appendChild(row);
 
