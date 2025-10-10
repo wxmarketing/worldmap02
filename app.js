@@ -1,5 +1,5 @@
 import { countryData, regionTranslations, updateCountryDetail, initDataAndSupabase, allWorldCountries } from './data.js';
-import { supabaseUrl, supabaseAnonKey } from './supabase.js';
+import { supabase, supabaseUrl, supabaseAnonKey } from './supabase.js';
 import { initAuth, initAuthEventListeners, requireAuth, onAuthStateChange } from './auth.js';
 
 // Main app functionality
@@ -289,9 +289,11 @@ async function initApp() {
           const cc = (item.countries && item.countries[0]) || item.countryCode;
           // 生成签名URL
           try {
-            const { data, error } = await supabase.storage.from('country-pdfs').createSignedUrl(item.path || '', 60 * 60);
+            const path = item.path || derivePathFromUrl(item.url);
+            if (!path) throw new Error('无有效路径');
+            const { data, error } = await supabase.storage.from('country-pdfs').createSignedUrl(path, 60 * 60);
             if (error) throw error; const url = data?.signedUrl || '';
-            window.currentReportMeta = { countryCode: cc, ...item, url };
+            window.currentReportMeta = { countryCode: cc, ...item, url, path };
             openPdfViewer(url, item.title || 'PDF 报告');
           } catch (e) { alert('生成阅读链接失败'); }
         };
