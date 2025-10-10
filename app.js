@@ -62,15 +62,7 @@ function displayAutocompleteResults(results) {
 // Select an item from autocomplete
 function selectAutocompleteItem(countryName, countryCode, countryNameZh) {
   const searchInput = document.getElementById("country-search");
-  // 将全局报告列表按钮移动到搜索区左侧作为悬浮按钮
-  const globalBtnHeader = document.getElementById('global-reports-btn');
-  const searchSection = document.querySelector('.search-section');
-  if (globalBtnHeader && searchSection) {
-    try {
-      searchSection.appendChild(globalBtnHeader);
-      globalBtnHeader.classList.add('floating-reports-btn');
-    } catch(_) {}
-  }
+  // 已移除全局报告按钮的移动逻辑，现在使用 auth-reports-toggle 按钮
   searchInput.value = countryNameZh || countryName; // 优先显示中文名
   autocompleteResultsContainer.classList.add('hidden');
   
@@ -141,8 +133,7 @@ async function initApp() {
   const btnDownload = document.getElementById('pdf-download');
   const btnAiRead = document.getElementById('pdf-ai-read');
   const titleEl = document.getElementById('pdf-title');
-  // 全部报告抽屉元素
-  const globalBtn = document.getElementById('global-reports-btn');
+  // 全部报告抽屉元素（现在通过 auth.js 中的 auth-reports-toggle 按钮触发）
   const repOverlay = document.getElementById('reports-overlay');
   const repDrawer = document.getElementById('reports-drawer');
   const repClose = document.getElementById('reports-close');
@@ -263,8 +254,9 @@ async function initApp() {
     repDrawer.classList.add('hidden');
     repDrawer.setAttribute('aria-hidden','true');
   }
-  // 使用权限控制包装报告列表功能
-  globalBtn && globalBtn.addEventListener('click', requireAuth(openReportsDrawer));
+  // 报告列表功能现在由 auth-reports-toggle 按钮触发
+  // 将 openReportsDrawer 暴露到全局供 auth.js 调用
+  window.openReportsDrawer = openReportsDrawer;
   repOverlay && repOverlay.addEventListener('click', closeReportsDrawer);
   repClose && repClose.addEventListener('click', closeReportsDrawer);
 

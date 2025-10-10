@@ -98,6 +98,23 @@
   cursor: not-allowed;
 }
 
+.auth-logout-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 10px;
+}
+
+.auth-logout-btn:hover {
+  background-color: #d32f2f;
+}
+
 .auth-switch {
   text-align: center;
   font-size: 14px;

@@ -79,32 +79,33 @@ export async function signOut() {
 
 // 更新认证UI
 function updateAuthUI() {
-  const authToggle = document.getElementById('auth-toggle');
+  const authReportsToggle = document.getElementById('auth-reports-toggle');
   const userInfo = document.getElementById('user-info');
   const adminToggle = document.getElementById('admin-toggle');
-  const globalReportsBtn = document.getElementById('global-reports-btn');
   
   if (currentUser) {
-    // 已登录状态
-    authToggle.textContent = '登出';
-    authToggle.classList.add('logout-btn');
+    // 已登录状态 - 显示报告列表按钮
+    if (authReportsToggle) {
+      authReportsToggle.textContent = '报告列表';
+      authReportsToggle.classList.remove('auth-btn');
+    }
     
     userInfo.textContent = `欢迎，${currentUser.email}`;
     userInfo.classList.remove('hidden');
     
-    // 显示管理面板和报告列表按钮
+    // 显示管理面板按钮
     if (adminToggle) adminToggle.style.display = 'inline-block';
-    if (globalReportsBtn) globalReportsBtn.style.display = 'inline-block';
   } else {
-    // 未登录状态
-    authToggle.textContent = '登录';
-    authToggle.classList.remove('logout-btn');
+    // 未登录状态 - 显示登录按钮
+    if (authReportsToggle) {
+      authReportsToggle.textContent = '登录';
+      authReportsToggle.classList.add('auth-btn');
+    }
     
     userInfo.classList.add('hidden');
     
-    // 隐藏管理面板和报告列表按钮
+    // 隐藏管理面板按钮
     if (adminToggle) adminToggle.style.display = 'none';
-    if (globalReportsBtn) globalReportsBtn.style.display = 'none';
   }
 }
 
@@ -114,11 +115,31 @@ export function showAuthModal(mode = 'login') {
   const modal = document.getElementById('auth-modal');
   const title = document.getElementById('auth-title');
   const loginForm = document.getElementById('login-form');
+  const logoutBtn = document.getElementById('logout-btn');
+  const submitBtn = loginForm.querySelector('.auth-submit-btn');
+  const authSwitch = loginForm.querySelector('.auth-switch');
+  const formGroups = loginForm.querySelectorAll('.form-group');
   
-  // 只显示登录表单
-  title.textContent = '用户登录';
+  // 根据登录状态调整模态框内容
+  if (currentUser) {
+    // 已登录 - 显示账号信息和登出按钮
+    title.textContent = '账号管理';
+    formGroups.forEach(group => group.classList.add('hidden'));
+    submitBtn.classList.add('hidden');
+    // 在 authSwitch 中显示用户邮箱
+    authSwitch.innerHTML = `<span style="font-size: 16px; font-weight: 500;">当前登录账号：${currentUser.email}</span>`;
+    authSwitch.classList.remove('hidden');
+    if (logoutBtn) logoutBtn.classList.remove('hidden');
+  } else {
+    // 未登录 - 显示登录表单
+    title.textContent = '用户登录';
+    formGroups.forEach(group => group.classList.remove('hidden'));
+    submitBtn.classList.remove('hidden');
+    authSwitch.classList.remove('hidden');
+    if (logoutBtn) logoutBtn.classList.add('hidden');
+  }
+  
   loginForm.classList.remove('hidden');
-  
   overlay.classList.remove('hidden');
   modal.classList.remove('hidden');
 }
@@ -127,6 +148,8 @@ export function showAuthModal(mode = 'login') {
 export function hideAuthModal() {
   const overlay = document.getElementById('auth-overlay');
   const modal = document.getElementById('auth-modal');
+  const loginForm = document.getElementById('login-form');
+  const authSwitch = loginForm.querySelector('.auth-switch');
   
   overlay.classList.add('hidden');
   modal.classList.add('hidden');
@@ -134,6 +157,11 @@ export function hideAuthModal() {
   // 清空表单
   document.getElementById('login-email').value = '';
   document.getElementById('login-password').value = '';
+  
+  // 恢复 authSwitch 原始内容
+  if (authSwitch) {
+    authSwitch.innerHTML = '<span>请联系管理员获取账号</span>';
+  }
   
   // 隐藏消息
   const message = document.getElementById('auth-message');
@@ -151,27 +179,20 @@ export function showAuthMessage(message, type = 'error') {
 
 // 初始化认证事件监听
 export function initAuthEventListeners() {
-  const authToggle = document.getElementById('auth-toggle');
+  const authReportsToggle = document.getElementById('auth-reports-toggle');
   const authClose = document.getElementById('auth-close');
   const authOverlay = document.getElementById('auth-overlay');
   const loginForm = document.getElementById('login-form');
-  const registerForm = document.getElementById('register-form');
-  const switchToRegister = document.getElementById('switch-to-register');
-  const switchToLogin = document.getElementById('switch-to-login');
   
-  // 认证按钮点击
-  authToggle.addEventListener('click', async () => {
+  // 认证/报告按钮点击
+  authReportsToggle.addEventListener('click', async () => {
     if (currentUser) {
-      // 登出
-      const result = await signOut();
-      if (result.success) {
-        showAuthMessage('已成功登出', 'success');
-        setTimeout(hideAuthModal, 1500);
-      } else {
-        showAuthMessage('登出失败：' + result.error, 'error');
+      // 已登录 - 打开报告列表
+      if (window.openReportsDrawer) {
+        window.openReportsDrawer();
       }
     } else {
-      // 显示登录模态框
+      // 未登录 - 显示登录模态框
       showAuthModal('login');
     }
   });
@@ -205,6 +226,27 @@ export function initAuthEventListeners() {
       showAuthMessage('登录失败：' + result.error, 'error');
     }
   });
+  
+  // 登出按钮点击
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      logoutBtn.disabled = true;
+      logoutBtn.textContent = '登出中...';
+      
+      const result = await signOut();
+      
+      logoutBtn.disabled = false;
+      logoutBtn.textContent = '登出';
+      
+      if (result.success) {
+        showAuthMessage('已成功登出', 'success');
+        setTimeout(hideAuthModal, 1500);
+      } else {
+        showAuthMessage('登出失败：' + result.error, 'error');
+      }
+    });
+  }
   
   // 注册表单提交功能已移除
 }

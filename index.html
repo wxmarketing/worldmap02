@@ -28,7 +28,7 @@
   
   <!-- 搜索框区域 -->
   <div class="search-section">
-    <button id="global-reports-btn" class="map-reset-btn floating-reports-btn">报告列表</button>
+    <button id="auth-reports-toggle" class="map-reset-btn floating-reports-btn">登录</button>
     <div class="search-container">
       <input type="text" id="country-search" placeholder="搜索国家...." class="modern-search-input">
       <div class="search-icon">
@@ -135,7 +135,6 @@
     </div>
     <div class="footer-right">
       <span id="user-info" class="user-info hidden"></span>
-      <button id="auth-toggle" class="auth-btn">登录</button>
     </div>
   </footer>
 
@@ -240,6 +239,7 @@
         <div class="auth-switch">
           <span>请联系管理员获取账号</span>
         </div>
+        <button type="button" id="logout-btn" class="auth-logout-btn hidden">登出</button>
       </form>
 
       <!-- 注册功能已关闭 -->
