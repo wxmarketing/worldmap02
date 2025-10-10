@@ -1,4 +1,4 @@
-import { supabase, supabaseUrl, supabaseKey } from './supabase.js';
+import { supabase, supabaseUrl, supabaseAnonKey } from './supabase.js';
 
 // 认证状态管理
 let currentUser = null;
