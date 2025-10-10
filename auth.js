@@ -83,6 +83,7 @@ function updateAuthUI() {
   const userInfo = document.getElementById('user-info');
   const adminToggle = document.getElementById('admin-toggle');
   const footerLogoutBtn = document.getElementById('footer-logout-btn');
+  const changePwdBtn = document.getElementById('change-password-btn');
   
   if (currentUser) {
     // 已登录状态 - 显示报告列表按钮
@@ -98,6 +99,9 @@ function updateAuthUI() {
     
     if (footerLogoutBtn) {
       footerLogoutBtn.classList.remove('hidden');
+    }
+    if (changePwdBtn) {
+      changePwdBtn.classList.remove('hidden');
     }
     
     // 显示管理面板按钮
@@ -115,6 +119,9 @@ function updateAuthUI() {
     
     if (footerLogoutBtn) {
       footerLogoutBtn.classList.add('hidden');
+    }
+    if (changePwdBtn) {
+      changePwdBtn.classList.add('hidden');
     }
     
     // 隐藏管理面板按钮
@@ -210,6 +217,19 @@ export function initAuthEventListeners() {
     }
   });
   
+  // 修改密码
+  const changePwdBtn = document.getElementById('change-password-btn');
+  if (changePwdBtn) {
+    changePwdBtn.addEventListener('click', async () => {
+      if (!currentUser) { showAuthModal('login'); return; }
+      const pwd = prompt('请输入新密码（至少6位）');
+      if (!pwd) return;
+      if (pwd.length < 6) { alert('密码至少6位'); return; }
+      const { error } = await supabase.auth.updateUser({ password: pwd });
+      if (error) alert('修改失败：' + error.message);
+      else alert('修改成功，请使用新密码重新登录');
+    });
+  }
   // 关闭模态框
   authClose.addEventListener('click', hideAuthModal);
   authOverlay.addEventListener('click', hideAuthModal);
