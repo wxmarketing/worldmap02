@@ -2064,6 +2064,13 @@ function renderReportBar(countryCode, chineseCountryName, data) {
   let old = document.getElementById('report-bar');
   if (old) old.remove();
   if (!Array.isArray(data.pdfs) || data.pdfs.length === 0) return;
+  
+  // 检查用户是否登录
+  const isAuthenticated = window.getCurrentUser && window.getCurrentUser();
+  if (!isAuthenticated) {
+    // 未登录用户不显示报告列表
+    return;
+  }
   const wrap = document.createElement('div');
   wrap.id = 'report-bar';
 
