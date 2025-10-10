@@ -204,6 +204,21 @@ async function initApp() {
     }
     const merged = Array.from(groups.values());
 
+    // 统一生成签名URL的函数（最近更新与全部列表共用）
+    const openItem = async (item, titleFallback) => {
+      try {
+        const path = item.path || derivePathFromUrl(item.url);
+        if (!path) throw new Error('无有效路径');
+        const { data, error } = await supabase.storage.from('country-pdfs').createSignedUrl(path, 60 * 60);
+        if (error) throw error; const url = data?.signedUrl || '';
+        const cc = (item.countries && item.countries[0]) || item.countryCode;
+        window.currentReportMeta = { countryCode: cc, ...item, path, url };
+        openPdfViewer(url, item.title || titleFallback || 'PDF 报告');
+      } catch (e) {
+        alert('生成阅读链接失败');
+      }
+    };
+
     if (merged.length === 0) {
       const tip = document.createElement('div');
       tip.textContent = '暂无任何报告';
@@ -216,8 +231,7 @@ async function initApp() {
       if (recents.length > 0) {
         const header = document.createElement('div');
         header.textContent = '最近更新';
-        header.style.fontWeight = '600';
-        header.style.margin = '8px 0';
+        header.className = 'report-section-title';
         repList.appendChild(header);
         recents.forEach((item, idx) => {
           const card = document.createElement('div');
@@ -238,18 +252,13 @@ async function initApp() {
           action.textContent = '阅读';
           headerRow.appendChild(tt);
           headerRow.appendChild(action);
-          const open = () => {
-            const cc = (item.countries && item.countries[0]) || item.countryCode;
-            window.currentReportMeta = { countryCode: cc, ...item };
-            openPdfViewer(item.url, item.title || 'PDF 报告');
-          };
-          headerRow.addEventListener('click', open);
+          headerRow.addEventListener('click', () => openItem(item));
           card.appendChild(headerRow);
           if (item.summaryCard) {
             const sum = document.createElement('div');
             sum.className = 'report-summary';
             sum.textContent = item.summaryCard;
-            sum.addEventListener('click', open);
+            sum.addEventListener('click', () => openItem(item));
             card.appendChild(sum);
           }
           repList.appendChild(card);
@@ -285,25 +294,13 @@ async function initApp() {
         action.textContent = '阅读';
         headerRow.appendChild(tt);
         headerRow.appendChild(action);
-        const open = async () => {
-          const cc = (item.countries && item.countries[0]) || item.countryCode;
-          // 生成签名URL
-          try {
-            const path = item.path || derivePathFromUrl(item.url);
-            if (!path) throw new Error('无有效路径');
-            const { data, error } = await supabase.storage.from('country-pdfs').createSignedUrl(path, 60 * 60);
-            if (error) throw error; const url = data?.signedUrl || '';
-            window.currentReportMeta = { countryCode: cc, ...item, url, path };
-            openPdfViewer(url, item.title || 'PDF 报告');
-          } catch (e) { alert('生成阅读链接失败'); }
-        };
-        headerRow.addEventListener('click', open);
+        headerRow.addEventListener('click', () => openItem(item));
         card.appendChild(headerRow);
         if (item.summaryCard) {
           const sum = document.createElement('div');
           sum.className = 'report-summary';
           sum.textContent = item.summaryCard;
-          sum.addEventListener('click', open);
+          sum.addEventListener('click', () => openItem(item));
           card.appendChild(sum);
         }
         repList.appendChild(card);
