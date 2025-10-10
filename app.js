@@ -282,9 +282,9 @@ async function initApp() {
       const url = meta.url || lastPdfUrl || '';
       const list = (countryData && countryData[code] && Array.isArray(countryData[code].pdfs)) ? countryData[code].pdfs : [];
       const found = list.find(p => p.url === url);
-      if (aiSummary) aiSummary.innerText = (found && found.summaryReader) ? found.summaryReader : '';
+      if (aiSummary) aiSummary.innerHTML = (found && found.summaryReader) ? found.summaryReader : '';
     } catch (_) {
-      if (aiSummary) aiSummary.innerText = '';
+      if (aiSummary) aiSummary.innerHTML = '';
     }
   }
   function closeAiDrawer() {
