@@ -2539,7 +2539,7 @@ async function uploadPdfAndSave(countryCode, file, title, currentPdfs) {
     .upload(path, file, { contentType: file.type || 'application/pdf', upsert: false });
   if (upErr) throw upErr;
   const { data: pub } = supabase.storage.from('country-pdfs').getPublicUrl(path);
-  const newItem = { title, url: pub.publicUrl, path, updatedAt: new Date().toISOString(), summaryCard: '', summaryReader: '', isRecent: false };
+  const newItem = { title, url: '', path, updatedAt: new Date().toISOString(), summaryCard: '', summaryReader: '', isRecent: false };
   // 若为全局报告，确保存在 GLOBAL 行，并读取现有 pdfs 再更新
   let basePdfs = currentPdfs;
   if (countryCode === 'GLOBAL') {
@@ -2587,9 +2587,22 @@ function renderPdfList(wrap, pdfs, countryCode) {
     const actions = document.createElement('div');
     actions.style.display = 'flex';
     actions.style.gap = '8px';
-    const aView = document.createElement('a'); aView.textContent = '预览'; aView.href = item.url; aView.target = '_blank';
+    const aView = document.createElement('button'); aView.textContent = '预览'; aView.style.cursor = 'pointer';
+    aView.addEventListener('click', async ()=>{
+      try {
+        const { data, error } = await supabase.storage.from('country-pdfs').createSignedUrl(item.path || '', 60 * 60);
+        if (error) throw error; const url = data?.signedUrl || '';
+        if (url) window.open(url, '_blank'); else alert('无法生成预览链接');
+      } catch(e){ alert('预览失败'); }
+    });
     const aOpen = document.createElement('button'); aOpen.textContent = '在阅读器打开'; aOpen.style.cursor='pointer';
-    aOpen.addEventListener('click', ()=> window.openPdfViewer && window.openPdfViewer(item.url, item.title));
+    aOpen.addEventListener('click', async ()=> {
+      try {
+        const { data, error } = await supabase.storage.from('country-pdfs').createSignedUrl(item.path || '', 60 * 60);
+        if (error) throw error; const url = data?.signedUrl || '';
+        if (window.openPdfViewer) window.openPdfViewer(url, item.title);
+      } catch(e){ alert('打开失败'); }
+    });
     // 最近更新切换
     const toggleRecent = document.createElement('button');
     toggleRecent.textContent = item.isRecent ? '取消置顶' : '置于最近更新';

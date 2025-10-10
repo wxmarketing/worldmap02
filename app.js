@@ -285,10 +285,15 @@ async function initApp() {
         action.textContent = '阅读';
         headerRow.appendChild(tt);
         headerRow.appendChild(action);
-        const open = () => {
+        const open = async () => {
           const cc = (item.countries && item.countries[0]) || item.countryCode;
-          window.currentReportMeta = { countryCode: cc, ...item };
-          openPdfViewer(item.url, item.title || 'PDF 报告');
+          // 生成签名URL
+          try {
+            const { data, error } = await supabase.storage.from('country-pdfs').createSignedUrl(item.path || '', 60 * 60);
+            if (error) throw error; const url = data?.signedUrl || '';
+            window.currentReportMeta = { countryCode: cc, ...item, url };
+            openPdfViewer(url, item.title || 'PDF 报告');
+          } catch (e) { alert('生成阅读链接失败'); }
         };
         headerRow.addEventListener('click', open);
         card.appendChild(headerRow);
@@ -339,7 +344,8 @@ async function initApp() {
       const code = (meta.countryCode || '').toUpperCase();
       const url = meta.url || lastPdfUrl || '';
       const list = (countryData && countryData[code] && Array.isArray(countryData[code].pdfs)) ? countryData[code].pdfs : [];
-      const found = list.find(p => p.url === url);
+      // 通过path匹配（url为签名临时链接）
+      const found = list.find(p => p.path === meta.path);
       if (aiSummary) aiSummary.innerHTML = (found && found.summaryReader) ? found.summaryReader : '';
     } catch (_) {
       if (aiSummary) aiSummary.innerHTML = '';
