@@ -220,7 +220,7 @@ export function initAuthEventListeners() {
   // 修改密码
   const changePwdBtn = document.getElementById('change-password-btn');
   if (changePwdBtn) {
-    changePwdBtn.addEventListener('click', async () => {
+    changePwdBtn.onclick = async () => {
       if (!currentUser) { showAuthModal('login'); return; }
       const pwd = prompt('请输入新密码（至少6位）');
       if (!pwd) return;
@@ -228,7 +228,7 @@ export function initAuthEventListeners() {
       const { error } = await supabase.auth.updateUser({ password: pwd });
       if (error) alert('修改失败：' + error.message);
       else alert('修改成功，请使用新密码重新登录');
-    });
+    };
   }
   // 关闭模态框
   authClose.addEventListener('click', hideAuthModal);
