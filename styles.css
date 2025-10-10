@@ -232,6 +232,23 @@ body.night-mode .auth-message.error {
   color: #ef5350;
 }
 
+body.night-mode #auth-modal .pdf-icon-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #f2f2f2 !important;
+  stroke: #f2f2f2 !important;
+}
+
+body.night-mode #auth-modal .pdf-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+body.night-mode #auth-modal .pdf-icon-btn svg {
+  color: #f2f2f2 !important;
+  stroke: #f2f2f2 !important;
+}
+
 /* 认证模态框玻璃拟态样式 */
 #auth-overlay {
   position: fixed;
@@ -245,6 +262,8 @@ body.night-mode .auth-message.error {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 #auth-modal {
@@ -282,15 +301,23 @@ body.night-mode .auth-message.error {
 }
 
 #auth-modal .pdf-icon-btn {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
+  color: var(--text-color) !important;
+  stroke: var(--text-color) !important;
 }
 
 #auth-modal .pdf-icon-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.2);
   transform: translateY(-1px);
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+#auth-modal .pdf-icon-btn svg {
+  color: var(--text-color) !important;
+  stroke: var(--text-color) !important;
 }
 
 #auth-content {
