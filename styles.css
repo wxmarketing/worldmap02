@@ -1114,6 +1114,23 @@ body.night-mode .pdf-icon-btn.primary { background: #4CAF50; border-color: #4CAF
 /* AI 助手内容 */
 .ai-body { display:flex; flex-direction:column; height:100%; }
 .ai-summary { padding:12px 14px; overflow:auto; flex:1; white-space:pre-wrap; line-height:1.6; }
+
+/* AI抽屉特殊样式 - 允许内容高度自适应 */
+#ai-drawer {
+  height: auto !important;
+  max-height: 90vh !important;
+  min-height: 200px !important;
+}
+
+#ai-drawer .ai-body {
+  height: auto !important;
+}
+
+#ai-drawer .ai-summary {
+  flex: none !important;
+  max-height: 70vh !important;
+  overflow-y: auto !important;
+}
 .country-card div,
 .country-card p {
   text-indent: 0 !important;
