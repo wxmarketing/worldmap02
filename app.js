@@ -143,7 +143,7 @@ async function initApp() {
     if (!overlay || !drawer || !frame) return;
     titleEl && (titleEl.textContent = title);
     // 使用本地查看器，避免跨域问题
-    frame.src = `https://unpkg.com/pdfjs-dist@3.11.174/web/viewer.html?file=${encodeURIComponent(url)}`;
+    frame.src = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(url)}`;
     overlay.classList.remove('hidden');
     drawer.classList.remove('hidden');
     // 置顶层级，避免被其他抽屉覆盖
