@@ -2654,10 +2654,10 @@ function renderPdfList(wrap, pdfs, countryCode) {
     };
     
     // 添加工具栏按钮
-    toolbar.appendChild(createToolbarButton('B', 'bold'));
-    toolbar.appendChild(createToolbarButton('I', 'italic'));
-    toolbar.appendChild(createToolbarButton('U', 'underline'));
-    toolbar.appendChild(createToolbarButton('S', 'strikeThrough'));
+    toolbar.appendChild(createToolbarButton('<b>B</b>', 'bold'));
+    toolbar.appendChild(createToolbarButton('<i>I</i>', 'italic'));
+    toolbar.appendChild(createToolbarButton('<u>U</u>', 'underline'));
+    toolbar.appendChild(createToolbarButton('<s>S</s>', 'strikeThrough'));
     
     // 字体大小下拉框
     const fontSizeSelect = document.createElement('select');
