@@ -272,9 +272,17 @@ body.night-mode #auth-modal .pdf-icon-btn svg {
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  position: relative;
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(90vw, 400px) !important;
+  height: auto !important;
+  max-height: 80vh !important;
   overflow: hidden;
   z-index: 2601;
+  display: flex;
+  flex-direction: column;
 }
 
 #auth-modal::before {
