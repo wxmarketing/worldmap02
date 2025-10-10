@@ -142,7 +142,7 @@ export function hideAuthModal() {
 }
 
 // 显示认证消息
-function showAuthMessage(message, type = 'error') {
+export function showAuthMessage(message, type = 'error') {
   const messageEl = document.getElementById('auth-message');
   messageEl.textContent = message;
   messageEl.className = `auth-message ${type}`;
