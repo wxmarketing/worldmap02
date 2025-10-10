@@ -2344,8 +2344,18 @@ function initAdminPanel() {
     }
   });
   
-  // Add event listeners for admin panel toggle
+  // Add event listeners for admin panel toggle - 需要认证
   document.getElementById("admin-toggle").addEventListener("click", function() {
+    // 检查认证状态
+    if (!window.getCurrentUser || !window.getCurrentUser()) {
+      if (window.showAuthModal) {
+        window.showAuthModal('login');
+        if (window.showAuthMessage) {
+          window.showAuthMessage('请先登录以访问管理面板', 'error');
+        }
+      }
+      return;
+    }
     document.getElementById("admin-panel").classList.remove("hidden");
   });
   
@@ -3250,7 +3260,20 @@ function cancelBatchUpload() {
 }
 
 // Initialize when DOM is ready
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", async function() {
+  // 等待认证系统初始化完成
+  await new Promise(resolve => {
+    if (window.authInitialized) {
+      resolve();
+    } else {
+      const checkAuth = () => {
+        if (window.authInitialized) resolve();
+        else setTimeout(checkAuth, 100);
+      };
+      checkAuth();
+    }
+  });
+  
   initAdminPanel();
   initImageModal();
   initBatchUpload();

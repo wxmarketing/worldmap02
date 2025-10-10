@@ -1,5 +1,6 @@
 import { countryData, regionTranslations, updateCountryDetail, initDataAndSupabase, allWorldCountries } from './data.js';
 import { supabaseUrl, supabaseAnonKey } from './supabase.js';
+import { initAuth, initAuthEventListeners, requireAuth, onAuthStateChange } from './auth.js';
 
 // Main app functionality
 
@@ -83,9 +84,13 @@ function selectAutocompleteItem(countryName, countryCode, countryNameZh) {
 }
 
 // Initialize the application
-function initApp() {
+async function initApp() {
+  // 初始化认证系统
+  await initAuth();
+  initAuthEventListeners();
+  
   // 调用数据初始化函数，确保在应用启动时加载 Supabase 数据
-  initDataAndSupabase();
+  await initDataAndSupabase();
 
   // Initialize search input
   const searchInput = document.getElementById("country-search");
@@ -258,7 +263,8 @@ function initApp() {
     repDrawer.classList.add('hidden');
     repDrawer.setAttribute('aria-hidden','true');
   }
-  globalBtn && globalBtn.addEventListener('click', openReportsDrawer);
+  // 使用权限控制包装报告列表功能
+  globalBtn && globalBtn.addEventListener('click', requireAuth(openReportsDrawer));
   repOverlay && repOverlay.addEventListener('click', closeReportsDrawer);
   repClose && repClose.addEventListener('click', closeReportsDrawer);
 
@@ -322,5 +328,14 @@ function onCountryClick(countryName, countryCode) {
 window.onCountryClick = onCountryClick;
 window.initApp = initApp; // 挂载 initApp 到 window，确保 map.js 可以调用它
 
+// 暴露认证相关函数到全局
+import { getCurrentUser, showAuthModal, showAuthMessage } from './auth.js';
+window.getCurrentUser = getCurrentUser;
+window.showAuthModal = showAuthModal;
+window.showAuthMessage = showAuthMessage;
+
 // Initialize when DOM is ready
-document.addEventListener("DOMContentLoaded", initApp);
+document.addEventListener("DOMContentLoaded", async () => {
+  await initApp();
+  window.authInitialized = true;
+});
