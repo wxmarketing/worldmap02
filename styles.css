@@ -45,7 +45,6 @@
 .user-info {
   color: var(--text-color);
   font-size: 14px;
-  margin-left: 10px;
 }
 
 .auth-form {
@@ -578,6 +577,17 @@ footer {
 
 footer p {
   margin: 0;
+}
+
+.footer-left,
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-right {
+  margin-left: auto;
 }
 
 /* Map Styles */
