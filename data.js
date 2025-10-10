@@ -2620,15 +2620,108 @@ function renderPdfList(wrap, pdfs, countryCode) {
     taCard.style.padding = '8px';
     taCard.placeholder = '卡片中显示的摘要（summaryCard）';
     taCard.value = item.summaryCard || '';
-    const taReader = document.createElement('textarea');
-    taReader.style.width = '100%';
-    taReader.style.minHeight = '70px';
-    taReader.style.border = '1px solid #ddd';
-    taReader.style.borderRadius = '6px';
-    taReader.style.padding = '8px';
-    taReader.style.marginTop = '6px';
-    taReader.placeholder = '帮我读中显示的摘要（summaryReader）';
-    taReader.value = item.summaryReader || '';
+    // 创建富文本编辑器容器
+    const editorContainer = document.createElement('div');
+    editorContainer.style.marginTop = '6px';
+    
+    // 创建工具栏
+    const toolbar = document.createElement('div');
+    toolbar.style.display = 'flex';
+    toolbar.style.gap = '4px';
+    toolbar.style.marginBottom = '6px';
+    toolbar.style.padding = '6px';
+    toolbar.style.backgroundColor = '#f5f5f5';
+    toolbar.style.borderRadius = '6px';
+    toolbar.style.border = '1px solid #ddd';
+    
+    // 创建工具栏按钮
+    const createToolbarButton = (text, command, value = '') => {
+      const btn = document.createElement('button');
+      btn.innerHTML = text;
+      btn.type = 'button';
+      btn.style.padding = '4px 8px';
+      btn.style.border = '1px solid #ccc';
+      btn.style.borderRadius = '4px';
+      btn.style.backgroundColor = '#fff';
+      btn.style.cursor = 'pointer';
+      btn.style.fontSize = '12px';
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.execCommand(command, false, value);
+        editorContainer.querySelector('.rich-editor').focus();
+      });
+      return btn;
+    };
+    
+    // 添加工具栏按钮
+    toolbar.appendChild(createToolbarButton('B', 'bold'));
+    toolbar.appendChild(createToolbarButton('I', 'italic'));
+    toolbar.appendChild(createToolbarButton('U', 'underline'));
+    toolbar.appendChild(createToolbarButton('S', 'strikeThrough'));
+    
+    // 字体大小下拉框
+    const fontSizeSelect = document.createElement('select');
+    fontSizeSelect.style.padding = '4px 6px';
+    fontSizeSelect.style.border = '1px solid #ccc';
+    fontSizeSelect.style.borderRadius = '4px';
+    fontSizeSelect.style.fontSize = '12px';
+    const sizes = ['12px', '14px', '16px', '18px', '20px', '24px'];
+    sizes.forEach(size => {
+      const option = document.createElement('option');
+      option.value = size;
+      option.textContent = size;
+      fontSizeSelect.appendChild(option);
+    });
+    fontSizeSelect.addEventListener('change', (e) => {
+      document.execCommand('fontSize', false, e.target.value);
+      editorContainer.querySelector('.rich-editor').focus();
+    });
+    toolbar.appendChild(fontSizeSelect);
+    
+    // 列表按钮
+    toolbar.appendChild(createToolbarButton('• 列表', 'insertUnorderedList'));
+    toolbar.appendChild(createToolbarButton('1. 编号', 'insertOrderedList'));
+    
+    // 创建富文本编辑器
+    const richEditor = document.createElement('div');
+    richEditor.className = 'rich-editor';
+    richEditor.contentEditable = true;
+    richEditor.style.minHeight = '70px';
+    richEditor.style.border = '1px solid #ddd';
+    richEditor.style.borderRadius = '6px';
+    richEditor.style.padding = '8px';
+    richEditor.style.backgroundColor = '#fff';
+    richEditor.style.outline = 'none';
+    richEditor.innerHTML = item.summaryReader || '';
+    
+    // 添加占位符效果
+    const updatePlaceholder = () => {
+      if (richEditor.innerHTML.trim() === '' || richEditor.innerHTML === '<br>') {
+        richEditor.innerHTML = '<span style="color: #999; font-style: italic;">帮我读中显示的摘要（summaryReader）</span>';
+      }
+    };
+    
+    const removePlaceholder = () => {
+      if (richEditor.innerHTML.includes('帮我读中显示的摘要')) {
+        richEditor.innerHTML = '';
+      }
+    };
+    
+    richEditor.addEventListener('focus', removePlaceholder);
+    richEditor.addEventListener('blur', updatePlaceholder);
+    richEditor.addEventListener('input', () => {
+      if (richEditor.innerHTML.includes('帮我读中显示的摘要')) {
+        richEditor.innerHTML = '';
+      }
+    });
+    
+    // 初始显示占位符
+    if (!item.summaryReader || item.summaryReader.trim() === '') {
+      updatePlaceholder();
+    }
+    
+    editorContainer.appendChild(toolbar);
+    editorContainer.appendChild(richEditor);
     const save = document.createElement('button');
     save.textContent = '保存摘要';
     save.style.marginTop = '6px';
@@ -2637,7 +2730,7 @@ function renderPdfList(wrap, pdfs, countryCode) {
     save.style.borderRadius = '6px';
     save.style.cursor = 'pointer';
     editor.appendChild(taCard);
-    editor.appendChild(taReader);
+    editor.appendChild(editorContainer);
     editor.appendChild(save);
     wrap.appendChild(editor);
 
@@ -2646,7 +2739,13 @@ function renderPdfList(wrap, pdfs, countryCode) {
       ta.focus();
     });
     save.addEventListener('click', async ()=>{
-      const next = pdfs.map(p => p === item ? { ...p, summaryCard: taCard.value.trim(), summaryReader: taReader.value.trim() } : p);
+      // 获取富文本编辑器内容，清理占位符文本
+      let readerContent = richEditor.innerHTML;
+      if (readerContent.includes('帮我读中显示的摘要')) {
+        readerContent = '';
+      }
+      
+      const next = pdfs.map(p => p === item ? { ...p, summaryCard: taCard.value.trim(), summaryReader: readerContent.trim() } : p);
       const { error: dbErr } = await supabase.from('country_cards').update({ pdfs: next }).eq('country_code', countryCode);
       if (dbErr) { alert('保存失败：' + (dbErr.message || '数据库错误')); return; }
       // 同步内存
