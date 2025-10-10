@@ -82,6 +82,7 @@ function updateAuthUI() {
   const authReportsToggle = document.getElementById('auth-reports-toggle');
   const userInfo = document.getElementById('user-info');
   const adminToggle = document.getElementById('admin-toggle');
+  const footerLogoutBtn = document.getElementById('footer-logout-btn');
   
   if (currentUser) {
     // 已登录状态 - 显示报告列表按钮
@@ -95,6 +96,10 @@ function updateAuthUI() {
       userInfo.classList.remove('hidden');
     }
     
+    if (footerLogoutBtn) {
+      footerLogoutBtn.classList.remove('hidden');
+    }
+    
     // 显示管理面板按钮
     if (adminToggle) adminToggle.style.display = 'inline-block';
   } else {
@@ -106,6 +111,10 @@ function updateAuthUI() {
     
     if (userInfo) {
       userInfo.classList.add('hidden');
+    }
+    
+    if (footerLogoutBtn) {
+      footerLogoutBtn.classList.add('hidden');
     }
     
     // 隐藏管理面板按钮
@@ -231,7 +240,7 @@ export function initAuthEventListeners() {
     }
   });
   
-  // 登出按钮点击
+  // 登出按钮点击（模态框内的）
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
@@ -248,6 +257,27 @@ export function initAuthEventListeners() {
         setTimeout(hideAuthModal, 1500);
       } else {
         showAuthMessage('登出失败：' + result.error, 'error');
+      }
+    });
+  }
+  
+  // 页脚登出按钮点击
+  const footerLogoutBtn = document.getElementById('footer-logout-btn');
+  if (footerLogoutBtn) {
+    footerLogoutBtn.addEventListener('click', async () => {
+      footerLogoutBtn.disabled = true;
+      footerLogoutBtn.textContent = '登出中...';
+      
+      const result = await signOut();
+      
+      footerLogoutBtn.disabled = false;
+      footerLogoutBtn.textContent = '登出';
+      
+      if (result.success) {
+        // 页脚登出不需要显示模态框消息，直接登出即可
+        console.log('已成功登出');
+      } else {
+        alert('登出失败：' + result.error);
       }
     });
   }
