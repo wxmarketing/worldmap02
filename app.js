@@ -142,9 +142,8 @@ async function initApp() {
   function openPdfViewer(url, title = 'PDF 报告') {
     if (!overlay || !drawer || !frame) return;
     titleEl && (titleEl.textContent = title);
-    // 使用官方托管的 PDF.js Viewer，最稳定
-    const viewerCdn = 'https://mozilla.github.io/pdf.js/web/viewer.html';
-    frame.src = `${viewerCdn}?file=${encodeURIComponent(url)}`;
+    // 使用本地查看器，避免跨域问题
+    frame.src = `./pdf-viewer.html?file=${encodeURIComponent(url)}`;
     overlay.classList.remove('hidden');
     drawer.classList.remove('hidden');
     // 置顶层级，避免被其他抽屉覆盖
@@ -192,14 +191,15 @@ async function initApp() {
     for (const it of all) {
       const key = (it.title || '').trim();
       if (!groups.has(key)) {
-        groups.set(key, { ...it, countries: [it.countryCode] });
+        groups.set(key, { ...it, countries: [it.countryCode], path: it.path });
       } else {
         const g = groups.get(key);
         if (!g.countries.includes(it.countryCode)) g.countries.push(it.countryCode);
         if (!g.summaryCard && it.summaryCard) g.summaryCard = it.summaryCard;
         if (!g.url && it.url) g.url = it.url;
-        // 合并isRecent：只要有一条为true就为true
+        // 合并isRecent与path
         g.isRecent = !!(g.isRecent || it.isRecent);
+        if (!g.path && it.path) g.path = it.path;
       }
     }
     const merged = Array.from(groups.values());
