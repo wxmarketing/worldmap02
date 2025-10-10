@@ -255,6 +255,7 @@ body.night-mode .auth-message.error {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   position: relative;
   overflow: hidden;
+  z-index: 2601;
 }
 
 #auth-modal::before {
