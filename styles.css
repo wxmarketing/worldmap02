@@ -22,7 +22,7 @@
 /* 悬浮的"报告列表/登录"按钮（放在搜索区左侧） */
 #auth-reports-toggle.floating-reports-btn {
   position: absolute;
-  left: 40px;
+  left: 2rem;
   top: 50%;
   transform: translateY(-50%);
   background: #fff;
