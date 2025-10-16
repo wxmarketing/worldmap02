@@ -698,51 +698,34 @@ main {
 }
 
 /* 英语水平卡片 */
-.country-card.english-card {
-  padding-top: 18px;
+.country-card.english-card { padding-top: 18px; }
+.country-card .english-meta { margin-top: 6px; }
+.country-card .english-meta .ef-score,
+.country-card .english-meta .ef-rank {
+  font-size: 22px;
+  color: #666;
+  font-weight: 600;
+  margin: 6px 0;
 }
-.country-card .english-top {
-  display: flex;
-  gap: 24px;
-  align-items: baseline;
-}
-.country-card .english-score .num {
-  font-size: 32px;
+.country-card .english-meta .num {
+  font-size: 36px;
+  color: #666;
   font-weight: 800;
-  color: var(--primary, #4CAF50);
-}
-.country-card .english-score .label {
-  margin-left: 6px;
-  color: var(--text-muted, #777);
-}
-.country-card .english-rank .num {
-  font-size: 28px;
-  font-weight: 700;
-}
-.country-card .english-rank .label {
   margin-left: 8px;
-  color: var(--text-muted, #777);
 }
 .country-card .english-divider {
   border: none;
   border-top: 1px solid rgba(0,0,0,0.08);
   margin: 14px 0 12px;
 }
-.country-card .english-level {
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-.country-card .english-desc {
-  color: var(--text-color, #333);
-  line-height: 1.7;
-}
+.country-card .english-desc-line { font-size: 20px; color: var(--text-color, #333); line-height: 1.8; }
+.country-card .english-desc-line .level-badge { font-weight: 800; color: #555; }
+.country-card .english-desc-line .desc { color: #555; }
 
 body.night-mode .country-card .english-divider {
   border-top-color: rgba(255,255,255,0.15);
 }
-body.night-mode .country-card .english-score .num {
-  color: #7ad98b;
-}
+body.night-mode .country-card .english-meta .num { color: #cfcfcf; }
 
 .country-card:hover {
   transform: translateY(-2px);

@@ -2232,13 +2232,12 @@ function createEnglishProficiencyCard(countryCode) {
   card.className = 'country-card english-card';
   card.innerHTML = `
     <h3>英语水平</h3>
-    <div class="english-top">
-      <div class="english-score"><span class="num">${score ?? '—'}</span><span class="label">分</span></div>
-      <div class="english-rank"><span class="num">${worldRank != null ? `${worldRank}/116` : '—'}</span><span class="label">世界排名</span></div>
+    <div class="english-meta">
+      <div class="ef-score">2024 EF英语熟练度分数：<span class="num">${score ?? '—'}</span></div>
+      <div class="ef-rank">世界排名：<span class="num">${worldRank != null ? `${worldRank}/116` : '—'}</span></div>
     </div>
-    <hr class="english-divider"/>
-    <div class="english-level">${levelTitle}</div>
-    <div class="english-desc">${desc}</div>
+    <hr class="english-divider" />
+    <div class="english-desc-line"><span class="level-badge">${levelTitle}：</span><span class="desc">${desc}</span></div>
   `;
   return card;
 }
