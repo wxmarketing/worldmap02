@@ -1952,7 +1952,7 @@ function getChineseCountryName(englishName) {
 }
 
 // Function to update country detail panel with country information cards
-export function updateCountryDetail(countryName, countryCode) {
+export async function updateCountryDetail(countryName, countryCode) {
   // Get country information with actual country name
   const data = getCountryInfo(countryCode, countryName);
   
