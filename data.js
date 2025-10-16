@@ -2303,8 +2303,26 @@ async function generateLanguageUsage(countryCode, chineseCountryName) {
     imageUrl: null,
     order_index: 0
   };
-  const { error } = await supabase.from('country_card_details').upsert(payload, { onConflict: 'country_code,card_id' });
-  if (error) throw error;
+  // 由于表上可能没有 (country_code, card_id) 复合唯一约束，这里手动实现 upsert
+  const { data: existedRows, error: selectErr } = await supabase
+    .from('country_card_details')
+    .select('card_id')
+    .eq('country_code', countryCode)
+    .eq('card_id', 'language_usage');
+  if (selectErr) throw selectErr;
+  if (Array.isArray(existedRows) && existedRows.length > 0) {
+    const { error: updErr } = await supabase
+      .from('country_card_details')
+      .update({ title: payload.title, content: payload.content, note: payload.note, imageUrl: payload.imageUrl, order_index: payload.order_index })
+      .eq('country_code', countryCode)
+      .eq('card_id', 'language_usage');
+    if (updErr) throw updErr;
+  } else {
+    const { error: insErr } = await supabase
+      .from('country_card_details')
+      .insert([payload]);
+    if (insErr) throw insErr;
+  }
   // 同步到内存结构
   if (!countryData[countryCode]) countryData[countryCode] = { cards: [] };
   const cards = Array.isArray(countryData[countryCode].cards) ? countryData[countryCode].cards : [];
