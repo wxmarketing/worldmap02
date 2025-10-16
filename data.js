@@ -2008,21 +2008,26 @@ export async function updateCountryDetail(countryName, countryCode) {
     cardsArr = Object.values(data.cards);
   }
   if (cardsArr.length > 0) {
-    // 若未插入语言表格，则提供生成入口
+    // 若已有语言卡，已在上面插入；否则先提供生成入口（保持在最前）
     if (!languageInserted) {
-      renderLanguageUsageGenerator(cardsContainer, countryCode, chineseCountryName);
+      const hasLangInCards = Array.isArray(cardsArr) && cardsArr.some(c => (c && (c.id === 'language_usage' || c.title === '使用语言')));
+      if (hasLangInCards) {
+        // 将来自数据的语言卡在迭代中插入一次，不额外生成
+        languageInserted = true;
+      } else {
+        renderLanguageUsageGenerator(cardsContainer, countryCode, chineseCountryName);
+      }
     }
     // 若存在英语卡片，再插入
     if (englishCard) cardsContainer.appendChild(englishCard);
-    cardsArr.forEach(cardData => {
+    const filteredCards = cardsArr.filter(c => !(c && (c.id === 'language_usage' || c.title === '使用语言')));
+    filteredCards.forEach(cardData => {
       const cardElement = createCardElement(cardData.id || '', cardData);
       cardsContainer.appendChild(cardElement);
     });
   } else {
-    // 无其它卡片时：先放“使用语言”生成入口或表格，再放英语卡片
-    if (!languageInserted) {
-      renderLanguageUsageGenerator(cardsContainer, countryCode, chineseCountryName);
-    }
+    // 无其它卡片时：若已有语言卡已插入，否则显示生成入口；随后插入英语卡
+    if (!languageInserted) renderLanguageUsageGenerator(cardsContainer, countryCode, chineseCountryName);
     if (englishCard) cardsContainer.appendChild(englishCard);
     const noDataCard = document.createElement("div");
     noDataCard.className = "country-card";
