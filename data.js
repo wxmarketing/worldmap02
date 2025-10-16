@@ -1985,6 +1985,14 @@ export function updateCountryDetail(countryName, countryCode) {
   if (cardsArr.length > 0) {
     // 若存在英语卡片，先插入
     if (englishCard) cardsContainer.appendChild(englishCard);
+    // 使用语言卡片：若已有存量就渲染；否则提供生成入口
+    const langCardExisting = (Array.isArray(data.cards) ? data.cards : []).find(c => (c.id === 'language_usage' || c.title === '使用语言'));
+    if (langCardExisting && (langCardExisting.content || '').includes('<table')) {
+      const el = createCardElement('language_usage', { title: '使用语言', content: langCardExisting.content, note: '' });
+      cardsContainer.appendChild(el);
+    } else {
+      renderLanguageUsageGenerator(cardsContainer, countryCode, chineseCountryName);
+    }
     cardsArr.forEach(cardData => {
       const cardElement = createCardElement(cardData.id || '', cardData);
       cardsContainer.appendChild(cardElement);
@@ -1992,6 +2000,14 @@ export function updateCountryDetail(countryName, countryCode) {
   } else {
     // 无其它卡片时，如有英语卡片则单独展示
     if (englishCard) cardsContainer.appendChild(englishCard);
+    // 无其它卡片时处理“使用语言”卡片
+    const langExisting = countryData[countryCode]?.cards?.find(c => (c.id === 'language_usage' || c.title === '使用语言'));
+    if (langExisting && langExisting.content) {
+      const el = createCardElement('language_usage', { title: '使用语言', content: langExisting.content, note: '' });
+      cardsContainer.appendChild(el);
+    } else {
+      renderLanguageUsageGenerator(cardsContainer, countryCode, chineseCountryName);
+    }
     const noDataCard = document.createElement("div");
     noDataCard.className = "country-card";
     noDataCard.innerHTML = `<h3>数据待更新</h3><p>该国家/地区的详细卡片信息正在整理中，您可以点击下方按钮使用AI自动生成相关内容。</p>`;
@@ -2240,6 +2256,85 @@ function createEnglishProficiencyCard(countryCode) {
     <div class="english-desc-line"><span class="level-badge">${levelTitle}：</span><span class="desc">${desc}</span></div>
   `;
   return card;
+}
+
+// —— 使用语言（表格）生成与保存 ——
+function renderLanguageTableHTML(rows) {
+  try {
+    if (!Array.isArray(rows) || rows.length === 0) return '<div>数据待更新</div>';
+    const header = `
+      <table class="lang-table">
+        <thead>
+          <tr>
+            <th>语言</th>
+            <th>使用人口占比</th>
+            <th>分布地区</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    const body = rows.map(r => {
+      const lang = (r.language || r.语言 || '').toString();
+      const ratio = (r.ratio || r.占比 || r.population_ratio || '').toString();
+      const region = (r.region || r.地区 || r.distribution || '').toString();
+      return `<tr><td>${lang}</td><td>${ratio}</td><td>${region}</td></tr>`;
+    }).join('');
+    const footer = `</tbody></table>`;
+    return header + body + footer;
+  } catch(_) {
+    return '<div>数据待更新</div>';
+  }
+}
+
+async function generateLanguageUsage(countryCode, chineseCountryName) {
+  const prompt = `请基于公开可得的信息，列出${chineseCountryName}常用语言情况，严格输出JSON数组，不要任何解释。每项包含字段：language（语言中文名），ratio（使用人口占比，保留百分号或区间文本），region（主要流行地区，中文）。数组元素数量3-6个，按使用规模排序。`;
+  const content = await callDeepSeekAPI(prompt);
+  let rows = [];
+  try { rows = JSON.parse(content); } catch(_) {}
+  if (!Array.isArray(rows) || rows.length === 0) throw new Error('AI未返回有效数据');
+  const html = renderLanguageTableHTML(rows);
+  // 保存到 country_card_details 表（持久化）
+  const payload = {
+    country_code: countryCode,
+    card_id: 'language_usage',
+    title: '使用语言',
+    content: html,
+    note: '',
+    imageUrl: null,
+    order_index: 0
+  };
+  const { error } = await supabase.from('country_card_details').upsert(payload, { onConflict: 'country_code,card_id' });
+  if (error) throw error;
+  // 同步到内存结构
+  if (!countryData[countryCode]) countryData[countryCode] = { cards: [] };
+  const cards = Array.isArray(countryData[countryCode].cards) ? countryData[countryCode].cards : [];
+  const idx = cards.findIndex(c => (c.id === 'language_usage' || c.title === '使用语言'));
+  const cardObj = { id: 'language_usage', title: '使用语言', content: html, note: '' };
+  if (idx >= 0) cards[idx] = cardObj; else cards.unshift(cardObj);
+  countryData[countryCode].cards = cards;
+  return html;
+}
+
+function renderLanguageUsageGenerator(container, countryCode, chineseCountryName) {
+  const card = document.createElement('div');
+  card.className = 'country-card';
+  card.innerHTML = `
+    <h3>使用语言</h3>
+    <div class="lang-gen-hint">尚无数据，点击下方按钮由AI生成并保存（再次访问将直接显示）。</div>
+    <div class="lang-gen-actions"><button class="lang-gen-btn">生成使用语言</button></div>
+  `;
+  const btn = card.querySelector('.lang-gen-btn');
+  btn.addEventListener('click', async () => {
+    btn.disabled = true; btn.textContent = '生成中...';
+    try {
+      await generateLanguageUsage(countryCode, chineseCountryName);
+      // 生成后，刷新面板
+      showCountryDetail(countryCode);
+    } catch(e) {
+      alert('生成失败：' + (e?.message || '网络错误'));
+    } finally { btn.disabled = false; btn.textContent = '生成使用语言'; }
+  });
+  container.appendChild(card);
 }
 
 // 渲染AI生成的四个固定卡片（临时）

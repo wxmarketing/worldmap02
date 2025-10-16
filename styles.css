@@ -727,6 +727,16 @@ body.night-mode .country-card .english-divider {
 }
 body.night-mode .country-card .english-meta .num { color: #cfcfcf; }
 
+.lang-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+.lang-table th, .lang-table td { border: 1px solid rgba(0,0,0,0.1); padding: 10px 12px; text-align: left; vertical-align: top; }
+.lang-table thead th { background: #f3f3f3; font-weight: 700; }
+body.night-mode .lang-table th, body.night-mode .lang-table td { border-color: rgba(255,255,255,0.15); }
+body.night-mode .lang-table thead th { background: rgba(255,255,255,0.06); }
+.lang-gen-hint { font-size: 0.9rem; color: var(--secondary-color); margin-bottom: 8px; }
+.lang-gen-actions { text-align: right; }
+.lang-gen-btn { background:#4CAF50;color:#fff;border:none;border-radius:16px;padding:6px 12px;cursor:pointer; }
+.lang-gen-btn:disabled { opacity:.6; cursor:not-allowed; }
+
 .country-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
