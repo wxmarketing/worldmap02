@@ -1971,11 +1971,9 @@ export function updateCountryDetail(countryName, countryCode) {
   const cardsContainer = document.getElementById("country-cards");
   cardsContainer.innerHTML = "";
 
-  // 优先渲染：英语水平卡片（若有数据）
-  try {
-    const englishCard = createEnglishProficiencyCard(countryCode);
-    if (englishCard) cardsContainer.appendChild(englishCard);
-  } catch(_) {}
+  // 在报告列表之后、其它信息卡之前：插入英语水平卡片
+  let englishCard = null;
+  try { englishCard = createEnglishProficiencyCard(countryCode); } catch(_) {}
   
   // 兼容数组和对象
   let cardsArr = [];
@@ -1985,11 +1983,15 @@ export function updateCountryDetail(countryName, countryCode) {
     cardsArr = Object.values(data.cards);
   }
   if (cardsArr.length > 0) {
+    // 若存在英语卡片，先插入
+    if (englishCard) cardsContainer.appendChild(englishCard);
     cardsArr.forEach(cardData => {
       const cardElement = createCardElement(cardData.id || '', cardData);
       cardsContainer.appendChild(cardElement);
     });
   } else {
+    // 无其它卡片时，如有英语卡片则单独展示
+    if (englishCard) cardsContainer.appendChild(englishCard);
     const noDataCard = document.createElement("div");
     noDataCard.className = "country-card";
     noDataCard.innerHTML = `<h3>数据待更新</h3><p>该国家/地区的详细卡片信息正在整理中，您可以点击下方按钮使用AI自动生成相关内容。</p>`;
@@ -2232,7 +2234,7 @@ function createEnglishProficiencyCard(countryCode) {
     <h3>英语水平</h3>
     <div class="english-top">
       <div class="english-score"><span class="num">${score ?? '—'}</span><span class="label">分</span></div>
-      <div class="english-rank"><span class="num">${worldRank ?? '—'}</span><span class="label">世界排名</span></div>
+      <div class="english-rank"><span class="num">${worldRank != null ? `${worldRank}/116` : '—'}</span><span class="label">世界排名</span></div>
     </div>
     <hr class="english-divider"/>
     <div class="english-level">${levelTitle}</div>
