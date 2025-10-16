@@ -1984,6 +1984,16 @@ export function updateCountryDetail(countryName, countryCode) {
     langExistingA = Array.isArray(arr) ? arr.find(c => (c && (c.id === 'language_usage' || c.title === '使用语言'))) : null;
   } catch(_) { langExistingA = null; }
   let languageInserted = false;
+  if (!langExistingA) {
+    // 尝试兜底从数据库读取一次
+    await fetchLanguageUsageFromDB(countryCode);
+    // 重新获取
+    try {
+      let raw = countryData[countryCode]?.cards; let arr = [];
+      if (Array.isArray(raw)) arr = raw; else if (raw && typeof raw === 'object') arr = Object.values(raw);
+      langExistingA = Array.isArray(arr) ? arr.find(c => (c && (c.id === 'language_usage' || c.title === '使用语言'))) : null;
+    } catch(_) {}
+  }
   if (langExistingA && (langExistingA.content && langExistingA.content.trim().length > 0)) {
     const el = createCardElement('language_usage', { title: '使用语言', content: langExistingA.content, note: '' });
     cardsContainer.appendChild(el);
@@ -2375,6 +2385,28 @@ function renderLanguageUsageGenerator(container, countryCode, chineseCountryName
     } finally { btn.disabled = false; btn.textContent = '生成使用语言'; }
   });
   container.appendChild(card);
+}
+
+// 按需从 Supabase 拉取单个国家的“使用语言”卡片（兜底）
+async function fetchLanguageUsageFromDB(countryCode) {
+  try {
+    const { data, error } = await supabase
+      .from('country_card_details')
+      .select('card_id, title, content, note')
+      .eq('country_code', countryCode)
+      .eq('card_id', 'language_usage')
+      .maybeSingle();
+    if (error) return null;
+    if (!data || !data.content) return null;
+    // 更新内存
+    if (!countryData[countryCode]) countryData[countryCode] = { cards: [] };
+    const arr = Array.isArray(countryData[countryCode].cards) ? countryData[countryCode].cards : [];
+    const idx = arr.findIndex(c => (c.id === 'language_usage' || c.title === '使用语言'));
+    const obj = { id: 'language_usage', title: data.title || '使用语言', content: data.content, note: data.note || '' };
+    if (idx >= 0) arr[idx] = obj; else arr.unshift(obj);
+    countryData[countryCode].cards = arr;
+    return obj;
+  } catch(_) { return null; }
 }
 
 // 渲染AI生成的四个固定卡片（临时）
