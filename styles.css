@@ -740,7 +740,7 @@ body.night-mode .country-card .english-meta .num { color: #cfcfcf; }
 body.night-mode .lang-table th, body.night-mode .lang-table td { border-color: rgba(255,255,255,0.15); }
 body.night-mode .lang-table thead th { background: rgba(255,255,255,0.06); }
 .lang-gen-hint { font-size: 0.9rem; color: var(--secondary-color); margin-bottom: 8px; }
-.lang-gen-actions { text-align: right; }
+.lang-gen-actions { text-align: center; }
 .lang-gen-btn { background:#4CAF50;color:#fff;border:none;border-radius:16px;padding:6px 12px;cursor:pointer; }
 .lang-gen-btn:disabled { opacity:.6; cursor:not-allowed; }
 
