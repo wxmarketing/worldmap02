@@ -732,14 +732,15 @@ body.night-mode .country-card .english-meta .num { color: #cfcfcf; }
 
 .lang-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; table-layout: fixed; }
 .lang-table th, .lang-table td { border: 1px solid rgba(0,0,0,0.1); padding: 10px 12px; text-align: left; vertical-align: middle; line-height: 1.6; }
-.lang-table thead th { background: #f3f3f3; font-weight: 700; }
+.lang-table thead th { background: #f3f3f3; font-weight: 700; font-size: 0.95rem; }
 /* 列宽与换行策略：前两列不换行，第三列允许换行 */
-.lang-table colgroup col:first-child { width: 24%; }
-.lang-table colgroup col:nth-child(2) { width: 24%; }
+.lang-table colgroup col:first-child { width: 22%; }
+.lang-table colgroup col:nth-child(2) { width: 26%; }
 .lang-table colgroup col:nth-child(3) { width: 52%; }
-.lang-table th:nth-child(1), .lang-table td:nth-child(1),
-.lang-table th:nth-child(2), .lang-table td:nth-child(2) { white-space: nowrap; word-break: keep-all; }
+.lang-table td:nth-child(1),
+.lang-table td:nth-child(2) { white-space: nowrap; word-break: keep-all; }
 .lang-table th:nth-child(3), .lang-table td:nth-child(3) { white-space: normal; word-break: break-word; }
+.lang-table th:nth-child(2) { white-space: normal; word-break: break-word; }
 body.night-mode .lang-table th, body.night-mode .lang-table td { border-color: rgba(255,255,255,0.15); }
 body.night-mode .lang-table thead th { background: rgba(255,255,255,0.06); }
 .lang-gen-hint { font-size: 0.9rem; color: var(--secondary-color); margin-bottom: 8px; }
