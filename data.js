@@ -1974,6 +1974,14 @@ export function updateCountryDetail(countryName, countryCode) {
   // 在报告列表之后、其它信息卡之前：插入英语水平卡片
   let englishCard = null;
   try { englishCard = createEnglishProficiencyCard(countryCode); } catch(_) {}
+  // 优先处理：使用语言卡片或其生成入口（确保无数据国家也能看到）
+  const langExistingA = countryData[countryCode]?.cards?.find(c => (c.id === 'language_usage' || c.title === '使用语言'));
+  let languageInserted = false;
+  if (langExistingA && langExistingA.content && (langExistingA.content || '').includes('<table')) {
+    const el = createCardElement('language_usage', { title: '使用语言', content: langExistingA.content, note: '' });
+    cardsContainer.appendChild(el);
+    languageInserted = true;
+  }
   
   // 兼容数组和对象
   let cardsArr = [];
@@ -1983,31 +1991,22 @@ export function updateCountryDetail(countryName, countryCode) {
     cardsArr = Object.values(data.cards);
   }
   if (cardsArr.length > 0) {
-    // 若存在英语卡片，先插入
-    if (englishCard) cardsContainer.appendChild(englishCard);
-    // 使用语言卡片：若已有存量就渲染；否则提供生成入口
-    const langCardExisting = (Array.isArray(data.cards) ? data.cards : []).find(c => (c.id === 'language_usage' || c.title === '使用语言'));
-    if (langCardExisting && (langCardExisting.content || '').includes('<table')) {
-      const el = createCardElement('language_usage', { title: '使用语言', content: langCardExisting.content, note: '' });
-      cardsContainer.appendChild(el);
-    } else {
+    // 若未插入语言表格，则提供生成入口
+    if (!languageInserted) {
       renderLanguageUsageGenerator(cardsContainer, countryCode, chineseCountryName);
     }
+    // 若存在英语卡片，再插入
+    if (englishCard) cardsContainer.appendChild(englishCard);
     cardsArr.forEach(cardData => {
       const cardElement = createCardElement(cardData.id || '', cardData);
       cardsContainer.appendChild(cardElement);
     });
   } else {
-    // 无其它卡片时，如有英语卡片则单独展示
-    if (englishCard) cardsContainer.appendChild(englishCard);
-    // 无其它卡片时处理“使用语言”卡片
-    const langExisting = countryData[countryCode]?.cards?.find(c => (c.id === 'language_usage' || c.title === '使用语言'));
-    if (langExisting && langExisting.content) {
-      const el = createCardElement('language_usage', { title: '使用语言', content: langExisting.content, note: '' });
-      cardsContainer.appendChild(el);
-    } else {
+    // 无其它卡片时：先放“使用语言”生成入口或表格，再放英语卡片
+    if (!languageInserted) {
       renderLanguageUsageGenerator(cardsContainer, countryCode, chineseCountryName);
     }
+    if (englishCard) cardsContainer.appendChild(englishCard);
     const noDataCard = document.createElement("div");
     noDataCard.className = "country-card";
     noDataCard.innerHTML = `<h3>数据待更新</h3><p>该国家/地区的详细卡片信息正在整理中，您可以点击下方按钮使用AI自动生成相关内容。</p>`;
@@ -2032,7 +2031,7 @@ export function updateCountryDetail(countryName, countryCode) {
     aiHint.style.fontSize = '12px';
     aiHint.style.color = '#888';
     aiHint.style.marginTop = '6px';
-    aiHint.textContent = '说明：内容通过DeepSeek-V3.1生成，仅供参考，离开本页面后不保留。';
+    aiHint.textContent = '说明：生成的四个信息卡仅在本次会话中展示（不入库）。“使用语言”卡片由AI生成后将自动保存，后续访问直接展示。';
 
     aiContainer.appendChild(aiBtn);
     aiContainer.appendChild(aiHint);
@@ -2060,9 +2059,12 @@ export function updateCountryDetail(countryName, countryCode) {
         addAIMoreActions(cardsContainer, () => {
           // 重新生成：清理并再次触发
           document.getElementById('country-cards').innerHTML = '';
-          // 将无数据分支重新执行
-          // 简单处理：递归调用当前渲染函数
-          showCountryDetail(countryCode);
+          // 重新渲染当前国家
+          try {
+            const nameForRender = (countryData[countryCode] && (countryData[countryCode].name_zh || countryData[countryCode].name)) || '';
+            if (typeof updateCountryDetail === 'function') updateCountryDetail(nameForRender || countryCode, countryCode);
+            else if (typeof window !== 'undefined' && typeof window.updateCountryDetail === 'function') window.updateCountryDetail(nameForRender || countryCode, countryCode);
+          } catch(_) {}
         });
       } catch (err) {
         alert('生成失败：' + (err?.message || '网络异常'));
