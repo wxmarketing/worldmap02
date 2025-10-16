@@ -702,13 +702,13 @@ main {
 .country-card .english-meta { margin-top: 6px; }
 .country-card .english-meta .ef-score,
 .country-card .english-meta .ef-rank {
-  font-size: 22px;
+  font-size: 1rem; /* 与其他信息卡正文接近 */
   color: #666;
   font-weight: 600;
   margin: 6px 0;
 }
 .country-card .english-meta .num {
-  font-size: 36px;
+  font-size: 1.6rem; /* 比正文稍大但不夸张 */
   color: #666;
   font-weight: 800;
   margin-left: 8px;
@@ -718,7 +718,7 @@ main {
   border-top: 1px solid rgba(0,0,0,0.08);
   margin: 14px 0 12px;
 }
-.country-card .english-desc-line { font-size: 20px; color: var(--text-color, #333); line-height: 1.8; }
+.country-card .english-desc-line { font-size: 1rem; color: var(--text-color, #333); line-height: 1.8; }
 .country-card .english-desc-line .level-badge { font-weight: 800; color: #555; }
 .country-card .english-desc-line .desc { color: #555; }
 
