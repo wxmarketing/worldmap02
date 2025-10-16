@@ -1984,7 +1984,7 @@ export function updateCountryDetail(countryName, countryCode) {
     langExistingA = Array.isArray(arr) ? arr.find(c => (c && (c.id === 'language_usage' || c.title === '使用语言'))) : null;
   } catch(_) { langExistingA = null; }
   let languageInserted = false;
-  if (langExistingA && langExistingA.content && (langExistingA.content || '').includes('<table')) {
+  if (langExistingA && (langExistingA.content && langExistingA.content.trim().length > 0)) {
     const el = createCardElement('language_usage', { title: '使用语言', content: langExistingA.content, note: '' });
     cardsContainer.appendChild(el);
     languageInserted = true;
