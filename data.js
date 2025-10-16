@@ -2264,6 +2264,11 @@ function renderLanguageTableHTML(rows) {
     if (!Array.isArray(rows) || rows.length === 0) return '<div>数据待更新</div>';
     const header = `
       <table class="lang-table">
+        <colgroup>
+          <col />
+          <col />
+          <col />
+        </colgroup>
         <thead>
           <tr>
             <th>语言</th>
