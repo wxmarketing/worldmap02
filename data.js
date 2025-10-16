@@ -1975,7 +1975,14 @@ export function updateCountryDetail(countryName, countryCode) {
   let englishCard = null;
   try { englishCard = createEnglishProficiencyCard(countryCode); } catch(_) {}
   // 优先处理：使用语言卡片或其生成入口（确保无数据国家也能看到）
-  const langExistingA = countryData[countryCode]?.cards?.find(c => (c.id === 'language_usage' || c.title === '使用语言'));
+  let langExistingA = null;
+  try {
+    let raw = countryData[countryCode]?.cards;
+    let arr = [];
+    if (Array.isArray(raw)) arr = raw;
+    else if (raw && typeof raw === 'object') arr = Object.values(raw);
+    langExistingA = Array.isArray(arr) ? arr.find(c => (c && (c.id === 'language_usage' || c.title === '使用语言'))) : null;
+  } catch(_) { langExistingA = null; }
   let languageInserted = false;
   if (langExistingA && langExistingA.content && (langExistingA.content || '').includes('<table')) {
     const el = createCardElement('language_usage', { title: '使用语言', content: langExistingA.content, note: '' });
