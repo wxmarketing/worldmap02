@@ -2038,7 +2038,7 @@ export function updateCountryDetail(countryName, countryCode) {
     aiHint.style.fontSize = '12px';
     aiHint.style.color = '#888';
     aiHint.style.marginTop = '6px';
-    aiHint.textContent = '说明：生成的四个信息卡仅在本次会话中展示（不入库）。“使用语言”卡片由AI生成后将自动保存，后续访问直接展示。';
+    aiHint.textContent = '说明：由Deepseek-V3.1模型支持生成，生成内容刷新后不保留。';
 
     aiContainer.appendChild(aiBtn);
     aiContainer.appendChild(aiHint);
@@ -2272,6 +2272,7 @@ function renderLanguageTableHTML(rows) {
   try {
     if (!Array.isArray(rows) || rows.length === 0) return '<div>数据待更新</div>';
     const header = `
+      <div class="lang-table-wrap">
       <table class="lang-table">
         <colgroup>
           <col />
@@ -2293,7 +2294,7 @@ function renderLanguageTableHTML(rows) {
       const region = (r.region || r.地区 || r.distribution || '').toString();
       return `<tr><td>${lang}</td><td>${ratio}</td><td>${region}</td></tr>`;
     }).join('');
-    const footer = `</tbody></table>`;
+    const footer = `</tbody></table></div>`;
     return header + body + footer;
   } catch(_) {
     return '<div>数据待更新</div>';
@@ -2352,7 +2353,7 @@ function renderLanguageUsageGenerator(container, countryCode, chineseCountryName
   card.className = 'country-card';
   card.innerHTML = `
     <h3>使用语言</h3>
-    <div class="lang-gen-hint">尚无数据，点击下方按钮由AI生成并保存（再次访问将直接显示）。</div>
+    <div class="lang-gen-hint">库内暂无数据，可点击下方按钮由AI生成相关内容，生成后的内容将上传至数据库中永久保留。</div>
     <div class="lang-gen-actions"><button class="lang-gen-btn">生成使用语言</button></div>
   `;
   const btn = card.querySelector('.lang-gen-btn');

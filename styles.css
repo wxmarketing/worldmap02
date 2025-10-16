@@ -1,3 +1,6 @@
+.lang-table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.lang-table-wrap::-webkit-scrollbar { height: 8px; }
+.lang-table-wrap::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
 .report-list { display: flex; flex-direction: column; gap: 8px; }
 .report-item {
   display: flex;
