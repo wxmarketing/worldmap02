@@ -1970,6 +1970,12 @@ export function updateCountryDetail(countryName, countryCode) {
   // Get the cards container
   const cardsContainer = document.getElementById("country-cards");
   cardsContainer.innerHTML = "";
+
+  // 优先渲染：英语水平卡片（若有数据）
+  try {
+    const englishCard = createEnglishProficiencyCard(countryCode);
+    if (englishCard) cardsContainer.appendChild(englishCard);
+  } catch(_) {}
   
   // 兼容数组和对象
   let cardsArr = [];
@@ -2183,6 +2189,56 @@ function createCardElement(cardId, cardData) {
   }
   
   return cardElement;
+}
+
+// 等级到文案映射（英语水平）
+const ENGLISH_LEVEL_MAP = {
+  '最高级': {
+    title: '最高级程度',
+    desc: '可以无障碍地使用英语进行阅读、交流，能够轻松理解一切听到和读到的内容，有能力消费文本内容较多、具有一定文学性和故事性的游戏，甚至可以判断出游戏本地化质量的优劣。'
+  },
+  '高级': {
+    title: '高级程度',
+    desc: '能够流畅阅读绝大多数英语游戏中的文本与剧情对话，能理解稍微复杂的故事背景和角色关系。但在理解生僻词汇、文化梗和晦涩表达上较为困难，在体验《极乐迪斯科》这类文本质量较高的游戏上会有障碍。'
+  },
+  '中级': {
+    title: '中级程度',
+    desc: '能够读懂一般游戏主线任务的剧情描述和大部分界面说明，但对于长篇的文学性文本、复杂的技能说明或带有大量俚语的对话有理解难度。'
+  },
+  '初级': {
+    title: '初级程度',
+    desc: '能借助游戏内的图标和简单提示，理解基本的任务目标和剧情大意，但在阅读大段的角色对话、物品背景描述或复杂的系统说明时，会感到明显吃力，无法畅玩剧情类游戏。'
+  },
+  '初学': {
+    title: '初学程度',
+    desc: '仅能识别游戏界面中的基础单词（如Start, Save, Exit）和非常简单的短句指引，几乎无法理解剧情文本和任务描述，游戏过程主要依靠图标、地图和视觉反馈来推进。'
+  }
+};
+
+// 创建“英语水平”卡片
+function createEnglishProficiencyCard(countryCode) {
+  const info = countryData[countryCode];
+  if (!info || !info.englishProficiency) return null;
+  const { score, worldRank, level } = info.englishProficiency;
+  if (!score && !worldRank && !level) return null;
+
+  const map = ENGLISH_LEVEL_MAP[level] || null;
+  const levelTitle = map ? map.title : (level ? `${level}程度` : '掌握程度');
+  const desc = map ? map.desc : '数据待更新';
+
+  const card = document.createElement('div');
+  card.className = 'country-card english-card';
+  card.innerHTML = `
+    <h3>英语水平</h3>
+    <div class="english-top">
+      <div class="english-score"><span class="num">${score ?? '—'}</span><span class="label">分</span></div>
+      <div class="english-rank"><span class="num">${worldRank ?? '—'}</span><span class="label">世界排名</span></div>
+    </div>
+    <hr class="english-divider"/>
+    <div class="english-level">${levelTitle}</div>
+    <div class="english-desc">${desc}</div>
+  `;
+  return card;
 }
 
 // 渲染AI生成的四个固定卡片（临时）
@@ -3488,6 +3544,34 @@ async function loadCountryDataFromSupabase() {
             // 同步PDF列表
             countryData[code].pdfs = Array.isArray(item.pdfs) ? item.pdfs : (item.pdfs ? item.pdfs : []);
         });
+
+      // 读取英语水平数据
+      const { data: englishRows, error: englishError } = await supabase
+          .from('english_proficiency')
+          .select('country_code, score, world_rank, level');
+      if (englishError) {
+          console.error('从 english_proficiency 表加载数据失败:', englishError);
+      } else if (Array.isArray(englishRows)) {
+          englishRows.forEach(row => {
+              const code = (row.country_code || '').toUpperCase();
+              if (!countryData[code]) {
+                  countryData[code] = {
+                      name: code,
+                      name_zh: code,
+                      region: '',
+                      region_zh: '',
+                      cards: [],
+                      pdfs: [],
+                      detailAnalysisUrl: ''
+                  };
+              }
+              countryData[code].englishProficiency = {
+                  score: typeof row.score === 'number' ? row.score : null,
+                  worldRank: typeof row.world_rank === 'number' ? row.world_rank : null,
+                  level: (row.level || '').trim()
+              };
+          });
+      }
     } catch (error) {
         console.error("加载 Supabase 数据时发生错误:", error);
     }

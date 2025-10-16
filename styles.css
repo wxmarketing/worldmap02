@@ -697,6 +697,53 @@ main {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* 英语水平卡片 */
+.country-card.english-card {
+  padding-top: 18px;
+}
+.country-card .english-top {
+  display: flex;
+  gap: 24px;
+  align-items: baseline;
+}
+.country-card .english-score .num {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--primary, #4CAF50);
+}
+.country-card .english-score .label {
+  margin-left: 6px;
+  color: var(--text-muted, #777);
+}
+.country-card .english-rank .num {
+  font-size: 28px;
+  font-weight: 700;
+}
+.country-card .english-rank .label {
+  margin-left: 8px;
+  color: var(--text-muted, #777);
+}
+.country-card .english-divider {
+  border: none;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  margin: 14px 0 12px;
+}
+.country-card .english-level {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.country-card .english-desc {
+  color: var(--text-color, #333);
+  line-height: 1.7;
+}
+
+body.night-mode .country-card .english-divider {
+  border-top-color: rgba(255,255,255,0.15);
+}
+body.night-mode .country-card .english-score .num {
+  color: #7ad98b;
+}
+
 .country-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
