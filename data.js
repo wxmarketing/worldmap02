@@ -2292,7 +2292,7 @@ function renderLanguageTableHTML(rows) {
         <thead>
           <tr>
             <th>语言</th>
-            <th>使用人口占比</th>
+            <th>使用人口</th>
             <th>分布地区</th>
           </tr>
         </thead>
