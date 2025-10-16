@@ -2347,7 +2347,14 @@ function renderLanguageUsageGenerator(container, countryCode, chineseCountryName
     try {
       await generateLanguageUsage(countryCode, chineseCountryName);
       // 生成后，刷新面板
-      showCountryDetail(countryCode);
+      try {
+        const nameForRender = (countryData[countryCode] && (countryData[countryCode].name_zh || countryData[countryCode].name)) || '';
+        if (typeof updateCountryDetail === 'function') {
+          updateCountryDetail(nameForRender || countryCode, countryCode);
+        } else if (typeof window !== 'undefined' && typeof window.updateCountryDetail === 'function') {
+          window.updateCountryDetail(nameForRender || countryCode, countryCode);
+        }
+      } catch(_) {}
     } catch(e) {
       alert('生成失败：' + (e?.message || '网络错误'));
     } finally { btn.disabled = false; btn.textContent = '生成使用语言'; }
