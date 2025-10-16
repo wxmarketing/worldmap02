@@ -737,8 +737,8 @@ body.night-mode .country-card .english-meta .num { color: #cfcfcf; }
 .lang-table colgroup col:first-child { width: 22%; }
 .lang-table colgroup col:nth-child(2) { width: 26%; }
 .lang-table colgroup col:nth-child(3) { width: 52%; }
-.lang-table td:nth-child(1),
 .lang-table td:nth-child(2) { white-space: nowrap; word-break: keep-all; }
+.lang-table td:nth-child(1) { white-space: normal; word-break: break-word; }
 .lang-table th:nth-child(3), .lang-table td:nth-child(3) { white-space: normal; word-break: break-word; }
 .lang-table th:nth-child(2) { white-space: normal; word-break: break-word; }
 body.night-mode .lang-table th, body.night-mode .lang-table td { border-color: rgba(255,255,255,0.15); }
