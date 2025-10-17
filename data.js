@@ -2007,21 +2007,16 @@ export async function updateCountryDetail(countryName, countryCode) {
   } else if (data.cards && typeof data.cards === 'object') {
     cardsArr = Object.values(data.cards);
   }
-  if (cardsArr.length > 0) {
+  // 过滤掉语言卡片，判断是否还有其他信息卡片
+  const nonLangCards = cardsArr.filter(c => !(c && (c.id === 'language_usage' || c.title === '使用语言')));
+  if (nonLangCards.length > 0) {
     // 若已有语言卡，已在上面插入；否则先提供生成入口（保持在最前）
     if (!languageInserted) {
-      const hasLangInCards = Array.isArray(cardsArr) && cardsArr.some(c => (c && (c.id === 'language_usage' || c.title === '使用语言')));
-      if (hasLangInCards) {
-        // 将来自数据的语言卡在迭代中插入一次，不额外生成
-        languageInserted = true;
-      } else {
-        renderLanguageUsageGenerator(cardsContainer, countryCode, chineseCountryName);
-      }
+      renderLanguageUsageGenerator(cardsContainer, countryCode, chineseCountryName);
     }
     // 若存在英语卡片，再插入
     if (englishCard) cardsContainer.appendChild(englishCard);
-    const filteredCards = cardsArr.filter(c => !(c && (c.id === 'language_usage' || c.title === '使用语言')));
-    filteredCards.forEach(cardData => {
+    nonLangCards.forEach(cardData => {
       const cardElement = createCardElement(cardData.id || '', cardData);
       cardsContainer.appendChild(cardElement);
     });
