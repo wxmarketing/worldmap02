@@ -2207,11 +2207,15 @@ function createCardElement(cardId, cardData) {
   cardElement.dataset.cardId = cardId;
   
   // Create card content
+  const imageHtml = cardData.imageUrl ? 
+    `<div class="image-explanation">下图中游戏不分先后排名，依据以下逻辑综合选出："谷歌苹果双商店在榜＞收入榜&下载榜均在榜＞单商店下载榜在榜（发达国家苹果、发展中国家谷歌）＞单商店收入榜在榜"</div>
+    <img src="${cardData.imageUrl}" alt="${cardData.title} 图片" class="card-image">` : '';
+  
   cardElement.innerHTML = `
     <h3>${cardData.title}</h3>
     <div>${cardData.content || ''}</div>
     ${cardData.note ? `<div class="card-note">${cardData.note}</div>` : ''}
-    ${cardData.imageUrl ? `<img src="${cardData.imageUrl}" alt="${cardData.title} 图片" class="card-image">` : ''}
+    ${imageHtml}
   `;
   
   // 为图片添加点击事件监听器
