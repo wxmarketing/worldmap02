@@ -2499,22 +2499,29 @@ function addDetailAnalysisButton(container, countryData, countryCode) {
   const analysisButton = document.createElement("button");
   analysisButton.className = "detail-analysis-btn";
   analysisButton.textContent = "查看详细分析";
-  analysisButton.style.padding = "10px 20px";
+  analysisButton.style.padding = "10px 16px";
   analysisButton.style.backgroundColor = "#4CAF50";
   analysisButton.style.color = "white";
   analysisButton.style.border = "none";
-  analysisButton.style.borderRadius = "5px";
+  analysisButton.style.borderRadius = "20px";
   analysisButton.style.cursor = "pointer";
-  analysisButton.style.fontSize = "14px";
-  analysisButton.style.fontWeight = "bold";
+  analysisButton.style.fontSize = "0.9rem";
+  analysisButton.style.fontWeight = "600";
+  analysisButton.style.transition = "all 0.2s ease";
   
   // Add hover effect
   analysisButton.addEventListener("mouseenter", function() {
     this.style.backgroundColor = "#45a049";
+    this.style.transform = "translateY(-1px)";
   });
   
   analysisButton.addEventListener("mouseleave", function() {
     this.style.backgroundColor = "#4CAF50";
+    this.style.transform = "translateY(0)";
+  });
+  
+  analysisButton.addEventListener("mousedown", function() {
+    this.style.transform = "translateY(0)";
   });
   
   // Add click event
