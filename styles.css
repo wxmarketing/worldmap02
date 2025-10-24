@@ -748,8 +748,25 @@ body.night-mode .lang-table thead th { background: rgba(255,255,255,0.06); }
   text-align: center; 
   margin-top: 20px;
 }
-.lang-gen-btn { background:#4CAF50;color:#fff;border:none;border-radius:16px;padding:6px 12px;cursor:pointer; }
-.lang-gen-btn:disabled { opacity:.6; cursor:not-allowed; }
+.lang-gen-btn { 
+  background: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.lang-gen-btn:hover {
+  background: #45a049;
+  transform: translateY(-1px);
+}
+.lang-gen-btn:disabled { 
+  opacity: .6; 
+  cursor: not-allowed; 
+  transform: none;
+}
 
 .country-card:hover {
   transform: translateY(-2px);
@@ -801,27 +818,24 @@ body.night-mode .image-explanation {
 }
 
 .ranking-button {
-  background: linear-gradient(135deg, #4CAF50, #45a049);
+  background: #4CAF50;
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 10px 16px;
   border-radius: 20px;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
 }
 
 .ranking-button:hover {
-  background: linear-gradient(135deg, #45a049, #3d8b40);
+  background: #45a049;
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
 }
 
 .ranking-button:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
 }
 
 .ranking-hint {
@@ -832,13 +846,11 @@ body.night-mode .image-explanation {
 }
 
 body.night-mode .ranking-button {
-  background: linear-gradient(135deg, #5cb85c, #4a9b4a);
-  box-shadow: 0 2px 4px rgba(92, 184, 92, 0.2);
+  background: #5cb85c;
 }
 
 body.night-mode .ranking-button:hover {
-  background: linear-gradient(135deg, #4a9b4a, #3d8b40);
-  box-shadow: 0 4px 8px rgba(92, 184, 92, 0.3);
+  background: #4a9b4a;
 }
 
 body.night-mode .ranking-hint {
