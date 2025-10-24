@@ -821,6 +821,13 @@ body.night-mode .image-explanation {
   box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
 }
 
+.ranking-hint {
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 6px;
+  font-style: italic;
+}
+
 body.night-mode .ranking-button {
   background: linear-gradient(135deg, #5cb85c, #4a9b4a);
   box-shadow: 0 2px 4px rgba(92, 184, 92, 0.2);
@@ -829,6 +836,10 @@ body.night-mode .ranking-button {
 body.night-mode .ranking-button:hover {
   background: linear-gradient(135deg, #4a9b4a, #3d8b40);
   box-shadow: 0 4px 8px rgba(92, 184, 92, 0.3);
+}
+
+body.night-mode .ranking-hint {
+  color: #aaa;
 }
 
 /* 管理面板的卡片编辑样式 */

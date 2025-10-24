@@ -2208,12 +2208,13 @@ function createCardElement(cardId, cardData) {
   
   // Create card content
   const imageHtml = cardData.imageUrl ? 
-    `<div class="image-explanation">下图中游戏不分先后排名，依据以下逻辑综合选出："谷歌苹果双商店在榜＞收入榜&下载榜均在榜＞单商店下载榜在榜（发达国家苹果、发展中国家谷歌）＞单商店收入榜在榜"</div>
+    `<div class="image-explanation">${cardData.title === '游戏市场' ? '下图中游戏不分先后排名，依据以下逻辑综合选出："谷歌苹果双商店在榜＞收入榜&下载榜均在榜＞单商店下载榜在榜（发达国家苹果、发展中国家谷歌）＞单商店收入榜在榜"' : ''}</div>
     <img src="${cardData.imageUrl}" alt="${cardData.title} 图片" class="card-image">` : '';
   
   const rankingButton = cardData.title === '游戏市场' ? 
     `<div class="ranking-button-container">
       <button class="ranking-button" onclick="window.open('https://databrain.woa.com/v2/intelligence/storeRanks/MobileGlobalRegion?filters_key=bded81aca6e4dc5829ad586fb0fa5371&', '_blank')">查看实时排名</button>
+      <div class="ranking-hint">注：跳转后需注意自行选择国家</div>
     </div>` : '';
   
   cardElement.innerHTML = `
