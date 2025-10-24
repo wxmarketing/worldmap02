@@ -776,8 +776,9 @@ body.night-mode .lang-table thead th { background: rgba(255,255,255,0.06); }
 /* 图片说明文字 */
 .image-explanation {
   font-size: 0.85rem;
-  color: var(--secondary-color);
-  margin: 8px 0 4px 0;
+  color: #888;
+  font-style: italic;
+  margin: 16px 0 8px 0;
   padding: 6px 8px;
   background: rgba(0,0,0,0.03);
   border-radius: 4px;
@@ -787,7 +788,7 @@ body.night-mode .lang-table thead th { background: rgba(255,255,255,0.06); }
 
 body.night-mode .image-explanation {
   background: rgba(255,255,255,0.05);
-  color: var(--secondary-color);
+  color: #aaa;
 }
 
 /* 管理面板的卡片编辑样式 */
