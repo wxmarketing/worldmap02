@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors() });
   if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405, headers: cors() });
 
-  // 显式检查密钥是否存在并记录长度（不输出明文）
+  // 检查密钥是否存在并记录长度（不输出明文）
   if (!DEEPSEEK_API_KEY) {
     console.log("NO_KEY");
     return new Response(JSON.stringify({ error: "DEEPSEEK_API_KEY not set" }), { status: 500, headers: corsJson() });
