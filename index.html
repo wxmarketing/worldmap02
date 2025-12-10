@@ -14,8 +14,6 @@
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <!-- TopoJSON library for map data -->
   <script src="https://unpkg.com/topojson@3"></script>
-  <!-- Supabase JS Library -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <!-- Custom CSS -->
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -133,7 +131,7 @@
 
   <footer>
     <div class="footer-left">
-      <button id="admin-toggle">管理面板</button>
+      <button id="admin-toggle" class="hidden">管理面板</button>
     </div>
     <div class="footer-right">
       <span id="user-info" class="user-info hidden"></span>

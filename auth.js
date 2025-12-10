@@ -104,8 +104,11 @@ function updateAuthUI() {
       changePwdBtn.classList.remove('hidden');
     }
     
-    // 显示管理面板按钮
-    if (adminToggle) adminToggle.style.display = 'inline-block';
+    // 管理面板按钮已隐藏（通过 HTML hidden 类）
+    // if (adminToggle) {
+    //   adminToggle.style.display = 'inline-block';
+    //   adminToggle.classList.remove('hidden');
+    // }
   } else {
     // 未登录状态 - 显示登录按钮
     if (authReportsToggle) {
@@ -124,8 +127,11 @@ function updateAuthUI() {
       changePwdBtn.classList.add('hidden');
     }
     
-    // 隐藏管理面板按钮
-    if (adminToggle) adminToggle.style.display = 'none';
+    // 管理面板按钮已隐藏（通过 HTML hidden 类）
+    // if (adminToggle) {
+    //   adminToggle.style.display = 'inline-block';
+    //   adminToggle.classList.remove('hidden');
+    // }
   }
 }
 
