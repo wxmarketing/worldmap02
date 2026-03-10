@@ -142,8 +142,8 @@ async function initApp() {
   function openPdfViewer(url, title = 'PDF 报告') {
     if (!overlay || !drawer || !frame) return;
     titleEl && (titleEl.textContent = title);
-    // 使用本地查看器，避免跨域问题
-    frame.src = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(url)}`;
+    // 使用 Mozilla 官方 legacy viewer，兼容性更好（避免新版本 API 在部分浏览器报错）
+    frame.src = `https://mozilla.github.io/pdf.js/legacy/web/viewer.html?file=${encodeURIComponent(url)}`;
     overlay.classList.remove('hidden');
     drawer.classList.remove('hidden');
     // 置顶层级，避免被其他抽屉覆盖
