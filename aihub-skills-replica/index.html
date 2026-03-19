@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIHub Skills 页面复刻</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <div class="brand">
+          <span class="brand-icon">
+            <span class="cube"></span>
+          </span>
+          <span class="brand-text">AIHub</span>
+        </div>
+        <div class="nav-right">
+          <div class="search">
+            <span class="search-icon">&#128269;</span>
+            <span class="search-placeholder">搜索插件...</span>
+            <span class="search-shortcut">⌘K</span>
+          </div>
+          <button class="upload-btn">上传Skills</button>
+          <div class="avatar"></div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero container">
+        <div class="hero-tag">超过 2,000+ 款 AI 插件可用</div>
+        <h1>
+          用 <span class="accent-green">强大</span>的<span class="accent-cyan">Skills</span><br>
+          为您的 AI 赋能
+        </h1>
+        <p>发现、集成并分享适合市场人的skills，一比一复刻高效工作流。</p>
+      </section>
+
+      <section class="skills container">
+        <div class="skills-top">
+          <div>
+            <h2>Skills列表</h2>
+            <p>同事们都在用。</p>
+          </div>
+          <div class="tabs" id="skills-tabs">
+            <button class="tab active" data-filter="all">全部</button>
+            <button class="tab" data-filter="代码生成">代码生成</button>
+            <button class="tab" data-filter="图像 AI">图像 AI</button>
+            <button class="tab" data-filter="数据分析">数据分析</button>
+          </div>
+        </div>
+
+        <div class="cards" id="skills-cards"></div>
+
+        <div class="more-wrap">
+          <button class="more-btn">查看所有Skills</button>
+        </div>
+      </section>
+
+      <section class="dashboard container">
+        <div class="dash-shell">
+          <aside class="dash-sidebar">
+            <div class="profile">
+              <div class="profile-avatar"></div>
+              <div>
+                <strong>Alex Developer</strong>
+                <span>专业创作者</span>
+              </div>
+            </div>
+            <nav class="dash-menu">
+              <a class="menu-item active" href="javascript:void(0)">我的插件</a>
+              <a class="menu-item" href="javascript:void(0)">数据分析</a>
+              <a class="menu-item" href="javascript:void(0)">设置</a>
+            </nav>
+          </aside>
+
+          <div class="dash-main">
+            <div class="dash-head">
+              <div>
+                <h2>管理Skills</h2>
+                <p>上传 Skills 或更新您现有的 Skills。</p>
+              </div>
+              <button class="upload-btn big">+ 上传新插件</button>
+            </div>
+
+            <div class="drop-zone" id="drop-zone">
+              <div class="drop-icon">&#8682;</div>
+              <h4 id="drop-title">拖放您的技能包</h4>
+              <p>支持 .zip, .tar.gz (最大 50MB)</p>
+              <a href="javascript:void(0)" id="browse-file">或点击浏览文件</a>
+              <input id="file-input" type="file" accept=".zip,.tar.gz,.tar,.gz" hidden>
+            </div>
+
+            <div class="upload-list">
+              <h3>您的上传</h3>
+              <div id="upload-list"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container foot-inner">
+        <span>&copy; 2026 AIHub 平台。保留所有权利。</span>
+        <div class="foot-links">
+          <a href="javascript:void(0)">隐私政策</a>
+          <a href="javascript:void(0)">服务条款</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+  <script src="./script.js"></script>
+</body>
+</html>
