@@ -19,10 +19,10 @@
         <div class="nav-right">
           <div class="search">
             <span class="search-icon">&#128269;</span>
-            <span class="search-placeholder">搜索插件...</span>
+            <input id="skills-search" class="search-input" type="text" placeholder="搜索插件..." aria-label="搜索插件">
             <span class="search-shortcut">⌘K</span>
           </div>
-          <button class="upload-btn">上传Skills</button>
+          <button class="upload-btn" id="auth-btn">登录</button>
           <div class="avatar"></div>
         </div>
       </div>
@@ -30,9 +30,9 @@
 
     <main>
       <section class="hero container">
-        <div class="hero-tag">超过 2,000+ 款 AI 插件可用</div>
+        <div class="hero-tag">平台营销中心出品</div>
         <h1>
-          用 <span class="accent-green">强大</span>的<span class="accent-cyan">Skills</span><br>
+          用 <span class="accent-title">强大的Skills</span><br>
           为您的 AI 赋能
         </h1>
         <p>发现、集成并分享适合市场人的skills，一比一复刻高效工作流。</p>
@@ -55,12 +55,17 @@
         <div class="cards" id="skills-cards"></div>
 
         <div class="more-wrap">
-          <button class="more-btn">查看所有Skills</button>
+          <button class="more-btn" id="skills-more-btn">查看所有Skills</button>
         </div>
       </section>
 
       <section class="dashboard container">
-        <div class="dash-shell">
+        <div class="auth-gate" id="auth-gate">
+          <h3>登录后可管理并上传 Skills</h3>
+          <p>请先登录账号，再进入上传与版本管理。</p>
+          <button class="more-btn" id="auth-gate-btn">立即登录</button>
+        </div>
+        <div class="dash-shell is-hidden" id="dashboard-content">
           <aside class="dash-sidebar">
             <div class="profile">
               <div class="profile-avatar"></div>
@@ -91,6 +96,9 @@
               <p>支持 .zip, .tar.gz (最大 50MB)</p>
               <a href="javascript:void(0)" id="browse-file">或点击浏览文件</a>
               <input id="file-input" type="file" accept=".zip,.tar.gz,.tar,.gz" hidden>
+              <div class="drop-progress" id="drop-progress" aria-hidden="true">
+                <span class="drop-progress-bar" id="drop-progress-bar"></span>
+              </div>
             </div>
 
             <div class="upload-list">
@@ -111,6 +119,19 @@
         </div>
       </div>
     </footer>
+  </div>
+  <div class="auth-modal is-hidden" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+    <div class="auth-modal-card">
+      <h3 id="auth-modal-title">登录 AIHub</h3>
+      <p id="auth-mode-hint">使用邮箱和密码登录后即可管理上传内容。</p>
+      <form id="auth-form">
+        <input id="auth-email" type="email" placeholder="邮箱地址" required>
+        <input id="auth-password" type="password" placeholder="密码（至少6位）" required minlength="6">
+        <button type="submit" class="upload-btn auth-submit-btn" id="auth-submit-btn">登录</button>
+      </form>
+      <button class="auth-switch" id="auth-switch-btn">没有账号？去注册</button>
+      <button class="auth-close" id="auth-close-btn">取消</button>
+    </div>
   </div>
   <script src="./script.js"></script>
 </body>
