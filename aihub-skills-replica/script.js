@@ -123,6 +123,8 @@ const authSwitchBtnEl = document.getElementById("auth-switch-btn");
 const authCloseBtnEl = document.getElementById("auth-close-btn");
 const authModeHintEl = document.getElementById("auth-mode-hint");
 const authModalTitleEl = document.getElementById("auth-modal-title");
+const profileNameEl = document.getElementById("profile-name");
+const profileSubtitleEl = document.getElementById("profile-subtitle");
 
 const state = {
   activeFilter: "all",
@@ -189,6 +191,20 @@ function updateAuthUI() {
   authGateEl.classList.toggle("is-hidden", isAuthed);
   dashboardContentEl.classList.toggle("is-hidden", !isAuthed);
   authBtnEl.textContent = isAuthed ? "退出登录" : "登录";
+
+  if (isAuthed) {
+    const email =
+      state.user?.email ||
+      state.user?.user_metadata?.email ||
+      state.user?.identities?.[0]?.identity_data?.email ||
+      "";
+    const displayName = email.includes("@") ? email.split("@")[0] : "已登录用户";
+    profileNameEl.textContent = displayName || "已登录用户";
+    profileSubtitleEl.textContent = email || "已登录账号";
+  } else {
+    profileNameEl.textContent = "user";
+    profileSubtitleEl.textContent = "专业创作者";
+  }
 }
 
 function getFilteredSkills() {
@@ -319,6 +335,8 @@ authBtnEl.addEventListener("click", async () => {
     createToast(`退出失败：${error.message}`);
     return;
   }
+  state.user = null;
+  updateAuthUI();
   createToast("已退出登录");
 });
 
@@ -354,10 +372,11 @@ authFormEl.addEventListener("submit", async (event) => {
   }
 
   let error = null;
+  let authData = null;
   if (state.authMode === "signin") {
-    ({ error } = await client.auth.signInWithPassword({ email, password }));
+    ({ data: authData, error } = await client.auth.signInWithPassword({ email, password }));
   } else {
-    ({ error } = await client.auth.signUp({ email, password }));
+    ({ data: authData, error } = await client.auth.signUp({ email, password }));
   }
 
   authSubmitBtnEl.disabled = false;
@@ -366,6 +385,13 @@ authFormEl.addEventListener("submit", async (event) => {
   if (error) {
     createToast(`操作失败：${error.message}`);
     return;
+  }
+
+  // 兜底：不依赖 onAuthStateChange 回调，登录成功立即刷新用户态
+  const userFromResp = authData?.user || authData?.session?.user || null;
+  if (userFromResp) {
+    state.user = userFromResp;
+    updateAuthUI();
   }
 
   createToast(state.authMode === "signin" ? "登录成功" : "注册成功，请查收验证邮件");
